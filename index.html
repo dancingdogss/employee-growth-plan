@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Progress Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg:       #080a0f;
+  --surface:  #0f1219;
+  --surface2: #161b25;
+  --border:   #1c2333;
+  --accent:   #00d4aa;
+  --accent2:  #5b6af0;
+  --accent3:  #f0a35b;
+  --text:     #e2e8f4;
+  --muted:    #56637a;
+  --gold:     #f0c05b;
+  --red:      #f06070;
+  --green:    #00d4aa;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── SHARED ── */
+.section {
+  padding: 28px 14px 0;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(160deg, #0c1020 0%, #080a0f 65%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 20px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 68%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(0,212,170,0.08);
+  border: 1px solid rgba(0,212,170,0.25);
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+.hero h1 {
+  font-size: clamp(24px, 6.5vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  background: linear-gradient(130deg, #ffffff 35%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 290px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* ── HOW IT WORKS ── */
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.how-cell { background: var(--surface); padding: 16px 14px; }
+.hc-icon { font-size: 18px; margin-bottom: 7px; display: block; }
+.hc-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.hc-val { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.hc-desc { font-size: 11px; color: var(--muted); line-height: 1.55; }
+
+.distinction-box { padding: 16px 14px; }
+.dist-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.dist-row { display: flex; gap: 10px; margin-bottom: 11px; align-items: flex-start; }
+.dist-row:last-of-type { margin-bottom: 0; }
+.dist-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.pill-cap  { background: rgba(240,96,112,0.12); color: var(--red);   border: 1px solid rgba(240,96,112,0.25); }
+.pill-earn { background: rgba(0,212,170,0.09);  color: var(--accent); border: 1px solid rgba(0,212,170,0.25); }
+.dist-text { font-size: 12px; color: var(--text); line-height: 1.58; }
+.dist-text small { color: var(--muted); font-size: 11px; display: block; margin-top: 2px; }
+
+.formula-strip {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--border);
+}
+.f-blk { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 8px; }
+.f-earn { background: rgba(240,192,91,0.1);  color: var(--gold); }
+.f-dep  { background: rgba(0,212,170,0.09);  color: var(--accent); }
+.f-sal  { background: rgba(91,106,240,0.1);  color: var(--accent2); }
+.f-op   { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 14px; }
+
+.cap-note {
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  padding: 13px 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.cap-note-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.cap-note-text { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.cap-note-text strong { color: var(--accent); font-weight: 600; }
+
+/* ── TRACKER ── */
+.tracker-input-area { padding: 18px; border-bottom: 1px solid var(--border); }
+.tracker-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.unit-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.unit-display {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex; align-items: baseline; gap: 7px;
+}
+.unit-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 38px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+  min-width: 48px;
+}
+.unit-word { font-size: 12px; color: var(--muted); }
+.btn-col { display: flex; flex-direction: column; gap: 6px; }
+
+.btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, color 0.14s;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { opacity: 0.65; }
+.btn-p { color: var(--accent); border-color: rgba(0,212,170,0.2); }
+.btn-p:hover { background: rgba(0,212,170,0.07); border-color: rgba(0,212,170,0.4); }
+.btn-m { color: var(--red); border-color: rgba(240,96,112,0.2); }
+.btn-m:hover { background: rgba(240,96,112,0.07); border-color: rgba(240,96,112,0.4); }
+
+.quick-row { display: flex; gap: 6px; margin-bottom: 16px; }
+.qbtn {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 9px 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.14s, color 0.14s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.qbtn:hover { color: var(--text); background: var(--border); }
+.qbtn.q-reset:hover { color: var(--red); border-color: rgba(240,96,112,0.3); }
+
+/* share + import area */
+.share-area { border-top: 1px solid var(--border); padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.share-row { display: flex; gap: 8px; align-items: center; }
+.share-btn {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: 0.5px;
+  transition: background 0.14s, border-color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.share-btn:hover { background: rgba(0,212,170,0.07); border-color: rgba(0,212,170,0.35); }
+.share-btn.copied { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+.import-row { display: flex; gap: 8px; }
+.import-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 0;
+}
+.import-input:focus { border-color: var(--accent); }
+.import-input::placeholder { color: var(--muted); }
+.import-lbl { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; font-size: 9px; }
+.load-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 9px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, border-color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.load-btn:hover { background: var(--border); }
+
+.save-flash {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+.save-flash.show { opacity: 1; }
+
+/* ── STATUS GRID ── */
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.sc { background: var(--surface); padding: 15px 14px; }
+.sc.wide { grid-column: 1 / -1; background: var(--surface2); display: flex; justify-content: space-between; align-items: center; }
+.sc-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.sc-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+.sc-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.v-dep { color: var(--accent); }
+.v-sal { color: var(--accent2); }
+.v-lv  { color: var(--gold); font-size: 15px; font-family: 'Syne', sans-serif; font-weight: 700; }
+.v-sp  { color: var(--text); font-size: 20px; }
+.v-cu  { color: var(--gold); font-size: 18px; }
+.v-nx  { color: var(--muted); font-size: 13px; font-family: 'Syne', sans-serif; }
+.v-cap { color: var(--red); font-size: 18px; }
+.v-earn{ color: var(--gold); font-size: 18px; }
+
+/* ── PROGRESS BAR ── */
+.pb-wrap { padding: 18px; border-bottom: 1px solid var(--border); }
+.pb-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+.pb-lbl { font-size: 13px; font-weight: 700; }
+.pb-pct { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+.pb-track {
+  height: 12px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.pb-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
+  min-width: 0;
+}
+.pb-fill.full { background: var(--accent); }
+.pb-sub { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+/* ── MILESTONES ── */
+.ms-list { display: flex; flex-direction: column; }
+.ms-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.ms-row:last-child { border-bottom: none; }
+.ms-row.done { background: rgba(0,212,170,0.035); }
+.ms-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: transparent;
+  transition: all 0.22s;
+  font-weight: 700;
+}
+.ms-row.done .ms-check { background: var(--accent); border-color: var(--accent); color: #000; }
+.ms-body { flex: 1; }
+.ms-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 2px; transition: color 0.2s; }
+.ms-row.done .ms-title { color: var(--text); }
+.ms-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.ms-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 99px; flex-shrink: 0;
+}
+.mb-lv2 { background: rgba(91,106,240,0.12); color: var(--accent2); border: 1px solid rgba(91,106,240,0.25); }
+.mb-lv3 { background: rgba(0,212,170,0.12);  color: var(--accent);  border: 1px solid rgba(0,212,170,0.25); }
+
+/* ── DEPOSIT MILESTONE BAR ── */
+.dep-bar-wrap { padding: 18px; }
+.dep-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.dep-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); }
+.dep-lbl.key { color: var(--text); font-weight: 600; }
+.dep-track { height: 10px; background: var(--border); border-radius: 99px; position: relative; margin-bottom: 8px; }
+.dep-seg { position: absolute; top: 0; height: 100%; }
+.dep-seg-1 { left: 0; width: 50%; background: var(--accent3); border-radius: 99px 0 0 99px; }
+.dep-seg-2 { left: 50%; width: 50%; background: var(--accent2); border-radius: 0 99px 99px 0; }
+.dep-dot {
+  position: absolute; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  z-index: 2;
+}
+.dep-ticks { display: flex; justify-content: space-between; margin-bottom: 16px; }
+.dep-tick { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); text-align: center; }
+.dep-tick.key { color: var(--text); }
+.dep-lv-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.dep-lv {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px; text-align: center;
+}
+.dep-lv-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.lv1-color { color: var(--accent3); }
+.lv2-color { color: var(--accent2); }
+.lv3-color { color: var(--accent); }
+.dep-lv-split { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+.dep-lv-range { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+/* ── LEVEL CARDS ── */
+.level-cards { display: flex; flex-direction: column; gap: 10px; }
+.lc {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; position: relative; overflow: hidden;
+}
+.lc::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; width: 3px; height: 100%;
+  border-radius: 14px 0 0 14px;
+}
+.lc.l1::after { background: var(--accent3); }
+.lc.l2::after { background: var(--accent2); }
+.lc.l3::after { background: var(--accent); }
+.lc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.lc-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.lc-range { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.lc-split { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: -1px; }
+.lc-split-lbl { font-size: 9px; color: var(--muted); text-align: right; font-family: 'DM Mono', monospace; }
+.lc-bar { height: 6px; border-radius: 99px; background: var(--border); overflow: hidden; margin-bottom: 12px; display: flex; }
+.lc-bar-d { height: 100%; }
+.lc-bar-s { height: 100%; opacity: 0.28; }
+.l1 .lc-name, .l1 .lc-split { color: var(--accent3); }
+.l1 .lc-bar-d, .l1 .lc-bar-s { background: var(--accent3); }
+.l2 .lc-name, .l2 .lc-split { color: var(--accent2); }
+.l2 .lc-bar-d, .l2 .lc-bar-s { background: var(--accent2); }
+.l3 .lc-name, .l3 .lc-split { color: var(--accent); }
+.l3 .lc-bar-d, .l3 .lc-bar-s { background: var(--accent); }
+.lc-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.lc-meta-key { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-family: 'DM Mono', monospace; margin-bottom: 3px; }
+.lc-meta-val { font-size: 12px; color: var(--text); font-weight: 600; }
+.lc-note { font-size: 12px; color: var(--muted); line-height: 1.55; padding-top: 12px; border-top: 1px solid var(--border); font-style: italic; }
+
+/* ── EXAMPLE JOURNEY ── */
+.journey { display: flex; flex-direction: column; gap: 10px; }
+.jn { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.jn-hd {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--surface2);
+}
+.jn-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); flex-shrink: 0;
+}
+.jn-title { font-size: 13px; font-weight: 700; margin-bottom: 1px; }
+.jn-sub { font-size: 11px; color: var(--muted); }
+.jn-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.jn-row { display: flex; justify-content: space-between; align-items: center; }
+.jn-lbl { font-size: 11px; color: var(--muted); }
+.jn-val { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; }
+.jv-cap  { color: var(--red); }
+.jv-earn { color: var(--gold); }
+.jv-dep  { color: var(--accent); }
+.jv-sal  { color: var(--accent2); }
+.jv-cu   { color: var(--gold); }
+.jn-unlock { margin-top: 4px; display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--accent); font-weight: 600; }
+.jn-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ── TIMELINE ── */
+.tl { display: flex; flex-direction: column; }
+.tl-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding-bottom: 22px; position: relative;
+}
+.tl-item:not(:last-child)::before {
+  content: ''; position: absolute;
+  left: 15px; top: 33px;
+  width: 1px; height: calc(100% - 10px);
+  background: var(--border);
+}
+.tl-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent);
+}
+.tl-body { flex: 1; padding-top: 5px; }
+.tl-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.tl-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--border); color: var(--text); }
+.chip-d { border-color: rgba(0,212,170,0.3); color: var(--accent); }
+.chip-s { border-color: rgba(91,106,240,0.3); color: var(--accent2); }
+.chip-c { border-color: rgba(240,96,112,0.3); color: var(--red); }
+
+/* ── TABLE ── */
+.ptable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ptable thead th {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); padding: 9px 10px;
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+.ptable tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.ptable tbody tr:hover { background: var(--surface2); }
+.ptable tbody td { padding: 11px 10px; vertical-align: middle; }
+.tv-u  { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+.tv-d  { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+.tv-s  { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); }
+.tv-c  { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); }
+.lbadge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 7px; border-radius: 99px; }
+.lb1 { background: rgba(240,163,91,0.12); color: var(--accent3); border: 1px solid rgba(240,163,91,0.25); }
+.lb2 { background: rgba(91,106,240,0.12); color: var(--accent2); border: 1px solid rgba(91,106,240,0.25); }
+.lb3 { background: rgba(0,212,170,0.12);  color: var(--accent);  border: 1px solid rgba(0,212,170,0.25); }
+
+/* ── SUMMARY ── */
+.summary {
+  background: var(--surface);
+  border: 1px solid rgba(0,212,170,0.28);
+  border-radius: 14px;
+  padding: 20px;
+}
+.summary-text { font-size: 14px; line-height: 1.85; color: var(--text); }
+.summary-text strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- A. HERO -->
+<div class="hero">
+  <div class="hero-badge">Internal Plan</div>
+  <h1>Employee Progress Tracker</h1>
+  <p>Track your units, understand your split, and build your capacity with every sale.</p>
+</div>
+
+<!-- B. HOW IT WORKS -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// How it works</div>
+  <div class="card">
+    <div class="how-grid">
+      <div class="how-cell">
+        <span class="hc-icon">📦</span>
+        <div class="hc-lbl">Capital lent</div>
+        <div class="hc-val" style="color:var(--red)">300 coins</div>
+        <div class="hc-desc">per unit I give you. This is not salary — it is the stock value being trusted to you.</div>
+      </div>
+      <div class="how-cell">
+        <span class="hc-icon">💰</span>
+        <div class="hc-lbl">Earned per sale</div>
+        <div class="hc-val" style="color:var(--accent)">100 coins</div>
+        <div class="hc-desc">generated when you sell 1 unit. This is your real growth, split between deposit and salary.</div>
+      </div>
+    </div>
+    <div class="distinction-box">
+      <div class="dist-title">// The key difference</div>
+      <div class="dist-row">
+        <span class="dist-pill pill-cap">Capital</span>
+        <span class="dist-text">
+          The 300 coins per unit is what I trust you to sell. It is not yours to keep.
+          <small>It returns to me once sold. You never earn the 300.</small>
+        </span>
+      </div>
+      <div class="dist-row">
+        <span class="dist-pill pill-earn">Earnings</span>
+        <span class="dist-text">
+          The 100 coins per unit sold is your actual growth — split between deposit and salary.
+          <small>Deposit helps you unlock more stock capacity. Salary is what you can actually use.</small>
+        </span>
+      </div>
+      <div class="formula-strip">
+        <span class="f-blk f-earn">100 earned</span>
+        <span class="f-op">=</span>
+        <span class="f-blk f-dep">deposit share</span>
+        <span class="f-op">+</span>
+        <span class="f-blk f-sal">salary share</span>
+      </div>
+    </div>
+    <div class="cap-note">
+      <span class="cap-note-icon">📈</span>
+      <span class="cap-note-text">
+        Every <strong>300 deposit = roughly +1 extra unit</strong> I can lend you.
+        1,500 deposit = +5 units capacity. 3,000 deposit = +10 units.
+        That is why we build deposit first. The first goal is simple: <strong>reach 20 units sold</strong>.
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- C. TRACKER -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">
+    <span>// Your current progress</span>
+    <span class="save-flash" id="saveFlash">● saved</span>
+  </div>
+  <div class="card">
+
+    <!-- input + controls -->
+    <div class="tracker-input-area">
+      <div class="tracker-lbl">Units sold so far</div>
+      <div class="unit-row">
+        <div class="unit-display">
+          <span class="unit-num" id="unitNum">0</span>
+          <span class="unit-word">units sold</span>
+        </div>
+        <div class="btn-col">
+          <button class="btn btn-p" onclick="adj(1)">+1</button>
+          <button class="btn btn-m" onclick="adj(-1)">−1</button>
+        </div>
+      </div>
+      <div class="quick-row">
+        <button class="qbtn" onclick="adj(5)">+5</button>
+        <button class="qbtn" onclick="adj(10)">+10</button>
+        <button class="qbtn" onclick="adj(-5)">−5</button>
+        <button class="qbtn q-reset" onclick="doReset()">Reset</button>
+      </div>
+    </div>
+
+    <!-- share + import -->
+    <div class="share-area">
+      <div class="share-row">
+        <button class="share-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy progress link</button>
+      </div>
+      <div>
+        <div class="import-lbl">Import from another device</div>
+        <div class="import-row">
+          <input class="import-input" type="number" id="importInput" min="0" placeholder="Enter units number">
+          <button class="load-btn" onclick="loadImport()">Load</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- status grid -->
+    <div class="status-grid">
+      <div class="sc wide" style="padding:14px 16px">
+        <div>
+          <div class="sc-lbl">Current level</div>
+          <div class="sc-val v-lv" id="stLevel">Level 1</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sc-lbl">Split (dep / sal)</div>
+          <div class="sc-val v-sp" id="stSplit">75 / 25</div>
+        </div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Deposit balance</div>
+        <div class="sc-val v-dep" id="stDep">0</div>
+        <div class="sc-sub">coins</div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Salary balance</div>
+        <div class="sc-val v-sal" id="stSal">0</div>
+        <div class="sc-sub">coins</div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Capital represented</div>
+        <div class="sc-val v-cap" id="stCapRep">0</div>
+        <div class="sc-sub">coins (units × 300)</div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Earnings generated</div>
+        <div class="sc-val v-earn" id="stEarn">0</div>
+        <div class="sc-sub">coins (units × 100)</div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Capacity unlocked</div>
+        <div class="sc-val v-cu" id="stCap">0</div>
+        <div class="sc-sub">extra units</div>
+      </div>
+      <div class="sc">
+        <div class="sc-lbl">Next milestone</div>
+        <div class="sc-val v-nx" id="stNext">—</div>
+      </div>
+    </div>
+
+    <!-- XP bar -->
+    <div class="pb-wrap">
+      <div class="pb-top">
+        <span class="pb-lbl" id="pbLbl">Progress to Level 2</span>
+        <span class="pb-pct" id="pbPct">0%</span>
+      </div>
+      <div class="pb-track">
+        <div class="pb-fill" id="pbFill" style="width:0%"></div>
+      </div>
+      <div class="pb-sub" id="pbSub">20 units remaining</div>
+    </div>
+
+    <!-- milestones -->
+    <div class="ms-list">
+      <div class="ms-row" id="ms10">
+        <div class="ms-check">✓</div>
+        <div class="ms-body">
+          <div class="ms-title">10 units sold</div>
+          <div class="ms-desc">750 deposit · 250 salary · +2.5 capacity</div>
+        </div>
+      </div>
+      <div class="ms-row" id="ms20">
+        <div class="ms-check">✓</div>
+        <div class="ms-body">
+          <div class="ms-title">20 units sold</div>
+          <div class="ms-desc">1,500 deposit · 500 salary · +5 capacity</div>
+        </div>
+        <span class="ms-badge mb-lv2">Level 2</span>
+      </div>
+      <div class="ms-row" id="ms30">
+        <div class="ms-check">✓</div>
+        <div class="ms-body">
+          <div class="ms-title">30 units sold</div>
+          <div class="ms-desc">2,100 deposit · 900 salary · +7 capacity</div>
+        </div>
+      </div>
+      <div class="ms-row" id="ms45">
+        <div class="ms-check">✓</div>
+        <div class="ms-body">
+          <div class="ms-title">45 units sold</div>
+          <div class="ms-desc">3,000 deposit · 1,500 salary · +10 capacity</div>
+        </div>
+        <span class="ms-badge mb-lv3">Level 3</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- D. DEPOSIT MILESTONE BAR -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Deposit milestones</div>
+  <div class="card">
+    <div class="dep-bar-wrap">
+      <div class="dep-labels">
+        <span class="dep-lbl">0</span>
+        <span class="dep-lbl">750</span>
+        <span class="dep-lbl key">1,500</span>
+        <span class="dep-lbl">2,100</span>
+        <span class="dep-lbl key">3,000</span>
+      </div>
+      <div class="dep-track">
+        <div class="dep-seg dep-seg-1"></div>
+        <div class="dep-seg dep-seg-2"></div>
+        <div class="dep-dot" style="left:0%"></div>
+        <div class="dep-dot" style="left:25%"></div>
+        <div class="dep-dot" style="left:50%; background:var(--accent3); border-color:var(--accent3)"></div>
+        <div class="dep-dot" style="left:70%"></div>
+        <div class="dep-dot" style="left:100%; background:var(--accent); border-color:var(--accent)"></div>
+      </div>
+      <div class="dep-ticks" style="margin-bottom:16px">
+        <span class="dep-tick" style="text-align:left">Start</span>
+        <span class="dep-tick">Batch 1</span>
+        <span class="dep-tick key">Lv 2</span>
+        <span class="dep-tick">Batch 3</span>
+        <span class="dep-tick key" style="text-align:right">Lv 3</span>
+      </div>
+      <div class="dep-lv-row">
+        <div class="dep-lv">
+          <div class="dep-lv-name lv1-color">Level 1</div>
+          <div class="dep-lv-split">75/25</div>
+          <div class="dep-lv-range">0 – 1,500</div>
+        </div>
+        <div class="dep-lv">
+          <div class="dep-lv-name lv2-color">Level 2</div>
+          <div class="dep-lv-split">60/40</div>
+          <div class="dep-lv-range">1,500 – 3,000</div>
+        </div>
+        <div class="dep-lv">
+          <div class="dep-lv-name lv3-color">Level 3</div>
+          <div class="dep-lv-split">50/50</div>
+          <div class="dep-lv-range">3,000+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- E. LEVEL CARDS -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Level details</div>
+  <div class="level-cards">
+    <div class="lc l1">
+      <div class="lc-top">
+        <div>
+          <div class="lc-name">Level 1 — Start</div>
+          <div class="lc-range">0 → 1,500 deposit</div>
+        </div>
+        <div style="text-align:right">
+          <div class="lc-split">75/25</div>
+          <div class="lc-split-lbl">DEP / SAL</div>
+        </div>
+      </div>
+      <div class="lc-bar">
+        <div class="lc-bar-d" style="width:75%"></div>
+        <div class="lc-bar-s" style="width:25%"></div>
+      </div>
+      <div class="lc-meta">
+        <div><div class="lc-meta-key">Goal</div><div class="lc-meta-val">Sell 20 units</div></div>
+        <div><div class="lc-meta-key">Per unit earned</div><div class="lc-meta-val">75 dep + 25 sal</div></div>
+        <div><div class="lc-meta-key">After 20 units</div><div class="lc-meta-val">1,500 dep / 500 sal</div></div>
+        <div><div class="lc-meta-key">Unlocks</div><div class="lc-meta-val">Level 2 split</div></div>
+      </div>
+      <div class="lc-note">Fast deposit growth. Lower salary at first, but unlocks the better split quickly.</div>
+    </div>
+
+    <div class="lc l2">
+      <div class="lc-top">
+        <div>
+          <div class="lc-name">Level 2 — Growth</div>
+          <div class="lc-range">1,500 → 3,000 deposit</div>
+        </div>
+        <div style="text-align:right">
+          <div class="lc-split">60/40</div>
+          <div class="lc-split-lbl">DEP / SAL</div>
+        </div>
+      </div>
+      <div class="lc-bar">
+        <div class="lc-bar-d" style="width:60%"></div>
+        <div class="lc-bar-s" style="width:40%"></div>
+      </div>
+      <div class="lc-meta">
+        <div><div class="lc-meta-key">Goal</div><div class="lc-meta-val">Reach 3,000 deposit</div></div>
+        <div><div class="lc-meta-key">Per unit earned</div><div class="lc-meta-val">60 dep + 40 sal</div></div>
+        <div><div class="lc-meta-key">Per 10 units</div><div class="lc-meta-val">+600 dep / +400 sal</div></div>
+        <div><div class="lc-meta-key">Unlocks</div><div class="lc-meta-val">Level 3 split</div></div>
+      </div>
+      <div class="lc-note">More salary while still growing deposit. Capacity keeps increasing.</div>
+    </div>
+
+    <div class="lc l3">
+      <div class="lc-top">
+        <div>
+          <div class="lc-name">Level 3 — Stable</div>
+          <div class="lc-range">3,000+ deposit</div>
+        </div>
+        <div style="text-align:right">
+          <div class="lc-split">50/50</div>
+          <div class="lc-split-lbl">DEP / SAL</div>
+        </div>
+      </div>
+      <div class="lc-bar">
+        <div class="lc-bar-d" style="width:50%"></div>
+        <div class="lc-bar-s" style="width:50%"></div>
+      </div>
+      <div class="lc-meta">
+        <div><div class="lc-meta-key">Status</div><div class="lc-meta-val">Long-term split</div></div>
+        <div><div class="lc-meta-key">Per unit earned</div><div class="lc-meta-val">50 dep + 50 sal</div></div>
+        <div><div class="lc-meta-key">Deposit</div><div class="lc-meta-val">Grows capacity</div></div>
+        <div><div class="lc-meta-key">Salary</div><div class="lc-meta-val">Withdraw freely</div></div>
+      </div>
+      <div class="lc-note">Stable long-term split. Deposit still grows, salary becomes equal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- F. EXAMPLE JOURNEY -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Example journey</div>
+  <div class="journey">
+
+    <div class="jn">
+      <div class="jn-hd">
+        <div class="jn-num">B1</div>
+        <div>
+          <div class="jn-title">Batch 1 — 10 units</div>
+          <div class="jn-sub">Week 1 · Level 1 · 75/25</div>
+        </div>
+      </div>
+      <div class="jn-body">
+        <div class="jn-row"><span class="jn-lbl">Capital lent (300 × 10)</span><span class="jn-val jv-cap">3,000 coins</span></div>
+        <div class="jn-row"><span class="jn-lbl">Earnings generated (100 × 10)</span><span class="jn-val jv-earn">1,000 coins</span></div>
+        <div class="jn-row"><span class="jn-lbl">Your deposit (75%)</span><span class="jn-val jv-dep">+750</span></div>
+        <div class="jn-row"><span class="jn-lbl">Your salary (25%)</span><span class="jn-val jv-sal">+250</span></div>
+        <div class="jn-row"><span class="jn-lbl">Capacity unlocked (750 ÷ 300)</span><span class="jn-val jv-cu">≈ +2.5 units</span></div>
+      </div>
+    </div>
+
+    <div class="jn">
+      <div class="jn-hd">
+        <div class="jn-num">B2</div>
+        <div>
+          <div class="jn-title">Batch 2 — 10 more units</div>
+          <div class="jn-sub">Week 2 · Level 1 complete</div>
+        </div>
+      </div>
+      <div class="jn-body">
+        <div class="jn-row"><span class="jn-lbl">Deposit reaches</span><span class="jn-val jv-dep">1,500</span></div>
+        <div class="jn-row"><span class="jn-lbl">Salary reaches</span><span class="jn-val jv-sal">500</span></div>
+        <div class="jn-row"><span class="jn-lbl">Capacity (1,500 ÷ 300)</span><span class="jn-val jv-cu">+5 units</span></div>
+        <div class="jn-unlock"><div class="jn-dot"></div>Level 2 split unlocked — 60/40</div>
+      </div>
+    </div>
+
+    <div class="jn">
+      <div class="jn-hd">
+        <div class="jn-num">B3</div>
+        <div>
+          <div class="jn-title">Batches 3 + 4 — 25 more units</div>
+          <div class="jn-sub">Weeks 3–4 · Level 2 → Level 3</div>
+        </div>
+      </div>
+      <div class="jn-body">
+        <div class="jn-row"><span class="jn-lbl">Deposit reaches</span><span class="jn-val jv-dep">3,000</span></div>
+        <div class="jn-row"><span class="jn-lbl">Salary reaches</span><span class="jn-val jv-sal">1,500</span></div>
+        <div class="jn-row"><span class="jn-lbl">Capacity (3,000 ÷ 300)</span><span class="jn-val jv-cu">+10 units</span></div>
+        <div class="jn-unlock"><div class="jn-dot"></div>Level 3 split unlocked — 50/50 stable</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- G. WEEK BY WEEK -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Week by week</div>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot">B1</div>
+      <div class="tl-body">
+        <div class="tl-title">Week 1 · Batch 1</div>
+        <div class="tl-desc">First 10 units. 3,000 coins of capital lent. Establishing trust.</div>
+        <div class="chips">
+          <span class="chip chip-c">3,000 capital</span>
+          <span class="chip chip-d">+750 dep</span>
+          <span class="chip chip-s">+250 sal</span>
+          <span class="chip">Lv 1 · 75/25</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">B2</div>
+      <div class="tl-body">
+        <div class="tl-title">Week 2 · Batch 2</div>
+        <div class="tl-desc">10 more units. 1,500 deposit reached. Level 1 complete.</div>
+        <div class="chips">
+          <span class="chip chip-d">+750 dep → 1,500</span>
+          <span class="chip chip-s">+250 sal → 500</span>
+          <span class="chip">Unlocks Level 2</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">B3</div>
+      <div class="tl-body">
+        <div class="tl-title">Week 3 · Batch 3</div>
+        <div class="tl-desc">10 units on Level 2 split. Salary increases.</div>
+        <div class="chips">
+          <span class="chip chip-d">+600 dep → 2,100</span>
+          <span class="chip chip-s">+400 sal → 900</span>
+          <span class="chip">Lv 2 · 60/40</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">B4</div>
+      <div class="tl-body">
+        <div class="tl-title">Week 4 · Batch 4</div>
+        <div class="tl-desc">15 units. 3,000 deposit. Level 3 unlocked. Stable split from here.</div>
+        <div class="chips">
+          <span class="chip chip-d">+900 dep → 3,000</span>
+          <span class="chip chip-s">+600 sal → 1,500</span>
+          <span class="chip">Unlocks Level 3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- H. PROGRESSION TABLE -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Progression table</div>
+  <div class="card">
+    <table class="ptable">
+      <thead>
+        <tr>
+          <th>Units</th>
+          <th>Deposit</th>
+          <th>Salary</th>
+          <th>Capacity</th>
+          <th>Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="tv-u">10</span></td><td><span class="tv-d">750</span></td><td><span class="tv-s">250</span></td><td><span class="tv-c">+2.5</span></td><td><span class="lbadge lb1">Lv 1</span></td></tr>
+        <tr><td><span class="tv-u">20</span></td><td><span class="tv-d">1,500</span></td><td><span class="tv-s">500</span></td><td><span class="tv-c">+5</span></td><td><span class="lbadge lb1">Lv 1 ✓</span></td></tr>
+        <tr><td><span class="tv-u">30</span></td><td><span class="tv-d">2,100</span></td><td><span class="tv-s">900</span></td><td><span class="tv-c">+7</span></td><td><span class="lbadge lb2">Lv 2</span></td></tr>
+        <tr><td><span class="tv-u">45</span></td><td><span class="tv-d">3,000</span></td><td><span class="tv-s">1,500</span></td><td><span class="tv-c">+10</span></td><td><span class="lbadge lb3">Lv 3 ✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- I. SUMMARY -->
+<div class="section" style="padding-top:28px">
+  <div class="section-label">// Summary</div>
+  <div class="summary">
+    <div class="summary-text">
+      Start with <strong>10 units</strong>. If everything goes clean, the next batch follows.<br>
+      First target: <strong>20 units sold</strong> → <strong>1,500 deposit</strong> → <strong>Level 2 unlocked</strong>.<br>
+      The better the consistency, the faster the split improves and the more capacity you build.
+    </div>
+  </div>
+</div>
+
+<div style="height:48px"></div>
+
+<script>
+(function () {
+  var STORAGE_KEY = 'emp_tracker_units';
+  var units = 0;
+  var saveTimer = null;
+
+  /* ── init: URL param > localStorage ── */
+  function init() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var fromUrl = urlParams.get('units');
+    if (fromUrl !== null) {
+      var parsed = parseInt(fromUrl, 10);
+      if (!isNaN(parsed) && parsed >= 0) {
+        units = parsed;
+        saveLocal();
+        render();
+        return;
+      }
+    }
+    try {
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (stored !== null) {
+        var n = parseInt(stored, 10);
+        if (!isNaN(n) && n >= 0) units = n;
+      }
+    } catch (e) {}
+    render();
+  }
+
+  /* ── calc ── */
+  function calcStats(u) {
+    var dep = 0, sal = 0;
+    var t1 = Math.min(u, 20);
+    dep += t1 * 75; sal += t1 * 25;
+    if (u > 20) { var t2 = Math.min(u - 20, 25); dep += t2 * 60; sal += t2 * 40; }
+    if (u > 45) { var t3 = u - 45; dep += t3 * 50; sal += t3 * 50; }
+
+    var capacity  = (dep / 300).toFixed(1);
+    var capRep    = u * 300;
+    var earn      = u * 100;
+
+    var level, split, pbLbl, pbPct, pbW, pbFull, pbSub, nextLbl;
+    if (u < 20) {
+      level = 'Level 1'; split = '75 / 25';
+      var pct = Math.round((u / 20) * 100);
+      pbLbl = 'Progress to Level 2'; pbPct = pct + '%'; pbW = pct; pbFull = false;
+      var rem = 20 - u;
+      pbSub = rem + ' unit' + (rem === 1 ? '' : 's') + ' remaining until Level 2';
+      nextLbl = rem + ' units \u2192 Level 2';
+    } else if (u < 45) {
+      level = 'Level 2'; split = '60 / 40';
+      var pct = Math.round(((u - 20) / 25) * 100);
+      pbLbl = 'Progress to Level 3'; pbPct = pct + '%'; pbW = pct; pbFull = false;
+      var rem = 45 - u;
+      pbSub = rem + ' unit' + (rem === 1 ? '' : 's') + ' remaining until Level 3';
+      nextLbl = rem + ' units \u2192 Level 3';
+    } else {
+      level = 'Level 3'; split = '50 / 50';
+      pbLbl = 'Level 3 \u2014 Stable'; pbPct = '100%'; pbW = 100; pbFull = true;
+      pbSub = 'Maximum level reached. Stable 50/50 split.';
+      nextLbl = 'Max level reached';
+    }
+
+    return {
+      dep: dep, sal: sal, capacity: capacity, capRep: capRep, earn: earn,
+      level: level, split: split,
+      pbLbl: pbLbl, pbPct: pbPct, pbW: pbW, pbFull: pbFull, pbSub: pbSub, nextLbl: nextLbl
+    };
+  }
+
+  function fmt(n) { return n.toLocaleString(); }
+
+  /* ── render ── */
+  function render() {
+    var u = units;
+    var s = calcStats(u);
+
+    setText('unitNum',  u);
+    setText('stLevel',  s.level);
+    setText('stSplit',  s.split);
+    setText('stDep',    fmt(s.dep));
+    setText('stSal',    fmt(s.sal));
+    setText('stCapRep', fmt(s.capRep));
+    setText('stEarn',   fmt(s.earn));
+    setText('stCap',    s.capacity);
+    setText('stNext',   s.nextLbl);
+    setText('pbLbl',    s.pbLbl);
+    setText('pbPct',    s.pbPct);
+    setText('pbSub',    s.pbSub);
+
+    var fill = document.getElementById('pbFill');
+    fill.style.width = s.pbW + '%';
+    if (s.pbFull) { fill.classList.add('full'); } else { fill.classList.remove('full'); }
+
+    toggleMs('ms10', u >= 10);
+    toggleMs('ms20', u >= 20);
+    toggleMs('ms30', u >= 30);
+    toggleMs('ms45', u >= 45);
+  }
+
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function toggleMs(id, on) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (on) { el.classList.add('done'); } else { el.classList.remove('done'); }
+  }
+
+  /* ── save ── */
+  function saveLocal() {
+    try { localStorage.setItem(STORAGE_KEY, units); } catch (e) {}
+  }
+
+  function flashSaved() {
+    var el = document.getElementById('saveFlash');
+    if (!el) return;
+    el.classList.add('show');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { el.classList.remove('show'); }, 1800);
+  }
+
+  function saveAndFlash() { saveLocal(); flashSaved(); }
+
+  /* ── controls ── */
+  window.adj = function (n) {
+    units = Math.max(0, units + n);
+    render(); saveAndFlash();
+  };
+
+  window.doReset = function () {
+    if (!confirm('Reset progress to 0?')) return;
+    units = 0;
+    render(); saveAndFlash();
+  };
+
+  /* ── copy progress link ── */
+  window.copyLink = function () {
+    var url = window.location.origin + window.location.pathname + '?units=' + units;
+    var btn = document.getElementById('copyLinkBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () { showCopied(btn); }).catch(function () { fallbackCopy(url, btn); });
+    } else {
+      fallbackCopy(url, btn);
+    }
+  };
+
+  function fallbackCopy(text, btn) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); showCopied(btn); } catch (e) { alert('Link: ' + text); }
+    document.body.removeChild(ta);
+  }
+
+  function showCopied(btn) {
+    if (!btn) return;
+    btn.textContent = '✓ Link copied!';
+    btn.classList.add('copied');
+    setTimeout(function () {
+      btn.textContent = '🔗 Copy progress link';
+      btn.classList.remove('copied');
+    }, 2200);
+  }
+
+  /* ── import ── */
+  window.loadImport = function () {
+    var input = document.getElementById('importInput');
+    var val = parseInt(input.value, 10);
+    if (isNaN(val) || val < 0) { alert('Enter a valid number of units.'); return; }
+    units = val;
+    input.value = '';
+    render(); saveAndFlash();
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>
