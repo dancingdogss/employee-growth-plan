@@ -107,6 +107,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .s-issue    {background:rgba(240,96,112,.12); color:var(--red);  border:1px solid rgba(240,96,112,.3);}
 .s-cancelled{background:rgba(90,102,120,.15); color:var(--muted);border:1px solid rgba(90,102,120,.3);}
 
+/* SEEN BADGE (inline in ledger cards) */
+.seen-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;border:1px solid;white-space:nowrap;}
+.seen-yes{color:var(--accent);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.08);}
+.seen-no {color:var(--muted); border-color:rgba(90,102,120,.3); background:transparent;}
+
 /* LEDGER CARDS */
 .ord-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
 .ord-card.cw{border-color:rgba(240,163,91,.18);}
@@ -129,8 +134,8 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .oc-actions{display:flex;gap:6px;padding:10px 13px;border-top:1px solid var(--bd);flex-wrap:wrap;}
 .oc-btn{font-family:'DM Mono',monospace;font-size:10px;padding:7px 11px;border-radius:8px;border:1px solid var(--bd);background:var(--s1);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
 .oc-btn:hover{color:var(--text);background:var(--s3);}
-.oc-btn.b-approve{color:var(--accent);border-color:rgba(0,212,170,.32);background:rgba(0,212,170,.06);}
-.oc-btn.b-approve:hover{background:rgba(0,212,170,.14);}
+.oc-btn.b-marksold{color:var(--accent);border-color:rgba(0,212,170,.32);background:rgba(0,212,170,.06);}
+.oc-btn.b-marksold:hover{background:rgba(0,212,170,.14);}
 .oc-btn.b-issue{color:var(--red);border-color:rgba(240,96,112,.28);}
 .oc-btn.b-issue:hover{background:rgba(240,96,112,.07);}
 .oc-btn.b-wait{color:var(--a3);border-color:rgba(240,163,91,.28);}
@@ -142,15 +147,13 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .oc-btn.b-del{color:var(--red);}
 .oc-btn.b-del:hover{background:rgba(240,96,112,.07);}
 
-/* AUDIT */
-.audit-wrap{padding:8px 13px 10px;border-top:1px solid var(--bd);background:rgba(0,0,0,.2);}
-.audit-ttl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
-.audit-ev{display:flex;align-items:baseline;gap:7px;margin-bottom:3px;}
-.audit-ev:last-child{margin-bottom:0;}
-.a-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-.a-cr{background:var(--muted);}.a-rp{background:var(--purple);}.a-ap{background:var(--accent);}.a-is{background:var(--red);}.a-ed{background:var(--a3);}.a-ca{background:var(--muted);}
-.audit-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.4;}
-.audit-txt span{color:var(--t2);}
+/* SEEN ROW inside card */
+.seen-row{padding:8px 13px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;background:rgba(0,212,170,.03);}
+.seen-row-ico{font-size:12px;}
+.seen-row-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
+.seen-row-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.notseen-row{padding:7px 13px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:7px;}
+.notseen-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
 
 /* FILTERS / SEARCH */
 .search-wrap{position:relative;margin-bottom:10px;}
@@ -207,7 +210,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .exp-btn.ec{color:var(--gold);border-color:rgba(240,192,91,.25);}
 .exp-btn.ec:hover{background:rgba(240,192,91,.07);}
 
-/* TOAST / EMPTY / MISC */
+/* MISC */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--bd2);border-radius:99px;padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .toast.show{opacity:1;}
 .toast.ok{border-color:rgba(0,212,170,.35);color:var(--accent);}
@@ -223,8 +226,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 <body>
 
 <!-- PIN GATE -->
-<!-- NOTE: This is a simple UI gate only. Anyone with DevTools can bypass it.
-     Real security requires Supabase Auth + Row Level Security (RLS) policies. -->
 <div class="pin-gate" id="pinGate">
   <div class="pin-box">
     <div style="font-size:28px;margin-bottom:10px">🛡</div>
@@ -233,7 +234,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <input class="pin-input" type="password" id="pinInput" maxlength="12" placeholder="••••" onkeydown="if(event.key==='Enter')tryPin()">
     <button class="pin-btn" onclick="tryPin()">Unlock dashboard</button>
     <div class="pin-err" id="pinErr"></div>
-    <div class="pin-note">⚠ Real security requires Supabase Auth and Row Level Security policies. Do not store sensitive data in this prototype without proper auth.</div>
+    <div class="pin-note">⚠ Real security requires Supabase Auth and Row Level Security policies.</div>
   </div>
 </div>
 
@@ -243,7 +244,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="hero-mark">🛡</div>
     <div class="hero-txt">
       <h1>Owner Dashboard</h1>
-      <p>Manage stock, approve sales, and review weekly stats.</p>
+      <p>Manage stock, mark as sold, and review weekly stats.</p>
     </div>
   </div>
 </div>
@@ -259,7 +260,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <button class="npill" onclick="scrollTo('sec-stats')">Stats</button>
       <button class="npill" onclick="scrollTo('sec-export')">Export</button>
     </div>
-    <div class="conn-dot" id="connDot" title="Realtime connection status"></div>
+    <div class="conn-dot" id="connDot"></div>
   </div>
 </div>
 
@@ -267,7 +268,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
 <!-- SECURITY BANNER -->
 <div class="section">
-  <div class="sec-banner"><strong>⚠ Security notice:</strong> This dashboard has no real server-side authentication yet. Real security requires Supabase Auth + Row Level Security. Do not share this page URL if it contains private data.</div>
+  <div class="sec-banner"><strong>⚠ Security notice:</strong> This dashboard has no real server-side authentication yet. Real security requires Supabase Auth + Row Level Security.</div>
 </div>
 
 <!-- A. OVERVIEW -->
@@ -276,7 +277,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   <div class="kpi-grid" style="margin-bottom:8px">
     <div class="kpi ca"><span class="kpi-ico">📦</span><div class="kpi-lbl">Total records</div><div class="kpi-val" id="ov-total">—</div><div class="kpi-sub">in ledger</div></div>
     <div class="kpi ca"><span class="kpi-ico">✅</span><div class="kpi-lbl">Approved sold</div><div class="kpi-val" id="ov-approved">—</div><div class="kpi-sub">confirmed</div></div>
-    <div class="kpi cp"><span class="kpi-ico">🔵</span><div class="kpi-lbl">Sale reported</div><div class="kpi-val" id="ov-reported">—</div><div class="kpi-sub">awaiting approval</div></div>
+    <div class="kpi cp"><span class="kpi-ico">👁</span><div class="kpi-lbl">Sold, not seen</div><div class="kpi-val" id="ov-notseen">—</div><div class="kpi-sub">employee pending</div></div>
     <div class="kpi cg"><span class="kpi-ico">🟡</span><div class="kpi-lbl">Waiting to sell</div><div class="kpi-val" id="ov-waiting">—</div><div class="kpi-sub">in stock</div></div>
     <div class="kpi cr"><span class="kpi-ico">🔴</span><div class="kpi-lbl">Issues</div><div class="kpi-val" id="ov-issue">—</div><div class="kpi-sub">needs attention</div></div>
     <div class="kpi c2"><span class="kpi-ico">📅</span><div class="kpi-lbl">Approved this week</div><div class="kpi-val" id="ov-week">—</div><div class="kpi-sub">this week</div></div>
@@ -321,7 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     </div>
     <div class="coll-body" id="addStockBody">
       <div class="coll-inner">
-        <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Stock ID is the physical item identifier. Order ID is assigned only when the item is sold — leave it blank now.</p>
+        <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Stock ID is the physical item identifier. Order ID is only assigned when the item is sold — do not enter it here.</p>
         <div class="form-grid">
           <div class="form-row">
             <div class="form-group"><label class="form-label">Stock ID *</label><input class="form-input" id="sf-stock" type="text" placeholder="STK-001"></div>
@@ -329,9 +330,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
           </div>
           <div class="form-group"><label class="form-label">Uploaded at *</label><input class="form-input" id="sf-upload" type="datetime-local"></div>
           <div class="form-group"><label class="form-label">Owner notes (optional)</label><textarea class="form-textarea" id="sf-notes" placeholder="Notes about this stock item..."></textarea></div>
-          <div style="background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.15);border-radius:var(--r);padding:10px 12px;font-size:11px;color:var(--muted);margin-bottom:2px">
-            📷 <strong style="color:var(--t2)">Photo upload</strong> — not implemented yet. Will be linked by Stock ID in a future update.
-          </div>
           <button class="btn-primary" onclick="addStockUnit()">+ Add stock unit</button>
         </div>
       </div>
@@ -360,9 +358,9 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
         </div>
         <div class="filters">
           <button class="fb fa" onclick="setFilter('all',this)">All</button>
-          <button class="fb"    onclick="setFilter('waiting_to_be_sold',this)">🟡 Waiting to sell</button>
-          <button class="fb"    onclick="setFilter('sale_reported',this)">🔵 Sale reported</button>
+          <button class="fb"    onclick="setFilter('waiting_to_be_sold',this)">🟡 Waiting</button>
           <button class="fb"    onclick="setFilter('sold_approved',this)">✅ Approved sold</button>
+          <button class="fb"    onclick="setFilter('sold_notseen',this)">👁 Sold, not seen</button>
           <button class="fb"    onclick="setFilter('issue',this)">🔴 Issue</button>
           <button class="fb"    onclick="setFilter('cancelled',this)">⛔ Cancelled</button>
           <button class="fb"    onclick="setFilter('wu',this)">📅 Uploaded this week</button>
@@ -387,10 +385,10 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="week-grid">
       <div class="wc"><div class="wc-lbl">Uploaded</div><div class="wc-val" id="w-up">—</div><div class="wc-sub">this week</div></div>
       <div class="wc"><div class="wc-lbl">Approved sold</div><div class="wc-val wv-sold" id="w-sold">—</div><div class="wc-sub">this week</div></div>
-      <div class="wc"><div class="wc-lbl">Sale reported</div><div class="wc-val wv-pend" id="w-rep">—</div><div class="wc-sub">awaiting approval</div></div>
+      <div class="wc"><div class="wc-lbl">Sold, not seen</div><div class="wc-val wv-pend" id="w-notseen">—</div><div class="wc-sub">employee pending</div></div>
       <div class="wc"><div class="wc-lbl">Waiting to sell</div><div class="wc-val" id="w-wait">—</div><div class="wc-sub">in stock</div></div>
       <div class="wc"><div class="wc-lbl">Sell-through</div><div class="wc-val wv-rate" id="w-rate">—</div><div class="wc-bar"><div class="wc-bar-fill" id="w-rate-bar" style="width:0%"></div></div></div>
-      <div class="wc"><div class="wc-lbl">Avg time to approve</div><div class="wc-val wv-tts" id="w-tts">—</div><div class="wc-sub">approved only</div></div>
+      <div class="wc"><div class="wc-lbl">Avg time to sell</div><div class="wc-val wv-tts" id="w-tts">—</div><div class="wc-sub">approved only</div></div>
       <div class="wc"><div class="wc-lbl">Earnings</div><div class="wc-val wv-earn" id="w-earn">—</div><div class="wc-sub">coins (approved)</div></div>
       <div class="wc"><div class="wc-lbl">Deposit</div><div class="wc-val wv-dep" id="w-dep">—</div><div class="wc-sub">coins</div></div>
       <div class="wc"><div class="wc-lbl">Salary</div><div class="wc-val wv-sal" id="w-sal">—</div><div class="wc-sub">coins</div></div>
@@ -413,22 +411,23 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 <div style="height:24px"></div>
 </div>
 
-<!-- APPROVE MODAL -->
-<div class="modal-ov" id="approveModal">
+<!-- MARK AS SOLD MODAL -->
+<div class="modal-ov" id="markSoldModal">
   <div class="modal-box">
-    <div class="modal-ttl"><span>✅ Approve sale</span><button class="modal-close" onclick="closeModal('approveModal')">✕</button></div>
+    <div class="modal-ttl"><span>✅ Mark as sold</span><button class="modal-close" onclick="closeModal('markSoldModal')">✕</button></div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Marking this unit as sold will update its status to approved. Enter the Order ID and sale date.</p>
     <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:14px">
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">Stock unit</div>
-      <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--text)" id="am-sid">—</div>
+      <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--text)" id="ms-sid">—</div>
     </div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label">Order ID * (required for approval)</label><input class="form-input" id="am-order" type="text" placeholder="ORD-001"></div>
-      <div class="form-group"><label class="form-label">Sold at *</label><input class="form-input" id="am-soldAt" type="datetime-local"></div>
-      <div class="form-group"><label class="form-label">Owner note (optional)</label><textarea class="form-textarea" id="am-note" placeholder="Internal note..."></textarea></div>
+      <div class="form-group"><label class="form-label">Order ID * (required)</label><input class="form-input" id="ms-order" type="text" placeholder="ORD-001"></div>
+      <div class="form-group"><label class="form-label">Sold at *</label><input class="form-input" id="ms-soldAt" type="datetime-local"></div>
+      <div class="form-group"><label class="form-label">Owner note (optional)</label><textarea class="form-textarea" id="ms-note" placeholder="Internal note..."></textarea></div>
     </div>
     <div class="modal-acts">
-      <button class="modal-cancel" onclick="closeModal('approveModal')">Cancel</button>
-      <button class="modal-save" onclick="submitApprove()">✅ Confirm approval</button>
+      <button class="modal-cancel" onclick="closeModal('markSoldModal')">Cancel</button>
+      <button class="modal-save" onclick="submitMarkSold()">✅ Confirm sold</button>
     </div>
   </div>
 </div>
@@ -459,7 +458,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       </div>
       <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="em-status">
         <option value="waiting_to_be_sold">🟡 Waiting to be sold</option>
-        <option value="sale_reported">🔵 Sale reported</option>
         <option value="sold_approved">✅ Approved sold</option>
         <option value="issue">🔴 Issue</option>
         <option value="cancelled">⛔ Cancelled</option>
@@ -484,16 +482,15 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ─── STATE ─────────────────────────────────────── */
-let allStock       = [];
-let allEmployees   = [];
-let ledgerFilter   = 'all';
-let actionId       = null;    // id of record being acted on
-let realtimeChannel= null;    // Fix 4: single channel guard — never create more than one
-let _wkCache       = null;
-let isAddingStock  = false;   // Fix 6: insert lock prevents double-submit
+let allStock        = [];
+let allEmployees    = [];
+let ledgerFilter    = 'all';
+let actionId        = null;
+let realtimeChannel = null;
+let _wkCache        = null;
+let isAddingStock   = false;
 
 /* ─── PIN GATE ──────────────────────────────────── */
-// NOTE: This is a UI-only gate. Not real server security.
 function tryPin() {
   const val = document.getElementById('pinInput').value;
   if (val === OWNER_PIN) {
@@ -563,8 +560,6 @@ async function toggleEmpActive(id, active) {
 }
 
 /* ─── STOCK ─────────────────────────────────────── */
-
-// Fix 2: deduplicate by primary key before any render
 function uniqueById(rows) {
   const seen = new Set();
   return (rows || []).filter(row => {
@@ -575,9 +570,8 @@ function uniqueById(rows) {
   });
 }
 
-// Fix 1 & 9: always REPLACE allStock, never append; add debug logs
 async function loadStock() {
-  console.log('[loadStock] starting fetch…');
+  console.log('[loadStock] fetching…');
   document.getElementById('ledgerContainer').innerHTML =
     '<div class="loading-wrap"><span class="spinner"></span>Loading...</div>';
 
@@ -592,23 +586,13 @@ async function loadStock() {
     return;
   }
 
-  console.log('[loadStock] rows from Supabase:', data?.length ?? 0);
-
-  // Fix 1: full replace, never concat
   allStock = uniqueById(data);
-
-  console.log('[loadStock] rows after dedup:', allStock.length);
+  console.log('[loadStock] rows:', allStock.length);
   renderAll();
 }
 
-// Fix 5: only onclick in HTML — no addEventListener added here
-// Fix 6: insert lock + button disable
-// Fix 7: after insert, only loadStock() — no manual push into allStock
 async function addStockUnit() {
-  if (isAddingStock) {
-    console.log('[addStockUnit] blocked — already in progress');
-    return;
-  }
+  if (isAddingStock) return;
 
   const stockId  = document.getElementById('sf-stock').value.trim();
   const empId    = document.getElementById('sf-emp').value;
@@ -619,15 +603,12 @@ async function addStockUnit() {
   if (!empId)    { showToast('Please select an employee', 'err'); return; }
   if (!uploadAt) { showToast('Uploaded at is required', 'err'); return; }
 
-  // Fix 6: lock + visual feedback
   isAddingStock = true;
   const addBtn = document.querySelector('#addStockBody .btn-primary');
   const origLabel = addBtn ? addBtn.textContent : '';
   if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Adding…'; }
 
   try {
-    console.log('[addStockUnit] inserting stock_id:', stockId);
-
     const { data, error } = await _sb.from('stock_units').insert({
       stock_id:    stockId,
       employee_id: empId,
@@ -636,81 +617,41 @@ async function addStockUnit() {
       status:      'waiting_to_be_sold'
     }).select().single();
 
-    if (error) {
-      showToast('Error: ' + error.message, 'err');
-      console.error('[addStockUnit] insert error:', error.message);
-      return;
-    }
+    if (error) { showToast('Error: ' + error.message, 'err'); return; }
 
-    console.log('[addStockUnit] inserted id:', data.id);
-
-    // Log audit event (non-blocking)
     _sb.from('stock_events').insert({
       stock_unit_id: data.id,
       event_type:    'created',
       actor:         'owner'
     }).then(() => {});
 
-    // Clear form
-    ['sf-stock', 'sf-notes'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
+    ['sf-stock', 'sf-notes'].forEach(id => { document.getElementById(id).value = ''; });
     setNow('sf-upload');
-
     showToast('Stock unit added!', 'ok');
-
-    // Fix 7: single clean path — loadStock replaces allStock fully
-    // The realtime INSERT will also fire, but setupRealtime now uses loadStock()
-    // so there is no manual push here and no double-append
     await loadStock();
-
   } finally {
-    // Fix 6: always unlock
     isAddingStock = false;
     if (addBtn) { addBtn.disabled = false; addBtn.textContent = origLabel; }
-    console.log('[addStockUnit] lock released');
   }
 }
 
 /* ─── REALTIME ──────────────────────────────────── */
-// Fix 3 & Fix 4:
-//   - realtimeChannel guard: only one subscription ever
-//   - on every realtime event call loadStock() which fully replaces allStock
-//   - this means even if an INSERT fires right after addStockUnit()'s own loadStock(),
-//     the result is idempotent: loadStock() fetches from DB and deduplicates, no manual push
 function setupRealtime() {
-  // Fix 4: if a channel already exists, do not create another one
   if (realtimeChannel) {
-    console.log('[setupRealtime] channel already exists, skipping');
+    console.log('[setupRealtime] already exists, skipping');
     return;
   }
 
-  console.log('[setupRealtime] subscribing…');
-
   realtimeChannel = _sb
     .channel('owner-stock-changes')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'stock_units' },
-      async (payload) => {
-        // Fix 3: on any realtime event, call loadStock() — it always replaces allStock fully
-        // No manual push/unshift/splice here. This eliminates the race that caused duplicates.
-        console.log('[realtime] event:', payload.eventType, 'id:', (payload.new || payload.old)?.id);
-        await loadStock();
-      }
-    )
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'stock_units' }, async () => {
+      await loadStock();
+    })
     .subscribe(status => {
-      console.log('[realtime] status:', status);
       const dot = document.getElementById('connDot');
-      if (status === 'SUBSCRIBED') {
-        dot.classList.add('live');
-        dot.classList.remove('err');
-      } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-        dot.classList.add('err');
-        dot.classList.remove('live');
-      } else {
-        dot.classList.remove('live', 'err');
-      }
+      if (status === 'SUBSCRIBED') { dot.classList.add('live'); dot.classList.remove('err'); }
+      else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') { dot.classList.add('err'); dot.classList.remove('live'); }
+      else { dot.classList.remove('live','err'); }
     });
 }
 
@@ -727,21 +668,25 @@ function setNow(id) { const el=document.getElementById(id);if(el)el.value=new Da
 function renderOverview() {
   const total    = allStock.length;
   const approved = allStock.filter(u=>u.status==='sold_approved').length;
-  const reported = allStock.filter(u=>u.status==='sale_reported').length;
+  const notseen  = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
   const waiting  = allStock.filter(u=>u.status==='waiting_to_be_sold').length;
   const issue    = allStock.filter(u=>u.status==='issue').length;
   txt('ov-total',total); txt('ov-approved',approved);
-  txt('ov-reported',reported); txt('ov-waiting',waiting); txt('ov-issue',issue);
+  txt('ov-notseen',notseen); txt('ov-waiting',waiting); txt('ov-issue',issue);
   const s = computeWeek();
   txt('ov-week',s.approvedWeek.length);
   txt('ov-wdep',fmt(s.dep)); txt('ov-wsal',fmt(s.sal));
 }
 
-/* ─── FILTER & SEARCH ───────────────────────────── */
+/* ─── FILTER ─────────────────────────────────────── */
 function setFilter(f, btn) {
   ledgerFilter = f;
   document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fp','fr','fw'));
-  const cls = {all:'fa',sold_approved:'fa',sale_reported:'fp',issue:'fr',waiting_to_be_sold:'fw',cancelled:'fr',wu:'fw',wa:'fa',ou:'fr'}[f]||'fa';
+  const cls = {
+    all:'fa', sold_approved:'fa', issue:'fr',
+    waiting_to_be_sold:'fw', cancelled:'fr',
+    wu:'fw', wa:'fa', ou:'fr', sold_notseen:'fp'
+  }[f] || 'fa';
   btn.classList.add(cls);
   renderLedger();
 }
@@ -763,8 +708,8 @@ function getFilteredFrom(rows) {
     if (q && u.stock_id?.toLowerCase().indexOf(q)===-1 && (u.order_id||'').toLowerCase().indexOf(q)===-1) return false;
     if (empF && u.employee_id !== empF) return false;
     if (ledgerFilter==='waiting_to_be_sold') return u.status==='waiting_to_be_sold';
-    if (ledgerFilter==='sale_reported')      return u.status==='sale_reported';
     if (ledgerFilter==='sold_approved')      return u.status==='sold_approved';
+    if (ledgerFilter==='sold_notseen')       return u.status==='sold_approved'&&!u.employee_seen_at;
     if (ledgerFilter==='issue')              return u.status==='issue';
     if (ledgerFilter==='cancelled')          return u.status==='cancelled';
     if (ledgerFilter==='wu')                 return inWeek(u.uploaded_at,b);
@@ -774,13 +719,12 @@ function getFilteredFrom(rows) {
   });
 }
 
-// Kept for export functions that still call getFiltered()
 function getFiltered() { return getFilteredFrom(uniqueById(allStock)); }
 
 function statusMeta(status) {
   const m = {
     waiting_to_be_sold:{ cls:'cw',  badge:'s-waiting',  label:'🟡 Waiting to be sold' },
-    sale_reported:     { cls:'cp2', badge:'s-reported', label:'🔵 Sale reported — awaiting approval' },
+    sale_reported:     { cls:'cp2', badge:'s-reported', label:'🔵 Sale reported' },
     sold_approved:     { cls:'ca2', badge:'s-approved', label:'✅ Approved sold' },
     issue:             { cls:'ci',  badge:'s-issue',    label:'🔴 Issue' },
     cancelled:         { cls:'cc',  badge:'s-cancelled',label:'⛔ Cancelled' },
@@ -790,18 +734,13 @@ function statusMeta(status) {
 
 /* ─── RENDER LEDGER ─────────────────────────────── */
 function renderLedger() {
-  // Fix 2 (defence-in-depth): deduplicate again at render time in case any
-  // code path ever adds a duplicate into allStock
   const unique = uniqueById(allStock);
   const fl = getFilteredFrom(unique);
-
-  console.log('[renderLedger] unique rows:', unique.length, '| filtered:', fl.length);
-
   txt('ledgerBadge', unique.length);
-  txt('ledgerCount', `Showing ${fl.length} of ${unique.length} record${unique.length === 1 ? '' : 's'}`);
+  txt('ledgerCount', `Showing ${fl.length} of ${unique.length} record${unique.length===1?'':'s'}`);
   const c = document.getElementById('ledgerContainer');
   if (!fl.length) {
-    c.innerHTML = unique.length === 0
+    c.innerHTML = unique.length===0
       ? '<div class="empty"><span class="empty-ico">📭</span>No stock units yet. Add one above.</div>'
       : '<div class="empty"><span class="empty-ico">🔎</span>No records match this filter.</div>';
     return;
@@ -817,9 +756,36 @@ function stockCardHtml(u) {
   const oidHtml = u.order_id
     ? `<span class="oc-oid has">${esc(u.order_id)}</span>`
     : `<span class="oc-oid no">No order ID yet</span>`;
-  const soldVal   = u.status==='sold_approved' ? formatDT(u.sold_at) : (u.status==='sale_reported' ? formatDT(u.sold_at) : '—');
-  const soldCls   = u.status==='sold_approved' ? 'vg' : (u.status==='sale_reported' ? 'vp' : '');
-  const ttsVal    = u.status==='sold_approved' ? tts(u.uploaded_at, u.approved_at) : '—';
+
+  const soldVal = (u.status==='sold_approved'||u.status==='sale_reported') ? formatDT(u.sold_at) : '—';
+  const soldCls = u.status==='sold_approved' ? 'vg' : (u.status==='sale_reported' ? 'vp' : '');
+  const ttsVal  = u.status==='sold_approved' ? tts(u.uploaded_at, u.approved_at) : '—';
+
+  // Employee seen state
+  const isSold    = u.status === 'sold_approved';
+  const isSeen    = isSold && !!u.employee_seen_at;
+  const isNotSeen = isSold && !u.employee_seen_at;
+
+  const seenBadgeHtml = isSold
+    ? (isSeen
+        ? `<span class="seen-badge seen-yes">👁 Seen</span>`
+        : `<span class="seen-badge seen-no">👁 Not seen</span>`)
+    : '';
+
+  const seenRowHtml = isSeen
+    ? `<div class="seen-row"><span class="seen-row-ico">👁</span><span class="seen-row-txt">Seen by employee</span><span class="seen-row-time">— ${formatDT(u.employee_seen_at)}</span></div>`
+    : (isNotSeen
+        ? `<div class="notseen-row"><span class="notseen-txt">👁 Not yet seen by employee</span></div>`
+        : '');
+
+  const saleNoteHtml = u.sale_note ? `<div class="oc-note">💬 ${esc(u.sale_note)}</div>` : '';
+  const ownerNoteHtml = u.owner_note ? `<div class="oc-note">🗒 ${esc(u.owner_note)}</div>` : '';
+
+  // Action buttons
+  const canMarkSold = u.status === 'waiting_to_be_sold' || u.status === 'issue';
+  const canIssue    = u.status !== 'sold_approved' && u.status !== 'cancelled';
+  const canReset    = u.status !== 'waiting_to_be_sold' && u.status !== 'cancelled';
+  const canCancel   = u.status !== 'cancelled';
 
   return `
   <div class="ord-card ${m.cls}">
@@ -829,7 +795,10 @@ function stockCardHtml(u) {
         ${oidHtml}
         <span class="oc-emp">${empName}</span>
       </div>
-      <span class="sbadge ${m.badge}">${m.label}</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        ${seenBadgeHtml}
+        <span class="sbadge ${m.badge}">${m.label}</span>
+      </div>
     </div>
     <div class="oc-mid">
       <div><div class="om-lbl">Uploaded</div><div class="om-val">${formatDT(u.uploaded_at)}</div></div>
@@ -837,50 +806,66 @@ function stockCardHtml(u) {
       <div><div class="om-lbl">Approved at</div><div class="om-val ${u.approved_at?'vg':''}">${formatDT(u.approved_at)}</div></div>
     </div>
     <div class="oc-mid" style="border-top:1px solid var(--bd);padding-top:9px">
-      <div><div class="om-lbl">Time to approve</div><div class="om-val vgold">${ttsVal}</div></div>
-      ${u.sale_note?`<div style="grid-column:2/-1"><div class="om-lbl">Employee note</div><div class="om-val" style="white-space:normal;overflow:visible">${esc(u.sale_note)}</div></div>`:''}
+      <div><div class="om-lbl">Time to sell</div><div class="om-val vgold">${ttsVal}</div></div>
     </div>
-    ${u.owner_note?`<div class="oc-note">🗒 ${esc(u.owner_note)}</div>`:''}
+    ${saleNoteHtml}
+    ${ownerNoteHtml}
+    ${seenRowHtml}
     <div class="oc-actions">
-      ${u.status==='sale_reported'?`<button class="oc-btn b-approve" onclick="openApprove('${u.id}','${esc(u.stock_id)}','${esc(u.order_id||'')}','${esc(u.sold_at||'')}')">✅ Approve sale</button>`:''}
-      ${u.status!=='sold_approved'&&u.status!=='cancelled'?`<button class="oc-btn b-issue" onclick="openIssue('${u.id}')">🔴 Flag issue</button>`:''}
-      ${u.status!=='waiting_to_be_sold'&&u.status!=='cancelled'?`<button class="oc-btn b-wait" onclick="setStatus('${u.id}','waiting_to_be_sold','Reset to waiting')">🟡 Reset</button>`:''}
+      ${canMarkSold ? `<button class="oc-btn b-marksold" onclick="openMarkSold('${u.id}','${esc(u.stock_id)}')">✅ Mark as sold</button>` : ''}
+      ${canIssue    ? `<button class="oc-btn b-issue"    onclick="openIssue('${u.id}')">🔴 Flag issue</button>` : ''}
+      ${canReset    ? `<button class="oc-btn b-wait"     onclick="setStatus('${u.id}','waiting_to_be_sold','Reset to waiting')">🟡 Reset</button>` : ''}
       <button class="oc-btn b-edit" onclick="openEdit('${u.id}')">✏ Edit</button>
-      ${u.status!=='cancelled'?`<button class="oc-btn b-cancel" onclick="setStatus('${u.id}','cancelled','Cancel stock unit')">⛔</button>`:''}
+      ${canCancel   ? `<button class="oc-btn b-cancel"   onclick="setStatus('${u.id}','cancelled','Cancel stock unit')">⛔</button>` : ''}
       <button class="oc-btn b-del" onclick="deleteRecord('${u.id}')">🗑</button>
     </div>
   </div>`;
 }
 
-/* ─── RECORD ACTIONS ────────────────────────────── */
-function openApprove(id, stockId, orderId, soldAt) {
+/* ─── MARK AS SOLD ───────────────────────────────── */
+function openMarkSold(id, stockId) {
   actionId = id;
-  txt('am-sid', stockId);
-  document.getElementById('am-order').value  = orderId || '';
-  document.getElementById('am-soldAt').value = soldAt ? new Date(soldAt).toISOString().slice(0,16) : new Date().toISOString().slice(0,16);
-  document.getElementById('am-note').value   = '';
-  openModal('approveModal');
+  txt('ms-sid', stockId);
+  document.getElementById('ms-order').value  = '';
+  document.getElementById('ms-soldAt').value = new Date().toISOString().slice(0,16);
+  document.getElementById('ms-note').value   = '';
+  openModal('markSoldModal');
 }
 
-async function submitApprove() {
-  const orderId = document.getElementById('am-order').value.trim();
-  const soldAt  = document.getElementById('am-soldAt').value;
-  const note    = document.getElementById('am-note').value.trim();
-  if (!orderId) { showToast('Order ID is required for approval','err'); return; }
+async function submitMarkSold() {
+  const orderId = document.getElementById('ms-order').value.trim();
+  const soldAt  = document.getElementById('ms-soldAt').value;
+  const note    = document.getElementById('ms-note').value.trim();
+  if (!orderId) { showToast('Order ID is required','err'); return; }
   if (!soldAt)  { showToast('Sold date/time is required','err'); return; }
+
   const now = new Date().toISOString();
   const { error } = await _sb.from('stock_units').update({
-    status: 'sold_approved', order_id: orderId,
-    sold_at: new Date(soldAt).toISOString(), approved_at: now,
-    owner_note: note||null, updated_at: now
+    status:             'sold_approved',
+    order_id:           orderId,
+    sold_at:            new Date(soldAt).toISOString(),
+    approved_at:        now,
+    owner_note:         note || null,
+    employee_seen_at:   null,
+    employee_seen_note: null,
+    updated_at:         now
   }).eq('id', actionId);
+
   if (error) { showToast('Error: '+error.message,'err'); return; }
-  await _sb.from('stock_events').insert({ stock_unit_id: actionId, event_type: 'sold_approved', actor: 'owner', note });
-  showToast('Sale approved!','ok');
-  closeModal('approveModal');
+
+  await _sb.from('stock_events').insert({
+    stock_unit_id: actionId,
+    event_type:    'marked_sold',
+    actor:         'owner',
+    note:          note || null
+  });
+
+  showToast('Marked as sold!','ok');
+  closeModal('markSoldModal');
   await loadStock();
 }
 
+/* ─── ISSUE ─────────────────────────────────────── */
 function openIssue(id) { actionId=id; document.getElementById('im-note').value=''; openModal('issueModal'); }
 
 async function submitIssue() {
@@ -894,15 +879,26 @@ async function submitIssue() {
   await loadStock();
 }
 
+/* ─── GENERIC STATUS ─────────────────────────────── */
 async function setStatus(id, status, label) {
   if (!confirm(`${label}?`)) return;
-  const { error } = await _sb.from('stock_units').update({ status, updated_at:new Date().toISOString() }).eq('id',id);
+  const updates = { status, updated_at:new Date().toISOString() };
+  // Clear seen state when resetting
+  if (status === 'waiting_to_be_sold') {
+    updates.employee_seen_at   = null;
+    updates.employee_seen_note = null;
+    updates.sold_at            = null;
+    updates.approved_at        = null;
+    updates.order_id           = null;
+  }
+  const { error } = await _sb.from('stock_units').update(updates).eq('id',id);
   if (error) { showToast('Error: '+error.message,'err'); return; }
   await _sb.from('stock_events').insert({ stock_unit_id:id, event_type:status, actor:'owner' });
   showToast('Status updated','ok');
   await loadStock();
 }
 
+/* ─── EDIT ───────────────────────────────────────── */
 function openEdit(id) {
   const u = allStock.find(x=>x.id===id);
   if (!u) return;
@@ -933,10 +929,9 @@ async function submitEdit() {
   await loadStock();
 }
 
-// Fix 8: delete from Supabase then call loadStock() — no manual UI splice
+/* ─── DELETE ─────────────────────────────────────── */
 async function deleteRecord(id) {
   if (!confirm('Permanently delete this stock unit? This cannot be undone.')) return;
-  console.log('[deleteRecord] deleting id:', id);
   const { error } = await _sb.from('stock_units').delete().eq('id', id);
   if (error) { showToast('Error: ' + error.message, 'err'); return; }
   showToast('Record deleted', 'ok');
@@ -952,24 +947,24 @@ function computeWeek() {
     .slice().sort((a,c)=>new Date(a.approved_at)-new Date(c.approved_at));
   const appWeek  = allApproved.filter(u=>inWeek(u.approved_at,b));
   const upWeek   = allStock.filter(u=>inWeek(u.uploaded_at,b));
-  const reported = allStock.filter(u=>u.status==='sale_reported').length;
   const waiting  = allStock.filter(u=>u.status==='waiting_to_be_sold').length;
+  const notseen  = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
   const soldFromUp = upWeek.filter(u=>u.status==='sold_approved'&&inWeek(u.approved_at,b)).length;
   const rate = upWeek.length>0 ? Math.round(soldFromUp/upWeek.length*100) : 0;
   let dep=0,sal=0;
-  appWeek.forEach((u,i)=>{ const sp=splitForPos(allApproved.indexOf(u)+1); dep+=sp.dep; sal+=sp.sal; });
+  appWeek.forEach(u=>{ const sp=splitForPos(allApproved.indexOf(u)+1); dep+=sp.dep; sal+=sp.sal; });
   const earn = appWeek.length * 100;
   const ttsList = appWeek.filter(u=>u.uploaded_at&&u.approved_at).map(u=>new Date(u.approved_at)-new Date(u.uploaded_at)).filter(ms=>ms>=0);
   const avgTts = ttsList.length>0 ? formatMs(ttsList.reduce((a,c)=>a+c,0)/ttsList.length) : '—';
   const opts = {day:'2-digit',month:'short'};
   const period = b.start.toLocaleDateString('en-GB',opts)+' – '+b.end.toLocaleDateString('en-GB',opts);
-  return { uploaded:upWeek.length, approvedWeek:appWeek, reported, waiting, rate, earn, dep, sal, avgTts, period };
+  return { uploaded:upWeek.length, approvedWeek:appWeek, waiting, notseen, rate, earn, dep, sal, avgTts, period };
 }
 
 function renderWeekStats() {
   const s = computeWeek(); _wkCache = s;
   txt('w-period',s.period); txt('w-up',s.uploaded); txt('w-sold',s.approvedWeek.length);
-  txt('w-rep',s.reported); txt('w-wait',s.waiting);
+  txt('w-notseen',s.notseen); txt('w-wait',s.waiting);
   txt('w-rate',s.rate+'%'); txt('w-tts',s.avgTts);
   txt('w-earn',fmt(s.earn)); txt('w-dep',fmt(s.dep)); txt('w-sal',fmt(s.sal));
   const bar=document.getElementById('w-rate-bar'); if(bar) bar.style.width=s.rate+'%';
@@ -978,30 +973,36 @@ function renderWeekStats() {
 /* ─── COPY REPORT ────────────────────────────────── */
 function copyReport() {
   const s = _wkCache || computeWeek();
+  const notSeenList = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at);
   const L = [
     '═══════════════════════════════',
     '  WEEKLY REPORT — '+s.period,
     '═══════════════════════════════',
     'Uploaded this week    : '+s.uploaded,
     'Approved sold         : '+s.approvedWeek.length,
-    'Sale reported (total) : '+s.reported,
+    'Sold, not seen by emp : '+s.notseen,
     'Waiting to sell       : '+s.waiting,
     'Sell-through rate     : '+s.rate+'%',
     '',
     'Earnings (approved)   : '+s.earn+' coins',
     'Deposit               : '+s.dep+' coins',
     'Salary                : '+s.sal+' coins',
-    'Avg time to approve   : '+s.avgTts,
+    'Avg time to sell      : '+s.avgTts,
   ];
   if (s.approvedWeek.length) {
-    L.push('','───────────────────────────────','APPROVED SALES:','───────────────────────────────');
+    L.push('','───────────────────────────────','APPROVED SALES THIS WEEK:','───────────────────────────────');
     s.approvedWeek.forEach((u,i) => {
       L.push(`${i+1}. Stock: ${u.stock_id}  |  Order: ${u.order_id||'—'}`);
       L.push(`   Employee : ${u.employees?.name||'—'}`);
-      L.push(`   Uploaded : ${formatDT(u.uploaded_at)}`);
       L.push(`   Sold at  : ${formatDT(u.sold_at)}`);
       L.push(`   Approved : ${formatDT(u.approved_at)}`);
-      if (u.sale_note) L.push(`   Note     : ${u.sale_note}`);
+      L.push(`   Seen     : ${u.employee_seen_at ? formatDT(u.employee_seen_at) : 'NOT YET SEEN'}`);
+    });
+  }
+  if (notSeenList.length) {
+    L.push('','───────────────────────────────','SOLD BUT NOT YET SEEN BY EMPLOYEE:','───────────────────────────────');
+    notSeenList.forEach((u,i) => {
+      L.push(`${i+1}. Stock: ${u.stock_id}  |  Order: ${u.order_id||'—'}  |  Employee: ${u.employees?.name||'—'}`);
     });
   }
   L.push('═══════════════════════════════');
@@ -1012,18 +1013,18 @@ function copyReport() {
 /* ─── EXPORT ─────────────────────────────────────── */
 function exportJSON() {
   const fl = getFiltered();
-  const obj = { version:'2.0', exported_at: new Date().toISOString(), records: fl };
-  dl(JSON.stringify(obj,null,2), 'stock_export_'+new Date().toISOString().slice(0,10)+'.json');
+  dl(JSON.stringify({ version:'2.0', exported_at: new Date().toISOString(), records: fl },null,2),
+    'stock_export_'+new Date().toISOString().slice(0,10)+'.json');
 }
 
 function exportCSV() {
   const fl = getFiltered();
-  const headers = ['stock_id','order_id','employee','status','uploaded_at','sold_at','approved_at','sale_note','owner_note'];
+  const headers = ['stock_id','order_id','employee','status','uploaded_at','sold_at','approved_at','employee_seen_at','owner_note'];
   const rows = fl.map(u => [
     u.stock_id||'', u.order_id||'',
     u.employees?`${u.employees.name} (${u.employees.employee_code})`:'',
     u.status||'', u.uploaded_at||'', u.sold_at||'', u.approved_at||'',
-    u.sale_note||'', u.owner_note||''
+    u.employee_seen_at||'', u.owner_note||''
   ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
   dl([headers.join(','),...rows].join('\n'), 'stock_export_'+new Date().toISOString().slice(0,10)+'.csv');
 }
