@@ -45,20 +45,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .form-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
 .form-select{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;}
 .form-select:focus{border-color:rgba(0,212,170,.4);}
-/* COMPACT TOP-BAR SELECTOR */
-.emp-mini{font-family:'DM Mono',monospace;font-size:11px;background:var(--s1);border:1px solid var(--bd);border-radius:99px;color:var(--text);padding:6px 11px;outline:none;appearance:none;-webkit-appearance:none;max-width:160px;text-overflow:ellipsis;cursor:pointer;flex-shrink:0;transition:border-color .15s;}
-.emp-mini:focus{border-color:rgba(0,212,170,.45);}
-/* ── UNSEEN-SOLD ALERT BANNER ── */
-.alert-banner{display:none;align-items:center;gap:11px;margin-top:16px;padding:13px 15px;border-radius:var(--rl);
-  background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(139,92,246,.06));
-  border:1px solid rgba(139,92,246,.4);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
-.alert-banner.show{display:flex;}
-.alert-banner:hover{background:linear-gradient(135deg,rgba(139,92,246,.24),rgba(139,92,246,.1));border-color:rgba(139,92,246,.55);}
-.alert-ico{font-size:20px;flex-shrink:0;}
-.alert-body{flex:1;min-width:0;}
-.alert-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
-.alert-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);}
-.alert-arr{font-family:'DM Mono',monospace;font-size:14px;color:var(--purple);flex-shrink:0;}
 /* KPI */
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 13px;position:relative;overflow:hidden;}
@@ -115,62 +101,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .tp-c{color:var(--accent);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.08);}
 .tp-b{color:var(--a2);border-color:rgba(91,106,240,.3);background:rgba(91,106,240,.08);}
 .tp-m{color:var(--gold);border-color:rgba(240,192,91,.3);background:rgba(240,192,91,.08);}
-/* CATEGORY OVERVIEW (employee) */
-.emp-cat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
-.emp-cat{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 9px;}
-.emp-cat.cat-c{border-color:rgba(0,212,170,.18);}
-.emp-cat.cat-b{border-color:rgba(91,106,240,.18);}
-.emp-cat.cat-m{border-color:rgba(240,192,91,.18);}
-.ec-prefix{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;line-height:1;margin-bottom:2px;}
-.cat-c .ec-prefix,.emp-cat.cat-c .ec-prefix{color:var(--accent);}
-.cat-b .ec-prefix,.emp-cat.cat-b .ec-prefix{color:var(--a2);}
-.cat-m .ec-prefix,.emp-cat.cat-m .ec-prefix{color:var(--gold);}
-.ec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-.ec-lbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);}
-.ec-val{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--text);}
-.ec-val.ev-wait{color:var(--a3);}
-.ec-val.ev-sold{color:var(--accent);}
-.ec-val.ev-ns{color:var(--purple);}
-.ec-phys{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:5px;line-height:1.5;}
-.ec-phys strong{color:var(--t2);}
-/* QUICK FILTERS */
-.qf-row{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
-.qf-row::-webkit-scrollbar{display:none;}
-.qfb{font-family:'DM Mono',monospace;font-size:10px;padding:5px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
-.qfb.qa{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
-.qfb.qc{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
-.qfb.qb{border-color:rgba(91,106,240,.4);color:var(--a2);background:rgba(91,106,240,.07);}
-.qfb.qm{border-color:rgba(240,192,91,.4);color:var(--gold);background:rgba(240,192,91,.07);}
-.qfb.qw{border-color:rgba(240,163,91,.4);color:var(--a3);background:rgba(240,163,91,.07);}
-.qfb.qs{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
-.qfb.qn{border-color:rgba(139,92,246,.4);color:var(--purple);background:rgba(139,92,246,.07);}
-/* FILTER COUNT BADGE */
-.qf-badge{display:inline-block;min-width:15px;padding:0 5px;margin-left:5px;border-radius:99px;background:var(--purple);color:#fff;font-size:9px;font-weight:700;line-height:15px;text-align:center;vertical-align:middle;}
-/* MARK ALL SEEN */
-.markall-row{margin-bottom:10px;}
-.markall-btn{width:100%;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:10px;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;
-  color:var(--purple);border:1px solid rgba(139,92,246,.4);background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.05));}
-.markall-btn:hover{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));}
-/* AVAILABLE-TO-SELL INVENTORY */
-.inv-panel{background:linear-gradient(160deg,rgba(0,212,170,.05),rgba(15,18,25,.4));border:1px solid rgba(0,212,170,.18);border-radius:var(--rl);padding:14px;margin-bottom:12px;}
-.inv-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px;}
-.inv-title{font-size:13px;font-weight:700;color:var(--text);}
-.inv-total{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
-.inv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.inv-cell{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 10px;text-align:center;position:relative;overflow:hidden;}
-.inv-cell::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.inv-cell.iv-c::after{background:var(--accent);}
-.inv-cell.iv-b::after{background:var(--a2);}
-.inv-cell.iv-m::after{background:var(--gold);}
-.inv-prefix{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;line-height:1;margin-bottom:3px;}
-.inv-cell.iv-c .inv-prefix{color:var(--accent);}
-.inv-cell.iv-b .inv-prefix{color:var(--a2);}
-.inv-cell.iv-m .inv-prefix{color:var(--gold);}
-.inv-bundles{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text);line-height:1.1;}
-.inv-bundles-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.inv-items{font-family:'DM Mono',monospace;font-size:10px;color:var(--t2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd);}
-.inv-items strong{color:var(--text);}
-.inv-empty{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center;padding:6px 0;}
 /* STOCK CARDS */
 .stock-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
 .stock-card.sw{border-color:rgba(240,163,91,.18);}
@@ -197,7 +127,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .seen-info{padding:8px 13px;border-top:1px solid var(--bd);background:rgba(0,212,170,.04);display:flex;align-items:center;gap:7px;}
 .seen-ico{font-size:12px;}.seen-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
 .seen-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
-/* PAYOUT */
+/* PAYOUT HISTORY (employee view) */
 .payout-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--bd);gap:8px;}
 .payout-row:first-child{border-top:none;}
 .pr-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
@@ -208,7 +138,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .bp-lbl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
 .bp-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;}
 .bp-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-/* MISC */
+/* TOAST / EMPTY / UTIL */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--bd2);border-radius:99px;padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .toast.show{opacity:1;}.toast.ok{border-color:rgba(0,212,170,.35);color:var(--accent);}.toast.err{border-color:rgba(240,96,112,.35);color:var(--red);}
 .empty{text-align:center;padding:32px 16px;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;background:var(--s2);border:1px dashed var(--bd2);border-radius:var(--r);}
@@ -217,86 +147,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-wrap{padding:24px;text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;}
 @supports(padding:max(0px)){body{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
-
-
-/* =========================================================
-   FINAL UI PATCH: keep nav + filters visible and clickable
-   - top nav wraps instead of triggering bad native scrollTo behavior
-   - quick filters wrap instead of disappearing outside screen
-   - sections keep titles visible under sticky nav
-========================================================= */
-.topbar-inner {
-  max-width: min(100%, 720px);
-  width: 100%;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.nav-pills {
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  overflow-x: visible;
-  overflow-y: visible;
-  gap: 6px;
-  padding-bottom: 0;
-  scrollbar-width: none;
-}
-
-.nav-pills::-webkit-scrollbar { display: none; }
-
-.npill {
-  flex: 0 0 auto;
-  width: auto;
-  min-width: max-content;
-  max-width: none;
-  white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-  line-height: 1;
-  padding: 7px 12px;
-}
-
-.conn-dot { margin-top: 11px; }
-
-.section[id] { scroll-margin-top: 104px; }
-
-.filters,
-.qf-row {
-  display: flex;
-  flex-wrap: wrap;
-  overflow-x: visible;
-  overflow-y: visible;
-  max-width: 100%;
-  gap: 6px;
-  row-gap: 7px;
-  padding-bottom: 0;
-}
-
-.fb,
-.qfb {
-  flex: 0 0 auto;
-  width: auto;
-  min-width: max-content;
-  max-width: none;
-  white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-}
-
-.filters + .ledger-count,
-.qf-row + .slbl { margin-top: 4px; }
-
-@media (max-width: 420px) {
-  .topbar-inner { padding-left: 10px; padding-right: 10px; }
-  .npill, .fb, .qfb { font-size: 9.5px; padding: 7px 10px; }
-  .section[id] { scroll-margin-top: 126px; }
-  .cat-grid, .emp-cat-grid { gap: 6px; }
-  .cat-card, .emp-cat { padding: 10px 8px; }
-}
-
 </style>
 </head>
 <body>
@@ -320,27 +170,15 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <button class="npill" data-target="sec-stock">My Stock</button>
       <button class="npill" data-target="sec-rules">Rules</button>
     </div>
-    <select class="emp-mini" id="empSelectMini" onchange="onEmpChangeMini()" title="Switch profile">
-      <option value="">Profile…</option>
-    </select>
     <div class="conn-dot" id="connDot"></div>
   </div>
 </div>
 
 <div class="page">
 
-<!-- UNSEEN-SOLD ALERT BANNER -->
-<div class="alert-banner" id="unseenBanner" onclick="goToUnseen()">
-  <span class="alert-ico">✅</span>
-  <div class="alert-body">
-    <div class="alert-title" id="unseenTitle">You have sold units to confirm</div>
-    <div class="alert-sub">Tap to review and mark them as seen →</div>
-  </div>
-  <span class="alert-arr">›</span>
-</div>
-
-<!-- EMPLOYEE SELECT (hidden — driven from top-bar mini selector) -->
-<div class="section" style="display:none">
+<!-- EMPLOYEE SELECT -->
+<div class="section">
+  <div class="slbl">// Select your profile</div>
   <div class="card">
     <div class="emp-select-wrap">
       <label class="form-label" for="empSelect">Who are you?</label>
@@ -381,7 +219,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="stats-grid">
       <div class="sg"><div class="sg-lbl">Deposit</div><div class="sg-val v-acc" id="stDep">—</div><div class="sg-sub">coins</div></div>
       <div class="sg"><div class="sg-lbl">Salary earned</div><div class="sg-val v-a2" id="stSal">—</div><div class="sg-sub">coins</div></div>
-      <div class="sg"><div class="sg-lbl">Earnings</div><div class="sg-val v-gold" id="stEarn">—</div><div class="sg-sub">total events × 100</div></div>
+      <div class="sg"><div class="sg-lbl">Earnings</div><div class="sg-val v-gold" id="stEarn">—</div><div class="sg-sub">total sale events × 100</div></div>
       <div class="sg"><div class="sg-lbl">Next milestone</div><div class="sg-val v-t2" id="stNext">—</div></div>
     </div>
     <!-- Deposit buying power -->
@@ -411,6 +249,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="kpi ca"><span class="kpi-ico">✅</span><div class="kpi-lbl">Available</div><div class="kpi-val" id="sal-avail" style="font-size:18px">—</div><div class="kpi-sub" id="sal-avail-sub">unpaid balance</div><div id="sal-avail-note" style="display:none;font-family:'DM Mono',monospace;font-size:9px;color:var(--red);margin-top:4px;line-height:1.4"></div></div>
     <div class="kpi ca"><span class="kpi-ico">💎</span><div class="kpi-lbl">Deposit balance</div><div class="kpi-val" id="sal-dep" style="font-size:18px">—</div><div class="kpi-sub">unchanged by payouts</div></div>
   </div>
+
   <div class="slbl" style="margin-top:6px">// Payout history <span id="payout-count" style="color:var(--t2)"></span></div>
   <div class="card">
     <div id="payoutContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
@@ -419,35 +258,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
 <!-- C. MY STOCK -->
 <div class="section" id="sec-stock">
-  <div class="slbl">// Available to sell now</div>
-  <div class="inv-panel" id="invPanel">
-    <!-- filled by renderInventory() -->
-  </div>
-
-  <div class="slbl">// My stock overview</div>
-
-  <!-- Category summary -->
-  <div class="emp-cat-grid" id="empCatGrid">
-    <!-- filled by renderEmpCategoryOverview() -->
-  </div>
-
-  <!-- Quick filters -->
-  <div class="slbl">// Quick filters</div>
-  <div class="qf-row" style="margin-bottom:12px" id="stockFilterRow">
-    <button class="qfb qa" onclick="setStockFilter('all',this)">All</button>
-    <button class="qfb"    onclick="setStockFilter('type_c',this)">C units</button>
-    <button class="qfb"    onclick="setStockFilter('type_b',this)">B bundles</button>
-    <button class="qfb"    onclick="setStockFilter('type_m',this)">M bundles</button>
-    <button class="qfb"    onclick="setStockFilter('waiting',this)">🟡 Waiting</button>
-    <button class="qfb"    onclick="setStockFilter('sold',this)">✅ Sold</button>
-    <button class="qfb"    onclick="setStockFilter('need_seen',this)">👁 Need seen</button>
-  </div>
-
-  <!-- MARK ALL SEEN (shown only when 2+ unseen) -->
-  <div class="markall-row" id="markAllRow" style="display:none">
-    <button class="markall-btn" id="markAllBtn" onclick="markAllSeen()">👁 Mark all sold units as seen</button>
-  </div>
-
   <div class="slbl">// My stock units <span id="stock-count" style="color:var(--t2)"></span></div>
   <div id="stockContainer">
     <div class="empty"><span class="empty-ico">📭</span>Select your profile to see stock units.</div>
@@ -464,25 +274,24 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
           <div style="font-size:14px;margin-bottom:5px">C</div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Base unit</div>
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:3px">300 coins</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.5"><strong>1 physical item</strong><br>1 sale event = 100 earnings</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5">1 physical item<br>1 sale event = 100 earnings</div>
         </div>
         <div style="background:var(--s1);padding:12px">
           <div style="font-size:14px;margin-bottom:5px">B</div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Bundle B</div>
           <div style="font-size:12px;font-weight:700;color:var(--a2);margin-bottom:3px">150 coins</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.5"><strong>10 physical items</strong><br>1 sale event = 100 earnings</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5">10 physical items<br>1 sale event = 100 earnings</div>
         </div>
         <div style="background:var(--s1);padding:12px">
           <div style="font-size:14px;margin-bottom:5px">M</div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:3px">Bundle M</div>
           <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:3px">250 coins</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.5"><strong>5 physical items</strong><br>1 sale event = 100 earnings</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.5">5 physical items<br>1 sale event = 100 earnings</div>
         </div>
       </div>
     </div>
     <div style="padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.7;background:var(--s2)">
-      <strong style="color:var(--accent)">Sale events count, not physical items.</strong> Each approved sold record = 1 sale event = 100 earnings, regardless of type.<br>
-      B-0001 = <strong>1 bundle of 10 physical items</strong>. M-0001 = <strong>1 bundle of 5 physical items</strong>.<br><br>
+      <strong style="color:var(--accent)">Sale event counts, not physical items.</strong> Each approved sold record = 1 sale event = 100 earnings, regardless of type.<br><br>
       <strong style="color:var(--t2)">Status guide:</strong><br>
       🟡 <strong>Waiting</strong> — owner will mark when sold<br>
       ✅ <strong>Marked as sold</strong> — tap to acknowledge<br>
@@ -503,73 +312,56 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 <script>
 console.log('index.html JS loaded');
 
-/* ─── NAVIGATION ──────────────────────────────────── */
+/* ─── NAVIGATION (defined first — never depends on Supabase) ── */
 function goToSection(id) {
   const el = document.getElementById(id);
   if (!el) { console.warn('goToSection: missing section', id); return; }
-  el.scrollIntoView({ behavior:'smooth', block:'start' });
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 window.goToSection = goToSection;
+
+// Wire all data-target nav buttons (safe — runs before any async logic)
 document.querySelectorAll('[data-target]').forEach(btn => {
   btn.addEventListener('click', () => goToSection(btn.dataset.target));
 });
 
-/* ─── SAFE CONFIG ─────────────────────────────────── */
+/* ─── SAFE CONFIG CHECK ──────────────────────────────────── */
 if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
   console.error('index.html: Missing Supabase config. Check supabase-config.js');
 }
 
-const _sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ─── STATE ───────────────────────────────────────── */
 let currentEmpId   = null;
 let currentEmpCode = null;
 let allStockUnits  = [];
 let allPayouts     = [];
 let stockTypes     = [];
 let realtimeSub    = null;
-let stockFilter    = 'all';   // current quick-filter for stock list
 
-/* ─── SAFE TYPE HELPERS ───────────────────────────── */
+/* ─── TYPE HELPERS ───────────────────────────────── */
 const TYPE_FALLBACK = {
   C: { prefix:'C', name:'Base stock unit', quantity_per_stock_sale:1, capital_per_stock_sale:300, earnings_per_approved_sale:100 },
   B: { prefix:'B', name:'Bundle B',        quantity_per_stock_sale:10, capital_per_stock_sale:150, earnings_per_approved_sale:100 },
   M: { prefix:'M', name:'Bundle M',        quantity_per_stock_sale:5,  capital_per_stock_sale:250, earnings_per_approved_sale:100 },
 };
-
-function getStockType(unit) {
-  if (!unit) return TYPE_FALLBACK['C'];
-  if (unit.stock_types) return unit.stock_types;
+function getType(unit) {
   if (unit.stock_type_id && stockTypes.length) {
     const t = stockTypes.find(t => t.id === unit.stock_type_id);
     if (t) return t;
   }
-  const p = getStockPrefix(unit);
-  return TYPE_FALLBACK[p] || TYPE_FALLBACK['C'];
+  // Try join result
+  if (unit.stock_types) return unit.stock_types;
+  const prefix = (unit.stock_id || '').split('-')[0].toUpperCase();
+  return TYPE_FALLBACK[prefix] || TYPE_FALLBACK['C'];
 }
-function getType(unit) { return getStockType(unit); }
-
-function getStockPrefix(unit) {
-  if (!unit) return 'C';
-  const t = unit.stock_types;
-  if (t && t.prefix) return t.prefix.toUpperCase();
-  if (unit.stock_type_id && stockTypes.length) {
-    const st = stockTypes.find(s => s.id === unit.stock_type_id);
-    if (st && st.prefix) return st.prefix.toUpperCase();
-  }
-  return ((unit.stock_id || '').split('-')[0] || 'C').toUpperCase();
-}
-function getQuantityPerSale(unit) { return getStockType(unit).quantity_per_stock_sale || 1; }
-function getCapitalPerSale(unit)  { return getStockType(unit).capital_per_stock_sale  || 300; }
-function getTypeDisplayName(unit) { return getStockType(unit).name || 'Base stock unit'; }
-
 function typePillCls(prefix) {
   if (prefix === 'B') return 'tp-b';
   if (prefix === 'M') return 'tp-m';
   return 'tp-c';
 }
 
-/* ─── BOOT ────────────────────────────────────────── */
+/* ─── BOOT ───────────────────────────────────────── */
 async function init() {
   const { data } = await _sb.from('stock_types').select('*');
   stockTypes = data || [];
@@ -583,30 +375,13 @@ async function init() {
   setupRealtime();
 }
 
-/* ─── EMPLOYEES ───────────────────────────────────── */
+/* ─── EMPLOYEES ──────────────────────────────────── */
 async function loadEmployees() {
   const { data, error } = await _sb.from('employees').select('id, employee_code, name').eq('active',true).order('name');
   const sel = document.getElementById('empSelect');
   if (error || !data?.length) { sel.innerHTML='<option value="">No employees found</option>'; return; }
   sel.innerHTML = '<option value="">— Select your name —</option>' +
     data.map(e=>`<option value="${e.id}" data-code="${e.employee_code}">${e.name} (${e.employee_code})</option>`).join('');
-  const mini = document.getElementById('empSelectMini');
-  if (mini) {
-    mini.innerHTML = '<option value="">Profile…</option>' +
-      data.map(e=>`<option value="${e.id}" data-code="${e.employee_code}">${e.name} (${e.employee_code})</option>`).join('');
-  }
-}
-
-function syncMiniSelector() {
-  const mini = document.getElementById('empSelectMini');
-  if (mini && currentEmpId) mini.value = currentEmpId;
-}
-
-async function onEmpChangeMini() {
-  const mini = document.getElementById('empSelectMini');
-  const main = document.getElementById('empSelect');
-  if (mini && main) { main.value = mini.value; }
-  await onEmpChange();
 }
 
 async function onEmpChange() {
@@ -615,13 +390,12 @@ async function onEmpChange() {
   currentEmpId   = sel.value || null;
   currentEmpCode = opt?.dataset?.code || null;
   document.getElementById('empPill').textContent = currentEmpCode || '—';
-  syncMiniSelector();
   if (!currentEmpId) { resetDashboard(); return; }
   localStorage.setItem('emp_selected_id', currentEmpId);
   await Promise.all([loadStockUnits(), loadMyPayouts()]);
 }
 
-/* ─── STOCK ───────────────────────────────────────── */
+/* ─── STOCK ──────────────────────────────────────── */
 async function loadStockUnits() {
   if (!currentEmpId) return;
   document.getElementById('stockContainer').innerHTML = '<div class="loading-wrap"><span class="spinner"></span>Loading...</div>';
@@ -645,10 +419,10 @@ async function loadMyPayouts() {
   if (error) return;
   allPayouts = data || [];
   renderPayouts();
-  renderAll();
+  renderAll(); // update salary KPIs
 }
 
-/* ─── REALTIME ────────────────────────────────────── */
+/* ─── REALTIME ───────────────────────────────────── */
 function setupRealtime() {
   if (realtimeSub) _sb.removeChannel(realtimeSub);
   realtimeSub = _sb
@@ -684,7 +458,7 @@ function handleRealtimeEvent(payload) {
   showToast('Stock updated','ok');
 }
 
-/* ─── MARK AS SEEN ────────────────────────────────── */
+/* ─── MARK AS SEEN ───────────────────────────────── */
 async function markAsSeen(id) {
   const now = new Date().toISOString();
   const { error } = await _sb.from('stock_units').update({ employee_seen_at:now, updated_at:now }).eq('id',id);
@@ -694,85 +468,29 @@ async function markAsSeen(id) {
   await loadStockUnits();
 }
 
-/* ─── MARK ALL SEEN ───────────────────────────────── */
-function getUnseenUnits() {
-  return allStockUnits.filter(u => u.status === 'sold_approved' && !u.employee_seen_at);
-}
-
-async function markAllSeen() {
-  const unseen = getUnseenUnits();
-  if (!unseen.length) return;
-  if (!confirm(`Mark all ${unseen.length} sold unit${unseen.length===1?'':'s'} as seen?`)) return;
-  const now = new Date().toISOString();
-  const ids = unseen.map(u => u.id);
-  const { error } = await _sb.from('stock_units').update({ employee_seen_at:now, updated_at:now }).in('id', ids);
-  if (error) { showToast('Error: '+error.message,'err'); return; }
-  // audit events (best-effort, non-blocking)
-  _sb.from('stock_events').insert(
-    ids.map(id => ({ stock_unit_id:id, event_type:'employee_seen', actor:currentEmpCode||'employee' }))
-  ).then(()=>{});
-  showToast(`Marked ${unseen.length} as seen ✓`,'ok');
-  await loadStockUnits();
-}
-
-/* ─── UNSEEN UI STATE (badge + mark-all visibility) ── */
-function renderUnseenControls() {
-  const count = getUnseenUnits().length;
-  // badge on the "Need seen" quick-filter button
-  const needBtn = document.querySelector('.qfb[onclick*="need_seen"]');
-  if (needBtn) {
-    let badge = needBtn.querySelector('.qf-badge');
-    if (count > 0) {
-      if (!badge) { badge = document.createElement('span'); badge.className = 'qf-badge'; needBtn.appendChild(badge); }
-      badge.textContent = count;
-    } else if (badge) {
-      badge.remove();
-    }
-  }
-  // mark-all row visible only when 2+ unseen
-  const row = document.getElementById('markAllRow');
-  if (row) row.style.display = count >= 2 ? 'block' : 'none';
-}
-
-/* ─── STOCK FILTER ────────────────────────────────── */
-function setStockFilter(f, btn) {
-  stockFilter = f;
-  document.querySelectorAll('.qfb').forEach(b => b.classList.remove('qa','qc','qb','qm','qw','qs','qn'));
-  const clsMap = { all:'qa', type_c:'qc', type_b:'qb', type_m:'qm', waiting:'qw', sold:'qs', need_seen:'qn' };
-  if (btn) btn.classList.add(clsMap[f]||'qa');
-  renderStockList(allStockUnits);
-}
-
-function applyStockFilter(units) {
-  if (stockFilter==='all')       return units;
-  if (stockFilter==='type_c')    return units.filter(u=>getStockPrefix(u)==='C');
-  if (stockFilter==='type_b')    return units.filter(u=>getStockPrefix(u)==='B');
-  if (stockFilter==='type_m')    return units.filter(u=>getStockPrefix(u)==='M');
-  if (stockFilter==='waiting')   return units.filter(u=>u.status==='waiting_to_be_sold');
-  if (stockFilter==='sold')      return units.filter(u=>u.status==='sold_approved');
-  if (stockFilter==='need_seen') return units.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at);
-  return units;
-}
-
-/* ─── SALARY CALCS ────────────────────────────────── */
+/* ─── SALARY CALCS ───────────────────────────────── */
 function calcMyStats() {
+  // approved sold events for this employee, in chronological order
   const sold = allStockUnits
     .filter(u => u.status === 'sold_approved')
     .slice().sort((a,b) => new Date(a.approved_at)-new Date(b.approved_at));
 
   const u = sold.length;
   let dep = 0, sal = 0;
+
   sold.forEach((unit, idx) => {
     const pos = idx + 1;
-    const earn = getStockType(unit).earnings_per_approved_sale || 100;
+    const earn = getType(unit).earnings_per_approved_sale || 100;
     const sp = pos <= 20 ? {d:75,s:25} : pos <= 45 ? {d:60,s:40} : {d:50,s:50};
     dep += Math.round(earn * sp.d / 100);
     sal += Math.round(earn * sp.s / 100);
   });
 
   const totalPaid = allPayouts.reduce((acc,p) => acc+(p.amount||0), 0);
+  // avail can be negative — means employee received an advance
   const avail = sal - totalPaid;
 
+  // Level / progress
   let level, dPct, sPct, pbLbl, pbPct, pbW, pbFull, pbSub, nextLbl;
   if (u < 20) {
     level='Level 1'; dPct=75; sPct=25;
@@ -793,41 +511,17 @@ function calcMyStats() {
   return { u, dep, sal, avail, totalPaid, earn:u*100, level, dPct, sPct, pbLbl, pbPct, pbW, pbFull, pbSub, nextLbl };
 }
 
-/* ─── RENDER ALL ──────────────────────────────────── */
+/* ─── RENDER ALL ─────────────────────────────────── */
 function renderAll() {
   const s = calcMyStats();
   renderTracker(s);
   renderSalarySection(s);
-  renderEmpCategoryOverview();
-  renderInventory();
   renderStockList(allStockUnits);
-  renderUnseenBanner();
-  renderUnseenControls();
 }
 
 function fmt(n) { return Number(n).toLocaleString(); }
 function txt(id,v) { const e=document.getElementById(id); if(e) e.textContent=v; }
 function msEl(id,on) { const e=document.getElementById(id); if(e){if(on)e.classList.add('done');else e.classList.remove('done');} }
-
-/* ─── UNSEEN-SOLD ALERT BANNER ────────────────────── */
-function renderUnseenBanner() {
-  const banner = document.getElementById('unseenBanner');
-  if (!banner) return;
-  if (!currentEmpId) { banner.classList.remove('show'); return; }
-  const unseen = allStockUnits.filter(u => u.status === 'sold_approved' && !u.employee_seen_at).length;
-  if (unseen > 0) {
-    txt('unseenTitle', `You have ${unseen} sold unit${unseen===1?'':'s'} to confirm`);
-    banner.classList.add('show');
-  } else {
-    banner.classList.remove('show');
-  }
-}
-
-function goToUnseen() {
-  const needSeenBtn = document.querySelector('.qfb[onclick*="need_seen"]');
-  setStockFilter('need_seen', needSeenBtn);
-  goToSection('sec-stock');
-}
 
 function renderTracker(s) {
   txt('unitNum',s.u); txt('kpi-units',s.u);
@@ -835,6 +529,7 @@ function renderTracker(s) {
   txt('stSplit',`${s.dPct} / ${s.sPct} dep/sal`);
   txt('stDep',fmt(s.dep)); txt('kpi-dep',fmt(s.dep));
   txt('stSal',fmt(s.sal)); txt('kpi-sal',fmt(s.sal));
+  // salary available: red if negative (advance balance)
   const availKpi = document.getElementById('kpi-avail');
   if (availKpi) { availKpi.textContent = fmt(s.avail); availKpi.style.color = s.avail < 0 ? 'var(--red)' : ''; }
   const availKpiSub = document.getElementById('kpi-avail-sub');
@@ -846,6 +541,7 @@ function renderTracker(s) {
   fill.style.width = s.pbW+'%';
   if (s.pbFull) fill.classList.add('full'); else fill.classList.remove('full');
   [['ms10',10],['ms20',20],['ms30',30],['ms45',45]].forEach(([id,n])=>msEl(id,s.u>=n));
+  // Buying power
   txt('bp-c', Math.floor(s.dep/300));
   txt('bp-b', Math.floor(s.dep/150));
   txt('bp-m', Math.floor(s.dep/250));
@@ -855,15 +551,25 @@ function renderSalarySection(s) {
   txt('sal-earned', fmt(s.sal)+' coins');
   txt('sal-paid',   fmt(s.totalPaid)+' coins');
   txt('sal-dep',    fmt(s.dep)+' coins');
-  const availEl   = document.getElementById('sal-avail');
+  // salary available — supports negative (advance)
+  const availEl  = document.getElementById('sal-avail');
   const availNote = document.getElementById('sal-avail-note');
   const availSub  = document.getElementById('sal-avail-sub');
-  if (availEl) { availEl.textContent = fmt(s.avail)+' coins'; availEl.style.color = s.avail < 0 ? 'var(--red)' : ''; }
-  if (availNote) {
-    if (s.avail < 0) { availNote.textContent = 'Advance balance: you are '+fmt(Math.abs(s.avail))+' coins ahead. Future salary will cover this.'; availNote.style.display='block'; }
-    else availNote.style.display='none';
+  if (availEl) {
+    availEl.textContent = fmt(s.avail)+' coins';
+    availEl.style.color = s.avail < 0 ? 'var(--red)' : '';
   }
-  if (availSub) availSub.textContent = s.avail < 0 ? 'advance / overpayment' : 'unpaid balance';
+  if (availNote) {
+    if (s.avail < 0) {
+      availNote.textContent = 'Advance balance: you are '+fmt(Math.abs(s.avail))+' coins ahead. Future salary will cover this.';
+      availNote.style.display = 'block';
+    } else {
+      availNote.style.display = 'none';
+    }
+  }
+  if (availSub) {
+    availSub.textContent = s.avail < 0 ? 'advance / overpayment' : 'unpaid balance';
+  }
 }
 
 function renderPayouts() {
@@ -875,71 +581,9 @@ function renderPayouts() {
   }
   c.innerHTML = allPayouts.map(p => {
     const meta = [formatDT(p.paid_at), p.method||'', p.note||''].filter(Boolean).join(' · ');
-    return `<div class="payout-row"><div class="pr-meta">${esc(meta)}</div><div class="pr-amount">${fmt(p.amount)} coins</div></div>`;
-  }).join('');
-}
-
-/* ─── AVAILABLE-TO-SELL INVENTORY ─────────────────── */
-function renderInventory() {
-  const panel = document.getElementById('invPanel');
-  if (!panel) return;
-  const prefixes = ['C','B','M'];
-  // waiting units = on hand, available to sell
-  const waiting = allStockUnits.filter(u => u.status === 'waiting_to_be_sold');
-  const totalBundles = waiting.length;
-  let totalItems = 0;
-
-  const cells = prefixes.map(pfx => {
-    const t = TYPE_FALLBACK[pfx];
-    const units   = waiting.filter(u => getStockPrefix(u) === pfx);
-    const bundles = units.length;
-    const perBundle = t.quantity_per_stock_sale;
-    const items   = bundles * perBundle;
-    totalItems += items;
-    const unitWord = pfx === 'C' ? 'unit' : 'bundle';
-    return `
-    <div class="inv-cell iv-${pfx.toLowerCase()}">
-      <div class="inv-prefix">${pfx}</div>
-      <div class="inv-bundles-lbl">${unitWord}${bundles!==1?'s':''}</div>
-      <div class="inv-bundles">${bundles}</div>
-      <div class="inv-items"><strong>${fmt(items)}</strong> item${items!==1?'s':''}</div>
-    </div>`;
-  }).join('');
-
-  panel.innerHTML = `
-    <div class="inv-head">
-      <span class="inv-title">📦 Ready to sell</span>
-      <span class="inv-total">${totalBundles} unit${totalBundles!==1?'s':''} · ${fmt(totalItems)} item${totalItems!==1?'s':''}</span>
-    </div>
-    ${totalBundles === 0
-      ? '<div class="inv-empty">Nothing waiting to sell right now.</div>'
-      : `<div class="inv-grid">${cells}</div>`}
-  `;
-}
-
-/* ─── EMPLOYEE CATEGORY OVERVIEW ─────────────────── */
-function renderEmpCategoryOverview() {
-  const grid = document.getElementById('empCatGrid');
-  if (!grid) return;
-  const prefixes = ['C','B','M'];
-  grid.innerHTML = prefixes.map(pfx => {
-    const t = TYPE_FALLBACK[pfx];
-    const units   = allStockUnits.filter(u=>getStockPrefix(u)===pfx);
-    const total   = units.length;
-    const waiting = units.filter(u=>u.status==='waiting_to_be_sold').length;
-    const sold    = units.filter(u=>u.status==='sold_approved').length;
-    const notseen = units.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
-    const physItems = total * t.quantity_per_stock_sale;
-    const unitWord  = pfx==='C' ? 'unit' : 'bundle';
-    const physLabel = pfx==='C' ? '1 item each' : pfx==='B' ? '10 items each' : '5 items each';
-    return `
-    <div class="emp-cat cat-${pfx.toLowerCase()}">
-      <div class="ec-prefix">${pfx}</div>
-      <div class="ec-row"><span class="ec-lbl">total</span><span class="ec-val">${total} ${unitWord}${total!==1?'s':''}</span></div>
-      <div class="ec-row"><span class="ec-lbl">waiting</span><span class="ec-val ev-wait">${waiting}</span></div>
-      <div class="ec-row"><span class="ec-lbl">sold</span><span class="ec-val ev-sold">${sold}</span></div>
-      ${notseen>0?`<div class="ec-row"><span class="ec-lbl">not seen</span><span class="ec-val ev-ns">${notseen}</span></div>`:''}
-      <div class="ec-phys"><strong>${fmt(physItems)}</strong> physical items<br><span style="color:var(--muted)">${physLabel}</span></div>
+    return `<div class="payout-row">
+      <div class="pr-meta">${esc(meta)}</div>
+      <div class="pr-amount">${fmt(p.amount)} coins</div>
     </div>`;
   }).join('');
 }
@@ -960,31 +604,19 @@ function resetDashboard() {
   if (salSub) salSub.textContent='unpaid balance';
   document.getElementById('stockContainer').innerHTML='<div class="empty"><span class="empty-ico">📭</span>Select your profile to see stock units.</div>';
   document.getElementById('payoutContainer').innerHTML='<div class="empty"><span class="empty-ico">💸</span>Select your profile.</div>';
-  const empCatGrid = document.getElementById('empCatGrid');
-  if (empCatGrid) empCatGrid.innerHTML='';
-  const invPanel = document.getElementById('invPanel');
-  if (invPanel) invPanel.innerHTML='<div class="inv-empty">Select your profile to see inventory.</div>';
   ['ms10','ms20','ms30','ms45'].forEach(id=>msEl(id,false));
   allPayouts=[];
-  renderUnseenBanner();
-  renderUnseenControls();
 }
 
-/* ─── STOCK CARD HTML ─────────────────────────────── */
+/* ─── STOCK CARD HTML ────────────────────────────── */
 function formatDT(s) { if(!s)return'—';try{return new Date(s).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});}catch(e){return s;} }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function renderStockList(units) {
-  const filtered = applyStockFilter(units);
   const c = document.getElementById('stockContainer');
-  txt('stock-count', filtered.length !== units.length ? `(${filtered.length}/${units.length})` : units.length ? `(${units.length})` : '');
-  if (!filtered.length) {
-    c.innerHTML = units.length===0
-      ? '<div class="empty"><span class="empty-ico">📭</span>No stock units assigned to you yet.</div>'
-      : '<div class="empty"><span class="empty-ico">🔎</span>No stock units match this filter.</div>';
-    return;
-  }
-  c.innerHTML = filtered.map(u => stockCardHtml(u)).join('');
+  txt('stock-count', units.length ? `(${units.length})` : '');
+  if (!units.length) { c.innerHTML='<div class="empty"><span class="empty-ico">📭</span>No stock units assigned to you yet.</div>'; return; }
+  c.innerHTML = units.map(u => stockCardHtml(u)).join('');
 }
 
 function stockCardHtml(u) {
@@ -992,10 +624,8 @@ function stockCardHtml(u) {
   const isSeen         = isSoldApproved && !!u.employee_seen_at;
   const isUnseen       = isSoldApproved && !u.employee_seen_at;
 
-  const t      = getStockType(u);
-  const prefix = getStockPrefix(u);
-  const qty    = t.quantity_per_stock_sale || 1;
-  const cap    = t.capital_per_stock_sale  || 300;
+  const t = getType(u);
+  const prefix = t.prefix || (u.stock_id||'').split('-')[0].toUpperCase() || 'C';
 
   let cardCls = '';
   if (u.status==='waiting_to_be_sold') cardCls='sw';
@@ -1025,11 +655,6 @@ function stockCardHtml(u) {
 
   const noteHtml = u.owner_note ? `<div class="sc-note">🗒 ${esc(u.owner_note)}</div>` : '';
 
-  // Physical items note — make bundle size clear
-  const physNote = prefix==='B' ? `This bundle = <strong>10 physical items</strong>`
-                 : prefix==='M' ? `This bundle = <strong>5 physical items</strong>`
-                 : '1 physical item';
-
   return `
   <div class="stock-card ${cardCls}">
     <div class="sc-top">
@@ -1038,7 +663,7 @@ function stockCardHtml(u) {
         ${oidHtml}
       </div>
       <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end">
-        <span class="type-pill ${typePillCls(prefix)}">${prefix} · ×${qty}</span>
+        <span class="type-pill ${typePillCls(prefix)}">${prefix} · ×${t.quantity_per_stock_sale||1}</span>
         <span class="sbadge ${badgeCls}">${badgeLabel}</span>
       </div>
     </div>
@@ -1048,17 +673,16 @@ function stockCardHtml(u) {
       <div><div class="sm-lbl">Approved at</div><div class="sm-val ${u.approved_at?'vg':''}">${formatDT(u.approved_at)}</div></div>
     </div>
     <div class="sc-mid2" style="border-top:1px solid var(--bd)">
-      <div><div class="sm-lbl">Capital</div><div class="sm-val">${fmt(cap)} coins</div></div>
-      <div><div class="sm-lbl">Physical qty</div><div class="sm-val">${qty} item${qty>1?'s':''}</div></div>
+      <div><div class="sm-lbl">Capital</div><div class="sm-val">${fmt(t.capital_per_stock_sale||300)} coins</div></div>
+      <div><div class="sm-lbl">Physical qty</div><div class="sm-val">${t.quantity_per_stock_sale||1} item${(t.quantity_per_stock_sale||1)>1?'s':''}</div></div>
     </div>
-    <div style="padding:6px 13px;border-top:1px solid var(--bd);font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.5">${physNote}</div>
     ${noteHtml}
     ${seenHtml}
     ${actionsHtml}
   </div>`;
 }
 
-/* ─── HELPERS ─────────────────────────────────────── */
+/* ─── HELPERS ────────────────────────────────────── */
 let toastTimer;
 function showToast(msg,type='') {
   const t=document.getElementById('toast');
@@ -1067,14 +691,10 @@ function showToast(msg,type='') {
   toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-/* ─── WINDOW EXPORTS ──────────────────────────────── */
-window.onEmpChange      = onEmpChange;
-window.onEmpChangeMini  = onEmpChangeMini;
-window.markAsSeen       = markAsSeen;
-window.markAllSeen      = markAllSeen;
-window.setStockFilter   = setStockFilter;
-window.goToUnseen       = goToUnseen;
-window.showToast        = showToast;
+/* ─── WINDOW EXPORTS (for inline onclick handlers) ──── */
+window.onEmpChange  = onEmpChange;
+window.markAsSeen   = markAsSeen;
+window.showToast    = showToast;
 
 init();
 </script>

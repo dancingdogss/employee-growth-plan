@@ -241,36 +241,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .info-box strong{color:var(--a2);}
 @supports(padding:max(0px)){body{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
 
-/* ── NEEDS ATTENTION BLOCK ── */
-.attn-wrap{margin-bottom:8px;}
-.attn-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:var(--r);margin-bottom:6px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;border:1px solid;}
-.attn-row:last-child{margin-bottom:0;}
-.attn-row.ar-ns{background:linear-gradient(135deg,rgba(139,92,246,.13),rgba(139,92,246,.05));border-color:rgba(139,92,246,.38);}
-.attn-row.ar-ns:hover{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));}
-.attn-row.ar-issue{background:linear-gradient(135deg,rgba(240,96,112,.13),rgba(240,96,112,.05));border-color:rgba(240,96,112,.38);}
-.attn-row.ar-issue:hover{background:linear-gradient(135deg,rgba(240,96,112,.2),rgba(240,96,112,.08));}
-.attn-ico{font-size:18px;flex-shrink:0;}
-.attn-body{flex:1;min-width:0;}
-.attn-title{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:1px;}
-.attn-sub{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);}
-.attn-arr{font-family:'DM Mono',monospace;font-size:14px;flex-shrink:0;}
-.attn-row.ar-ns .attn-arr{color:var(--purple);}
-.attn-row.ar-issue .attn-arr{color:var(--red);}
-.attn-clear{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:10px 14px;background:rgba(0,212,170,.04);border:1px solid rgba(0,212,170,.18);border-radius:var(--r);display:flex;align-items:center;gap:8px;}
-/* ── PER-EMPLOYEE SALARY CARDS ── */
-.esal-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 13px;margin-bottom:6px;}
-.esal-card:last-child{margin-bottom:0;}
-.esal-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
-.esal-name{font-size:12px;font-weight:600;color:var(--text);}
-.esal-units{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);padding:2px 8px;border-radius:99px;background:var(--s2);border:1px solid var(--bd2);white-space:nowrap;}
-.esal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.esal-cell{min-width:0;}
-.esal-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
-.esal-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.esal-val.ev-earn{color:var(--a2);}
-.esal-val.ev-avail{color:var(--gold);}
-.esal-val.ev-neg{color:var(--red);}
-
 
 /* =========================================================
    FINAL UI PATCH: keep nav + filters visible and clickable
@@ -386,9 +356,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <button class="npill" data-target="sec-catoverview">By Category</button>
       <button class="npill" data-target="sec-employees">Employees</button>
       <button class="npill" data-target="sec-addstock">Add Stock</button>
+      <button class="npill" data-target="sec-bulk">Bulk Add</button>
       <button class="npill" data-target="sec-ledger">Ledger</button>
       <button class="npill" data-target="sec-payouts">Payouts</button>
       <button class="npill" data-target="sec-stats">Stats</button>
+      <button class="npill" data-target="sec-export">Export</button>
     </div>
     <div class="conn-dot" id="connDot"></div>
   </div>
@@ -414,14 +386,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="kpi ca"><span class="kpi-ico">💎</span><div class="kpi-lbl">Weekly deposit</div><div class="kpi-val" id="ov-wdep" style="font-size:18px">—</div><div class="kpi-sub">coins</div></div>
     <div class="kpi c2"><span class="kpi-ico">💰</span><div class="kpi-lbl">Weekly salary</div><div class="kpi-val" id="ov-wsal" style="font-size:18px">—</div><div class="kpi-sub">coins</div></div>
   </div>
-
-  <!-- NEEDS ATTENTION -->
-  <div class="slbl" style="margin-top:16px">// Needs your attention</div>
-  <div class="attn-wrap" id="attnWrap"></div>
-
-  <!-- PER-EMPLOYEE SALARY -->
-  <div class="slbl" style="margin-top:16px">// Salary by employee</div>
-  <div id="empSalaryWrap"></div>
 </div>
 
 <!-- A2. STOCK BY CATEGORY -->
@@ -456,9 +420,9 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   <div id="empListContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
 </div>
 
-<!-- C. ADD STOCK (single + bulk) -->
+<!-- C. ADD SINGLE STOCK UNIT -->
 <div class="section" id="sec-addstock">
-  <div class="slbl">// Add stock</div>
+  <div class="slbl">// Add single stock unit</div>
   <div style="margin-bottom:8px">
     <div class="coll-hd" id="addStockHead" onclick="toggleColl('addStock')">
       <div class="coll-title"><span>📦 New stock unit</span></div>
@@ -489,12 +453,17 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       </div>
     </div>
   </div>
+</div>
 
-  <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')" style="margin-top:8px">
-    <div class="coll-title"><span>📦 Bulk replenish (create many)</span></div>
-    <span class="coll-arr">▼</span>
-  </div>
-  <div class="coll-body" id="bulkBody">
+<!-- D. BULK REPLENISH -->
+<div class="section" id="sec-bulk">
+  <div class="slbl">// Bulk replenish</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')">
+      <div class="coll-title"><span>📦 Create multiple stock units</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="bulkBody">
       <div class="coll-inner">
         <div class="info-box" style="margin-bottom:12px">
           <strong>How bulk replenish works:</strong><br>
@@ -521,6 +490,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
         </div>
       </div>
     </div>
+  </div>
 </div>
 
 <!-- E. LEDGER -->
@@ -627,8 +597,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div class="wc"><div class="wc-lbl">Avg time to sell</div><div class="wc-val wv-gold" id="w-tts">—</div><div class="wc-sub">approved only</div></div>
     </div>
   </div>
+</div>
 
-  <div class="slbl" style="margin-top:16px">// Export data</div>
+<!-- H. EXPORT -->
+<div class="section" id="sec-export">
+  <div class="slbl">// Export data</div>
   <div class="card" style="padding:16px">
     <div class="export-row" style="margin-bottom:10px">
       <button class="exp-btn ej" onclick="exportJSON()">📦 Export JSON</button>
@@ -1065,75 +1038,6 @@ function renderOverview() {
   const s = computeWeek();
   txt('ov-week',s.approvedWeek.length);
   txt('ov-wdep',fmt(s.dep)); txt('ov-wsal',fmt(s.sal));
-  renderAttentionBlock();
-  renderEmpSalaryCards();
-}
-
-/* ─── NEEDS ATTENTION + EMP SALARY (Overview) ───────── */
-function jumpToFilter(filterKey) {
-  const btn = document.querySelector(`.fb[onclick*="setFilter('${filterKey}'"]`);
-  if (btn) setFilter(filterKey, btn);
-  goToSection('sec-ledger');
-}
-
-function renderAttentionBlock() {
-  const wrap = document.getElementById('attnWrap');
-  if (!wrap) return;
-  const notseen = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
-  const issues  = allStock.filter(u=>u.status==='issue').length;
-  let html = '';
-  if (notseen > 0) {
-    html += `<div class="attn-row ar-ns" onclick="jumpToFilter('sold_notseen')">
-      <span class="attn-ico">👁</span>
-      <div class="attn-body">
-        <div class="attn-title">${notseen} sold unit${notseen===1?'':'s'} not yet seen by employee</div>
-        <div class="attn-sub">Tap to view in ledger →</div>
-      </div>
-      <span class="attn-arr">›</span>
-    </div>`;
-  }
-  if (issues > 0) {
-    html += `<div class="attn-row ar-issue" onclick="jumpToFilter('issue')">
-      <span class="attn-ico">🔴</span>
-      <div class="attn-body">
-        <div class="attn-title">${issues} unit${issues===1?'':'s'} flagged as issue</div>
-        <div class="attn-sub">Tap to view in ledger →</div>
-      </div>
-      <span class="attn-arr">›</span>
-    </div>`;
-  }
-  if (!html) {
-    html = `<div class="attn-clear"><span>✅</span>All clear — nothing needs attention right now.</div>`;
-  }
-  wrap.innerHTML = html;
-}
-
-function renderEmpSalaryCards() {
-  const wrap = document.getElementById('empSalaryWrap');
-  if (!wrap) return;
-  const active = allEmployees.filter(e=>e.active);
-  if (!active.length) {
-    wrap.innerHTML = '<div class="empty"><span class="empty-ico">👤</span>No active employees.</div>';
-    return;
-  }
-  wrap.innerHTML = active.map(e => {
-    const s = calcSalaryForEmployee(e.id);
-    const soldCount = allStock.filter(u=>u.employee_id===e.id&&u.status==='sold_approved').length;
-    const availCls  = s.salaryAvail < 0 ? 'ev-neg' : 'ev-avail';
-    const availTxt  = fmt(s.salaryAvail) + (s.salaryAvail < 0 ? ' (advance)' : '');
-    return `
-    <div class="esal-card">
-      <div class="esal-top">
-        <span class="esal-name">${esc(e.name)} <span style="color:var(--muted);font-weight:400">(${esc(e.employee_code)})</span></span>
-        <span class="esal-units">${soldCount} sold</span>
-      </div>
-      <div class="esal-grid">
-        <div class="esal-cell"><div class="esal-lbl">Earned</div><div class="esal-val ev-earn">${fmt(s.salaryEarned)}</div></div>
-        <div class="esal-cell"><div class="esal-lbl">Paid</div><div class="esal-val">${fmt(s.salaryPaid)}</div></div>
-        <div class="esal-cell"><div class="esal-lbl">Available</div><div class="esal-val ${availCls}">${availTxt}</div></div>
-      </div>
-    </div>`;
-  }).join('');
 }
 
 /* ─── CATEGORY OVERVIEW ─────────────────────────────── */
@@ -1681,7 +1585,6 @@ window.exportJSON         = exportJSON;
 window.exportCSV          = exportCSV;
 window.closeModal         = closeModal;
 window.renderLedger       = renderLedger;
-window.jumpToFilter       = jumpToFilter;
 </script>
 </body>
 </html>

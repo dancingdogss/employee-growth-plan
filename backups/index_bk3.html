@@ -151,26 +151,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .markall-btn{width:100%;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:10px;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;
   color:var(--purple);border:1px solid rgba(139,92,246,.4);background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.05));}
 .markall-btn:hover{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));}
-/* AVAILABLE-TO-SELL INVENTORY */
-.inv-panel{background:linear-gradient(160deg,rgba(0,212,170,.05),rgba(15,18,25,.4));border:1px solid rgba(0,212,170,.18);border-radius:var(--rl);padding:14px;margin-bottom:12px;}
-.inv-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px;}
-.inv-title{font-size:13px;font-weight:700;color:var(--text);}
-.inv-total{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
-.inv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.inv-cell{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 10px;text-align:center;position:relative;overflow:hidden;}
-.inv-cell::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.inv-cell.iv-c::after{background:var(--accent);}
-.inv-cell.iv-b::after{background:var(--a2);}
-.inv-cell.iv-m::after{background:var(--gold);}
-.inv-prefix{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;line-height:1;margin-bottom:3px;}
-.inv-cell.iv-c .inv-prefix{color:var(--accent);}
-.inv-cell.iv-b .inv-prefix{color:var(--a2);}
-.inv-cell.iv-m .inv-prefix{color:var(--gold);}
-.inv-bundles{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--text);line-height:1.1;}
-.inv-bundles-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.inv-items{font-family:'DM Mono',monospace;font-size:10px;color:var(--t2);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd);}
-.inv-items strong{color:var(--text);}
-.inv-empty{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center;padding:6px 0;}
 /* STOCK CARDS */
 .stock-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
 .stock-card.sw{border-color:rgba(240,163,91,.18);}
@@ -419,11 +399,6 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
 <!-- C. MY STOCK -->
 <div class="section" id="sec-stock">
-  <div class="slbl">// Available to sell now</div>
-  <div class="inv-panel" id="invPanel">
-    <!-- filled by renderInventory() -->
-  </div>
-
   <div class="slbl">// My stock overview</div>
 
   <!-- Category summary -->
@@ -799,7 +774,6 @@ function renderAll() {
   renderTracker(s);
   renderSalarySection(s);
   renderEmpCategoryOverview();
-  renderInventory();
   renderStockList(allStockUnits);
   renderUnseenBanner();
   renderUnseenControls();
@@ -879,44 +853,6 @@ function renderPayouts() {
   }).join('');
 }
 
-/* ─── AVAILABLE-TO-SELL INVENTORY ─────────────────── */
-function renderInventory() {
-  const panel = document.getElementById('invPanel');
-  if (!panel) return;
-  const prefixes = ['C','B','M'];
-  // waiting units = on hand, available to sell
-  const waiting = allStockUnits.filter(u => u.status === 'waiting_to_be_sold');
-  const totalBundles = waiting.length;
-  let totalItems = 0;
-
-  const cells = prefixes.map(pfx => {
-    const t = TYPE_FALLBACK[pfx];
-    const units   = waiting.filter(u => getStockPrefix(u) === pfx);
-    const bundles = units.length;
-    const perBundle = t.quantity_per_stock_sale;
-    const items   = bundles * perBundle;
-    totalItems += items;
-    const unitWord = pfx === 'C' ? 'unit' : 'bundle';
-    return `
-    <div class="inv-cell iv-${pfx.toLowerCase()}">
-      <div class="inv-prefix">${pfx}</div>
-      <div class="inv-bundles-lbl">${unitWord}${bundles!==1?'s':''}</div>
-      <div class="inv-bundles">${bundles}</div>
-      <div class="inv-items"><strong>${fmt(items)}</strong> item${items!==1?'s':''}</div>
-    </div>`;
-  }).join('');
-
-  panel.innerHTML = `
-    <div class="inv-head">
-      <span class="inv-title">📦 Ready to sell</span>
-      <span class="inv-total">${totalBundles} unit${totalBundles!==1?'s':''} · ${fmt(totalItems)} item${totalItems!==1?'s':''}</span>
-    </div>
-    ${totalBundles === 0
-      ? '<div class="inv-empty">Nothing waiting to sell right now.</div>'
-      : `<div class="inv-grid">${cells}</div>`}
-  `;
-}
-
 /* ─── EMPLOYEE CATEGORY OVERVIEW ─────────────────── */
 function renderEmpCategoryOverview() {
   const grid = document.getElementById('empCatGrid');
@@ -962,8 +898,6 @@ function resetDashboard() {
   document.getElementById('payoutContainer').innerHTML='<div class="empty"><span class="empty-ico">💸</span>Select your profile.</div>';
   const empCatGrid = document.getElementById('empCatGrid');
   if (empCatGrid) empCatGrid.innerHTML='';
-  const invPanel = document.getElementById('invPanel');
-  if (invPanel) invPanel.innerHTML='<div class="inv-empty">Select your profile to see inventory.</div>';
   ['ms10','ms20','ms30','ms45'].forEach(id=>msEl(id,false));
   allPayouts=[];
   renderUnseenBanner();

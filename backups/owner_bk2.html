@@ -386,9 +386,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <button class="npill" data-target="sec-catoverview">By Category</button>
       <button class="npill" data-target="sec-employees">Employees</button>
       <button class="npill" data-target="sec-addstock">Add Stock</button>
+      <button class="npill" data-target="sec-bulk">Bulk Add</button>
       <button class="npill" data-target="sec-ledger">Ledger</button>
       <button class="npill" data-target="sec-payouts">Payouts</button>
       <button class="npill" data-target="sec-stats">Stats</button>
+      <button class="npill" data-target="sec-export">Export</button>
     </div>
     <div class="conn-dot" id="connDot"></div>
   </div>
@@ -456,9 +458,9 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
   <div id="empListContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
 </div>
 
-<!-- C. ADD STOCK (single + bulk) -->
+<!-- C. ADD SINGLE STOCK UNIT -->
 <div class="section" id="sec-addstock">
-  <div class="slbl">// Add stock</div>
+  <div class="slbl">// Add single stock unit</div>
   <div style="margin-bottom:8px">
     <div class="coll-hd" id="addStockHead" onclick="toggleColl('addStock')">
       <div class="coll-title"><span>📦 New stock unit</span></div>
@@ -489,12 +491,17 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       </div>
     </div>
   </div>
+</div>
 
-  <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')" style="margin-top:8px">
-    <div class="coll-title"><span>📦 Bulk replenish (create many)</span></div>
-    <span class="coll-arr">▼</span>
-  </div>
-  <div class="coll-body" id="bulkBody">
+<!-- D. BULK REPLENISH -->
+<div class="section" id="sec-bulk">
+  <div class="slbl">// Bulk replenish</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')">
+      <div class="coll-title"><span>📦 Create multiple stock units</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="bulkBody">
       <div class="coll-inner">
         <div class="info-box" style="margin-bottom:12px">
           <strong>How bulk replenish works:</strong><br>
@@ -521,6 +528,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
         </div>
       </div>
     </div>
+  </div>
 </div>
 
 <!-- E. LEDGER -->
@@ -627,8 +635,11 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div class="wc"><div class="wc-lbl">Avg time to sell</div><div class="wc-val wv-gold" id="w-tts">—</div><div class="wc-sub">approved only</div></div>
     </div>
   </div>
+</div>
 
-  <div class="slbl" style="margin-top:16px">// Export data</div>
+<!-- H. EXPORT -->
+<div class="section" id="sec-export">
+  <div class="slbl">// Export data</div>
   <div class="card" style="padding:16px">
     <div class="export-row" style="margin-bottom:10px">
       <button class="exp-btn ej" onclick="exportJSON()">📦 Export JSON</button>

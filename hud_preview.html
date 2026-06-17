@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUD — D2 Polished</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+:root{
+  --bg:#07090e;--s1:#0f1219;--s2:#161b25;--s3:#1a2030;
+  --bd:#1d2433;--bd2:#252d40;
+  --accent:#00d4aa;--a2:#5b6af0;--a3:#f0a35b;
+  --text:#e6ecf5;--t2:#a8b3c5;--muted:#5a6678;
+  --gold:#f0c05b;--red:#f06070;--purple:#8b5cf6;
+  --r:14px;--rl:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#05060a;color:var(--text);font-family:'Space Grotesk',sans-serif;padding:24px 16px 60px;-webkit-font-smoothing:antialiased;}
+.frame{max-width:440px;margin:0 auto;}
+.note{font-family:'DM Mono',monospace;font-size:10px;color:var(--a3);text-align:center;margin-bottom:20px;letter-spacing:1.5px;text-transform:uppercase;}
+.hero{position:relative;border-radius:22px;padding:22px 20px;margin-bottom:14px;overflow:hidden;
+  background:
+    radial-gradient(120% 100% at 85% 10%, rgba(0,212,170,.16), transparent 55%),
+    radial-gradient(120% 120% at 10% 100%, rgba(139,92,246,.18), transparent 50%),
+    linear-gradient(150deg,#150e33 0%,#0a1f24 100%);
+  border:1px solid rgba(139,92,246,.28);
+  box-shadow:0 20px 50px -20px rgba(0,212,170,.25), inset 0 1px 0 rgba(255,255,255,.05);}
+.hero-glow{position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,170,.25),transparent 60%);filter:blur(20px);
+  animation:float 7s ease-in-out infinite;pointer-events:none;}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.8}50%{transform:translateY(14px) scale(1.08);opacity:1}}
+.hero-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;margin-bottom:4px;}
+.hero-ey{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);}
+.hero-who{font-family:'DM Mono',monospace;font-size:10px;color:var(--t2);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:99px;}
+.hero-big{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:.85;letter-spacing:-3px;position:relative;z-index:2;
+  background:linear-gradient(100deg,#ffffff 10%,#7defc9 50%,#5b6af0 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 4px 20px rgba(0,212,170,.3));}
+.hero-biglbl{font-size:11px;font-weight:500;color:var(--t2);position:relative;z-index:2;margin-top:2px;margin-bottom:14px;letter-spacing:.3px;}
+.hero-chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 13px;border-radius:99px;position:relative;z-index:2;
+  background:linear-gradient(135deg,rgba(240,192,91,.22),rgba(240,192,91,.1));border:1px solid rgba(240,192,91,.4);color:var(--gold);}
+.hero-bar{height:9px;border-radius:99px;overflow:hidden;margin:15px 0 7px;position:relative;z-index:2;background:rgba(0,0,0,.4);box-shadow:inset 0 1px 3px rgba(0,0,0,.5);}
+.hero-bar i{display:block;height:100%;width:60%;border-radius:99px;position:relative;
+  background:linear-gradient(90deg,var(--purple),var(--a2) 50%,var(--accent));
+  box-shadow:0 0 12px rgba(0,212,170,.5);}
+.hero-bar i::after{content:'';position:absolute;inset:0;border-radius:99px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  background-size:200% 100%;animation:shimmer 2.4s linear infinite;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.hero-barsub{font-size:11px;color:var(--t2);position:relative;z-index:2;font-weight:500;}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.k{position:relative;border-radius:15px;padding:15px 14px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  border:1px solid var(--bd2);box-shadow:0 6px 18px -10px rgba(0,0,0,.6);}
+.k::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:99px;}
+.k::after{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;filter:blur(22px);opacity:.5;}
+.k.a::before{background:var(--accent);}.k.a::after{background:var(--accent);}
+.k.b::before{background:var(--a2);}.k.b::after{background:var(--a2);}
+.k.c::before{background:var(--gold);}.k.c::after{background:var(--gold);}
+.k.d::before{background:var(--purple);}.k.d::after{background:var(--purple);}
+.k .kl{font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;position:relative;z-index:1;padding-left:8px;}
+.k .kv{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;line-height:1;position:relative;z-index:1;padding-left:8px;}
+.k.a .kv{color:var(--accent);}.k.b .kv{color:#8d99ff;}.k.c .kv{color:var(--gold);}.k.d .kv{color:#b18cf5;}
+.k .ks{font-size:10px;color:var(--muted);margin-top:4px;padding-left:8px;position:relative;z-index:1;font-weight:500;}
+.inv{border-radius:18px;padding:16px;
+  background:linear-gradient(160deg,rgba(0,212,170,.07),rgba(10,22,38,.5));
+  border:1px solid rgba(0,212,170,.22);box-shadow:0 10px 30px -16px rgba(0,212,170,.3);}
+.inv-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.inv-h b{font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.inv-h .tot{font-size:11px;font-weight:600;color:var(--accent);background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);padding:4px 11px;border-radius:99px;}
+.inv-g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.ic{position:relative;border-radius:14px;padding:14px 8px 12px;text-align:center;overflow:hidden;
+  box-shadow:0 8px 20px -10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.18);}
+.ic.c{background:linear-gradient(165deg,#0fe6bc,#008f76);}
+.ic.b{background:linear-gradient(165deg,#7b88ff,#3a44b8);}
+.ic.m{background:linear-gradient(165deg,#f5c861,#cf9530);}
+.ic .p{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:.9;color:rgba(0,0,0,.82);}
+.ic.b .p{color:rgba(255,255,255,.92);}
+.ic .n{font-size:13px;font-weight:700;color:rgba(0,0,0,.7);margin-top:2px;}
+.ic.b .n{color:rgba(255,255,255,.85);}
+.ic .it{font-size:10px;font-weight:600;margin-top:8px;padding-top:7px;border-top:1px solid rgba(0,0,0,.15);color:rgba(0,0,0,.6);}
+.ic.b .it{border-top-color:rgba(255,255,255,.2);color:rgba(255,255,255,.75);}
+.ic .glint{position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.25),transparent);pointer-events:none;}
+.pick{margin-top:26px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--t2);background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:15px;line-height:1.8;}
+.pick b{color:var(--accent);}
+@media(prefers-reduced-motion:reduce){.hero-glow,.hero-bar i::after{animation:none;}}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="note">// D2 polished · Maria (EMP-002) · sample data</div>
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-top">
+      <span class="hero-ey">Approved sales</span>
+      <span class="hero-who">EMP-002</span>
+    </div>
+    <div class="hero-big">12</div>
+    <div class="hero-biglbl">sale events approved · keep going</div>
+    <span class="hero-chip">⚡ Level 1 · 75 / 25 split</span>
+    <div class="hero-bar"><i></i></div>
+    <div class="hero-barsub">8 more approved sales to reach Level 2</div>
+  </div>
+  <div class="kpis">
+    <div class="k a"><div class="kl">Deposit balance</div><div class="kv">900</div><div class="ks">coins</div></div>
+    <div class="k b"><div class="kl">Salary earned</div><div class="kv">300</div><div class="ks">coins total</div></div>
+    <div class="k c"><div class="kl">Available</div><div class="kv">300</div><div class="ks">unpaid balance</div></div>
+    <div class="k d"><div class="kl">Sold · not seen</div><div class="kv">2</div><div class="ks">tap to confirm</div></div>
+  </div>
+  <div class="inv">
+    <div class="inv-h"><b>📦 Ready to sell</b><span class="tot">17 units · 65 items</span></div>
+    <div class="inv-g">
+      <div class="ic c"><span class="glint"></span><div class="p">9</div><div class="n">C units</div><div class="it">9 items</div></div>
+      <div class="ic b"><span class="glint"></span><div class="p">5</div><div class="n">B bundles</div><div class="it">50 items</div></div>
+      <div class="ic m"><span class="glint"></span><div class="p">3</div><div class="n">M bundles</div><div class="it">15 items</div></div>
+    </div>
+  </div>
+  <div class="pick">
+    Like this? Say <b>"apply it"</b> and I'll patch the real index.html (visual only).<br>
+    Want tweaks? e.g. <b>"calmer glow"</b>, <b>"flatter KPIs"</b>, <b>"different inventory colors"</b>.
+  </div>
+</div>
+</body>
+</html>
