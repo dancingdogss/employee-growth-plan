@@ -1001,11 +1001,16 @@ async function sendOwnerMessage() {
       console.error('owner_messages insert failed:', insertError);
       continue;
     }
-    const { error: fnError } = await _sb.functions.invoke('notify-message', { body: { employee_id, text } });
+    const { data: fnData, error: fnError } = await _sb.functions.invoke('notify-message', { body: { employee_id, text } });
     if (fnError) {
       failCount++; lastError = fnError.message || String(fnError);
       console.error('notify-message invoke failed:', fnError);
-    } else okCount++;
+    } else if (fnData && fnData.ok === false) {
+      failCount++; lastError = fnData.reason || 'Telegram delivery failed';
+      console.error('notify-message reported failure:', fnData);
+    } else {
+      okCount++;
+    }
   }
 
   if (btn) { btn.disabled = false; btn.textContent = orig; }
