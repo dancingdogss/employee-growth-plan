@@ -993,16 +993,25 @@ async function sendOwnerMessage() {
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
   let okCount = 0, failCount = 0;
+  let lastError = '';
   for (const employee_id of targets) {
     const { error: insertError } = await _sb.from('owner_messages').insert({ employee_id, message: text });
-    if (insertError) { failCount++; continue; }
+    if (insertError) {
+      failCount++; lastError = insertError.message;
+      console.error('owner_messages insert failed:', insertError);
+      continue;
+    }
     const { error: fnError } = await _sb.functions.invoke('notify-message', { body: { employee_id, text } });
-    if (fnError) failCount++; else okCount++;
+    if (fnError) {
+      failCount++; lastError = fnError.message || String(fnError);
+      console.error('notify-message invoke failed:', fnError);
+    } else okCount++;
   }
 
   if (btn) { btn.disabled = false; btn.textContent = orig; }
   document.getElementById('msg-text').value = '';
-  showToast(`Sent to ${okCount} employee${okCount===1?'':'s'}${failCount?', '+failCount+' failed':''}`, failCount && !okCount ? 'err' : 'ok');
+  const summary = `Sent to ${okCount} employee${okCount===1?'':'s'}${failCount?', '+failCount+' failed':''}`;
+  showToast(failCount && !okCount ? summary+': '+lastError : summary, failCount && !okCount ? 'err' : 'ok');
 }
 
 /* ─── STOCK DEDUPE ──────────────────────────────────── */
