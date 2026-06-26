@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07090e">
+<title>Owner Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#07090e;--s1:#0f1219;--s2:#161b25;--s3:#1a2030;
+  --bd:#1d2433;--bd2:#252d40;
+  --accent:#00d4aa;--a2:#5b6af0;--a3:#f0a35b;
+  --text:#e6ecf5;--t2:#a8b3c5;--muted:#5a6678;
+  --gold:#f0c05b;--red:#f06070;--purple:#8b5cf6;
+  --r:12px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding-bottom:60px;font-size:14px;-webkit-font-smoothing:antialiased;}
+.topbar{background:rgba(7,9,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:80;}
+.topbar-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:9px 14px;}
+.nav-pills{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex:1;}
+.nav-pills::-webkit-scrollbar{display:none;}
+.npill{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:6px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--s1);cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.npill:hover{color:var(--text);border-color:var(--bd2);}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s;}
+.conn-dot.live{background:var(--accent);}.conn-dot.err{background:var(--red);}
+.page{max-width:600px;margin:0 auto;padding:0 14px;}
+.section{padding-top:20px;}
+.slbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;}
+.hero{background:linear-gradient(160deg,#0d1220 0%,#07090e 100%);border-bottom:1px solid var(--bd);padding:20px 14px 16px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-20px;width:150px;height:150px;background:radial-gradient(circle,rgba(91,106,240,.1) 0%,transparent 70%);pointer-events:none;}
+.hero-inner{max-width:600px;margin:0 auto;position:relative;z-index:2;display:flex;align-items:center;gap:12px;}
+.hero-mark{width:38px;height:38px;flex-shrink:0;background:linear-gradient(135deg,var(--a2) 0%,var(--purple) 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.hero-txt h1{font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:2px;}
+.hero-txt p{color:var(--muted);font-size:11px;line-height:1.45;}
+/* PIN */
+.pin-gate{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.pin-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:28px 22px;width:100%;max-width:320px;text-align:center;}
+.pin-box h2{font-size:16px;font-weight:700;margin-bottom:6px;}
+.pin-box p{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:18px;}
+.pin-input{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:20px;padding:12px;outline:none;text-align:center;letter-spacing:6px;margin-bottom:10px;transition:border-color .2s;}
+.pin-input:focus{border-color:rgba(91,106,240,.5);}
+.pin-btn{width:100%;background:linear-gradient(135deg,rgba(91,106,240,.14),rgba(91,106,240,.07));border:1px solid rgba(91,106,240,.32);border-radius:10px;color:var(--a2);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;padding:12px;cursor:pointer;transition:all .14s;}
+.pin-btn:hover{background:linear-gradient(135deg,rgba(91,106,240,.22),rgba(91,106,240,.12));}
+.pin-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-top:8px;}
+.pin-note{font-size:10px;color:var(--muted);margin-top:12px;line-height:1.55;}
+/* SECURITY */
+.sec-banner{background:rgba(240,96,112,.07);border:1px solid rgba(240,96,112,.22);border-radius:var(--r);padding:10px 13px;font-size:11px;color:var(--t2);line-height:1.55;margin-bottom:16px;}
+.sec-banner strong{color:var(--red);}
+/* FORMS */
+.form-grid{display:flex;flex-direction:column;gap:10px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:rgba(0,212,170,.4);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+.form-textarea{min-height:54px;resize:vertical;font-size:12px;line-height:1.5;}
+.form-select{appearance:none;-webkit-appearance:none;}
+.form-hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.5;}
+.form-warn{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);line-height:1.5;display:none;}
+.btn-primary{width:100%;background:linear-gradient(135deg,rgba(0,212,170,.14),rgba(0,212,170,.07));border:1px solid rgba(0,212,170,.32);border-radius:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;padding:12px;cursor:pointer;transition:all .14s;-webkit-tap-highlight-color:transparent;}
+.btn-primary:hover{background:linear-gradient(135deg,rgba(0,212,170,.22),rgba(0,212,170,.12));}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-secondary{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--t2);font-family:'DM Mono',monospace;font-size:12px;padding:11px;cursor:pointer;transition:background .14s;}
+.btn-secondary:hover{background:var(--s3);}
+/* COLLAPSIBLE */
+.coll-hd{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);display:flex;align-items:center;justify-content:space-between;padding:12px 15px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.coll-hd:hover{background:var(--s2);}
+.coll-hd.open{border-radius:var(--r) var(--r) 0 0;border-bottom-color:transparent;}
+.coll-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;}
+.coll-badge{font-family:'DM Mono',monospace;font-size:9px;padding:3px 8px;border-radius:99px;background:var(--s2);border:1px solid var(--bd2);color:var(--muted);}
+.coll-arr{font-size:11px;color:var(--muted);transition:transform .25s;}
+.coll-hd.open .coll-arr{transform:rotate(180deg);}
+.coll-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1);background:var(--s1);border:1px solid var(--bd);border-top:none;border-radius:0 0 var(--r) var(--r);}
+.coll-body.open{max-height:9999px;}
+.coll-inner{padding:14px 15px 16px;}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.kpi-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:13px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0;}
+.kpi.ca::after{background:var(--accent);}.kpi.cp::after{background:var(--purple);}.kpi.cr::after{background:var(--red);}.kpi.cg::after{background:var(--gold);}.kpi.c2::after{background:var(--a2);}
+.kpi-ico{position:absolute;top:10px;right:10px;font-size:14px;opacity:.35;}
+.kpi-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.kpi-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;line-height:1;letter-spacing:-.3px;}
+.kpi.ca .kpi-val{color:var(--accent);}.kpi.cp .kpi-val{color:var(--purple);}.kpi.cr .kpi-val{color:var(--red);}.kpi.cg .kpi-val{color:var(--gold);}.kpi.c2 .kpi-val{color:var(--a2);}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+/* STATUS BADGES */
+.sbadge{font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;letter-spacing:.4px;white-space:nowrap;}
+.s-waiting{background:rgba(240,163,91,.12);color:var(--a3);border:1px solid rgba(240,163,91,.3);}
+.s-approved{background:rgba(0,212,170,.14);color:var(--accent);border:1px solid rgba(0,212,170,.3);}
+.s-issue{background:rgba(240,96,112,.12);color:var(--red);border:1px solid rgba(240,96,112,.3);}
+.s-cancelled{background:rgba(90,102,120,.15);color:var(--muted);border:1px solid rgba(90,102,120,.3);}
+/* SEEN BADGE */
+.seen-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;border:1px solid;white-space:nowrap;}
+.seen-yes{color:var(--accent);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.08);}
+.seen-no{color:var(--muted);border-color:rgba(90,102,120,.3);background:transparent;}
+/* TYPE PILL */
+.type-pill{font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;border:1px solid;white-space:nowrap;}
+.tp-c{color:var(--accent);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.08);}
+.tp-b{color:var(--a2);border-color:rgba(91,106,240,.3);background:rgba(91,106,240,.08);}
+.tp-m{color:var(--gold);border-color:rgba(240,192,91,.3);background:rgba(240,192,91,.08);}
+/* CATEGORY CARDS */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;}
+.cat-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 11px;position:relative;overflow:hidden;}
+.cat-card.cat-c{border-color:rgba(0,212,170,.2);}
+.cat-card.cat-b{border-color:rgba(91,106,240,.2);}
+.cat-card.cat-m{border-color:rgba(240,192,91,.2);}
+.cat-prefix{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;line-height:1;margin-bottom:3px;}
+.cat-c .cat-prefix{color:var(--accent);}
+.cat-b .cat-prefix{color:var(--a2);}
+.cat-m .cat-prefix{color:var(--gold);}
+.cat-name{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.cat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.cat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);}
+.cat-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text);}
+.cat-val.cv-wait{color:var(--a3);}
+.cat-val.cv-sold{color:var(--accent);}
+.cat-val.cv-ns{color:var(--purple);}
+.cat-val.cv-issue{color:var(--red);}
+.cat-divider{height:1px;background:var(--bd);margin:7px 0;}
+.cat-phys{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.5;}
+.cat-phys strong{color:var(--t2);}
+/* LEDGER CARDS */
+.ord-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
+.ord-card.cw{border-color:rgba(240,163,91,.18);}
+.ord-card.ca2{border-color:rgba(0,212,170,.2);}
+.ord-card.ci{border-color:rgba(240,96,112,.22);}
+.ord-card.cc{border-color:rgba(90,102,120,.2);}
+.ord-card:last-child{margin-bottom:0;}
+.oc-top{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--bd);gap:8px;flex-wrap:wrap;}
+.oc-ids{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;}
+.oc-sid{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.oc-oid{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:99px;background:var(--s1);border:1px solid var(--bd);}
+.oc-oid.has{color:var(--accent);}.oc-oid.no{color:var(--muted);}
+.oc-emp{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);padding:2px 7px;border-radius:99px;background:var(--s3);border:1px solid var(--bd2);}
+.oc-mid{padding:9px 13px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.oc-mid4{padding:9px 13px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+.om-lbl{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.om-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.om-val.vg{color:var(--accent);}.om-val.vp{color:var(--purple);}.om-val.vgold{color:var(--gold);}
+.oc-note{font-size:11px;color:var(--muted);font-style:italic;padding:7px 13px;border-top:1px solid var(--bd);line-height:1.5;}
+.oc-actions{display:flex;gap:6px;padding:10px 13px;border-top:1px solid var(--bd);flex-wrap:wrap;}
+.oc-btn{font-family:'DM Mono',monospace;font-size:10px;padding:7px 11px;border-radius:8px;border:1px solid var(--bd);background:var(--s1);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.oc-btn:hover{color:var(--text);background:var(--s3);}
+.oc-btn.b-marksold{color:var(--accent);border-color:rgba(0,212,170,.32);background:rgba(0,212,170,.06);}
+.oc-btn.b-marksold:hover{background:rgba(0,212,170,.14);}
+.oc-btn.b-issue{color:var(--red);border-color:rgba(240,96,112,.28);}
+.oc-btn.b-issue:hover{background:rgba(240,96,112,.07);}
+.oc-btn.b-wait{color:var(--a3);border-color:rgba(240,163,91,.28);}
+.oc-btn.b-wait:hover{background:rgba(240,163,91,.07);}
+.oc-btn.b-cancel{color:var(--muted);border-color:rgba(90,102,120,.3);}
+.oc-btn.b-cancel:hover{color:var(--red);}
+.oc-btn.b-edit{color:var(--a2);border-color:rgba(91,106,240,.28);}
+.oc-btn.b-edit:hover{background:rgba(91,106,240,.07);}
+.oc-btn.b-del{color:var(--red);}
+.oc-btn.b-del:hover{background:rgba(240,96,112,.07);}
+/* SEEN ROWS */
+.seen-row{padding:8px 13px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;background:rgba(0,212,170,.03);}
+.seen-row-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
+.seen-row-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.notseen-row{padding:7px 13px;border-top:1px solid var(--bd);}
+.notseen-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+/* PAYOUT */
+.payout-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--bd);gap:8px;}
+.payout-row:first-child{border-top:none;}
+.pr-left{flex:1;min-width:0;}
+.pr-emp{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);margin-bottom:2px;}
+.pr-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.pr-amount{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--accent);white-space:nowrap;}
+/* FILTERS */
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;opacity:.4;pointer-events:none;}
+.search-inp{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px 10px 34px;outline:none;transition:border-color .2s;}
+.search-inp:focus{border-color:rgba(0,212,170,.4);}
+.search-inp::placeholder{color:var(--muted);}
+.filters{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:3px;}
+.filters::-webkit-scrollbar{display:none;}
+.fb{font-family:'DM Mono',monospace;font-size:10px;padding:5px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.fb.fa{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
+.fb.fb-c{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
+.fb.fb-b{border-color:rgba(91,106,240,.4);color:var(--a2);background:rgba(91,106,240,.07);}
+.fb.fb-m{border-color:rgba(240,192,91,.4);color:var(--gold);background:rgba(240,192,91,.07);}
+.fb.fp{border-color:rgba(139,92,246,.4);color:var(--purple);background:rgba(139,92,246,.07);}
+.fb.fr{border-color:rgba(240,96,112,.4);color:var(--red);background:rgba(240,96,112,.07);}
+.fb.fw{border-color:rgba(240,163,91,.4);color:var(--a3);background:rgba(240,163,91,.07);}
+.ledger-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;letter-spacing:1px;}
+.emp-filter-row{margin-bottom:10px;}
+/* WEEKLY */
+.week-hd{background:var(--s2);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.wh-info{display:flex;flex-direction:column;gap:1px;}
+.wh-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.wh-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
+.rpt-btn{font-family:'DM Mono',monospace;font-size:10px;padding:7px 12px;border-radius:8px;border:1px solid rgba(91,106,240,.3);background:rgba(91,106,240,.07);color:var(--a2);cursor:pointer;transition:background .14s;white-space:nowrap;}
+.rpt-btn:hover{background:rgba(91,106,240,.14);}
+.rpt-btn.copied{background:var(--a2);color:#fff;border-color:var(--a2);}
+.week-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd);}
+.wc{background:var(--s1);padding:13px 14px;}
+.wc-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.wc-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;line-height:1;color:var(--text);}
+.wc-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.wv-acc{color:var(--accent);}.wv-a2{color:var(--a2);}.wv-gold{color:var(--gold);}.wv-red{color:var(--red);}.wv-purple{color:var(--purple);}
+.wc-bar{height:4px;background:var(--s3);border-radius:99px;overflow:hidden;margin-top:7px;}
+.wc-bar-fill{height:100%;background:linear-gradient(90deg,var(--a2),var(--accent));border-radius:99px;transition:width .45s;}
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.modal-ov.open{display:flex;}
+.modal-box{background:var(--s1);border:1px solid var(--bd);border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px 18px 28px;max-height:88vh;overflow-y:auto;}
+.modal-ttl{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close{font-size:18px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1;padding:0 4px;}
+.modal-close:hover{color:var(--text);}
+.modal-acts{display:flex;gap:8px;margin-top:14px;}
+.modal-save{flex:1;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);border-radius:10px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;padding:11px;cursor:pointer;transition:background .14s;}
+.modal-save:hover{background:rgba(0,212,170,.18);}
+.modal-save.red{background:rgba(240,96,112,.1);border-color:rgba(240,96,112,.3);color:var(--red);}
+.modal-save.red:hover{background:rgba(240,96,112,.18);}
+.modal-cancel{background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;padding:11px 18px;cursor:pointer;}
+/* EXPORT */
+.export-row{display:flex;gap:8px;}
+.exp-btn{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;font-family:'DM Mono',monospace;font-size:11px;padding:10px 8px;cursor:pointer;text-align:center;transition:background .14s;color:var(--t2);}
+.exp-btn.ej{color:var(--a2);border-color:rgba(91,106,240,.25);}
+.exp-btn.ej:hover{background:rgba(91,106,240,.07);}
+.exp-btn.ec{color:var(--gold);border-color:rgba(240,192,91,.25);}
+.exp-btn.ec:hover{background:rgba(240,192,91,.07);}
+/* MISC */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--bd2);border-radius:99px;padding:10px 18px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text);z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.toast.show{opacity:1;}
+.toast.ok{border-color:rgba(0,212,170,.35);color:var(--accent);}
+.toast.err{border-color:rgba(240,96,112,.35);color:var(--red);}
+.empty{text-align:center;padding:32px 16px;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;background:var(--s2);border:1px dashed var(--bd2);border-radius:var(--r);}
+.empty-ico{font-size:26px;opacity:.4;margin-bottom:8px;display:block;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bd2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-wrap{padding:24px;text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;}
+.info-box{background:rgba(91,106,240,.06);border:1px solid rgba(91,106,240,.2);border-radius:var(--r);padding:10px 13px;font-size:11px;color:var(--t2);line-height:1.65;}
+.info-box strong{color:var(--a2);}
+@supports(padding:max(0px)){body{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
+
+/* ── NEEDS ATTENTION BLOCK ── */
+.attn-wrap{margin-bottom:8px;}
+.attn-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:var(--r);margin-bottom:6px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;border:1px solid;}
+.attn-row:last-child{margin-bottom:0;}
+.attn-row.ar-ns{background:linear-gradient(135deg,rgba(139,92,246,.13),rgba(139,92,246,.05));border-color:rgba(139,92,246,.38);}
+.attn-row.ar-ns:hover{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));}
+.attn-row.ar-issue{background:linear-gradient(135deg,rgba(240,96,112,.13),rgba(240,96,112,.05));border-color:rgba(240,96,112,.38);}
+.attn-row.ar-issue:hover{background:linear-gradient(135deg,rgba(240,96,112,.2),rgba(240,96,112,.08));}
+.attn-ico{font-size:18px;flex-shrink:0;}
+.attn-body{flex:1;min-width:0;}
+.attn-title{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:1px;}
+.attn-sub{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);}
+.attn-arr{font-family:'DM Mono',monospace;font-size:14px;flex-shrink:0;}
+.attn-row.ar-ns .attn-arr{color:var(--purple);}
+.attn-row.ar-issue .attn-arr{color:var(--red);}
+.attn-clear{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:10px 14px;background:rgba(0,212,170,.04);border:1px solid rgba(0,212,170,.18);border-radius:var(--r);display:flex;align-items:center;gap:8px;}
+/* ── PER-EMPLOYEE SALARY CARDS ── */
+.esal-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:11px 13px;margin-bottom:6px;}
+.esal-card:last-child{margin-bottom:0;}
+.esal-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.esal-name{font-size:12px;font-weight:600;color:var(--text);}
+.esal-units{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);padding:2px 8px;border-radius:99px;background:var(--s2);border:1px solid var(--bd2);white-space:nowrap;}
+.esal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.esal-cell{min-width:0;}
+.esal-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.esal-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.esal-val.ev-earn{color:var(--a2);}
+.esal-val.ev-avail{color:var(--gold);}
+.esal-val.ev-neg{color:var(--red);}
+
+
+/* =========================================================
+   FINAL UI PATCH: keep nav + filters visible and clickable
+   - top nav wraps instead of triggering bad native scrollTo behavior
+   - quick filters wrap instead of disappearing outside screen
+   - sections keep titles visible under sticky nav
+========================================================= */
+.topbar-inner {
+  max-width: min(100%, 720px);
+  width: 100%;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.nav-pills {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-x: visible;
+  overflow-y: visible;
+  gap: 6px;
+  padding-bottom: 0;
+  scrollbar-width: none;
+}
+
+.nav-pills::-webkit-scrollbar { display: none; }
+
+.npill {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1;
+  padding: 7px 12px;
+}
+
+.conn-dot { margin-top: 11px; }
+
+.section[id] { scroll-margin-top: 104px; }
+
+.filters,
+.qf-row {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-x: visible;
+  overflow-y: visible;
+  max-width: 100%;
+  gap: 6px;
+  row-gap: 7px;
+  padding-bottom: 0;
+}
+
+.fb,
+.qfb {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.filters + .ledger-count,
+.qf-row + .slbl { margin-top: 4px; }
+
+@media (max-width: 420px) {
+  .topbar-inner { padding-left: 10px; padding-right: 10px; }
+  .npill, .fb, .qfb { font-size: 9.5px; padding: 7px 10px; }
+  .section[id] { scroll-margin-top: 126px; }
+  .cat-grid, .emp-cat-grid { gap: 6px; }
+  .cat-card, .emp-cat { padding: 10px 8px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- PIN GATE -->
+<div class="pin-gate" id="pinGate">
+  <div class="pin-box">
+    <div style="font-size:28px;margin-bottom:10px">🛡</div>
+    <h2>Owner Dashboard</h2>
+    <p>Enter your owner PIN to access the dashboard.</p>
+    <input class="pin-input" type="password" id="pinInput" maxlength="12" placeholder="••••">
+    <button class="pin-btn" onclick="tryPin()">Unlock dashboard</button>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="pin-note">⚠ Real security requires Supabase Auth + Row Level Security.</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-mark">🛡</div>
+    <div class="hero-txt">
+      <h1>Owner Dashboard</h1>
+      <p>Manage stock, mark as sold, track salary payouts.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="nav-pills">
+      <button class="npill" data-target="sec-overview">Overview</button>
+      <button class="npill" data-target="sec-catoverview">By Category</button>
+      <button class="npill" data-target="sec-employees">Employees</button>
+      <button class="npill" data-target="sec-addstock">Add Stock</button>
+      <button class="npill" data-target="sec-ledger">Ledger</button>
+      <button class="npill" data-target="sec-payouts">Payouts</button>
+      <button class="npill" data-target="sec-stats">Stats</button>
+    </div>
+    <div class="conn-dot" id="connDot"></div>
+  </div>
+</div>
+
+<div class="page">
+<div class="section">
+  <div class="sec-banner"><strong>⚠ Security notice:</strong> This dashboard has no real server-side authentication. Real security requires Supabase Auth + Row Level Security.</div>
+</div>
+
+<!-- A. OVERVIEW -->
+<div class="section" id="sec-overview">
+  <div class="slbl">// Overview</div>
+  <div class="kpi-grid" style="margin-bottom:8px">
+    <div class="kpi ca"><span class="kpi-ico">📦</span><div class="kpi-lbl">Total records</div><div class="kpi-val" id="ov-total">—</div><div class="kpi-sub">in ledger</div></div>
+    <div class="kpi ca"><span class="kpi-ico">✅</span><div class="kpi-lbl">Approved sold</div><div class="kpi-val" id="ov-approved">—</div><div class="kpi-sub">sale events</div></div>
+    <div class="kpi cp"><span class="kpi-ico">👁</span><div class="kpi-lbl">Sold, not seen</div><div class="kpi-val" id="ov-notseen">—</div><div class="kpi-sub">employee pending</div></div>
+    <div class="kpi cg"><span class="kpi-ico">🟡</span><div class="kpi-lbl">Waiting to sell</div><div class="kpi-val" id="ov-waiting">—</div><div class="kpi-sub">in stock</div></div>
+    <div class="kpi cr"><span class="kpi-ico">🔴</span><div class="kpi-lbl">Issues</div><div class="kpi-val" id="ov-issue">—</div><div class="kpi-sub">needs attention</div></div>
+    <div class="kpi c2"><span class="kpi-ico">📅</span><div class="kpi-lbl">Approved this week</div><div class="kpi-val" id="ov-week">—</div><div class="kpi-sub">this week</div></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi ca"><span class="kpi-ico">💎</span><div class="kpi-lbl">Weekly deposit</div><div class="kpi-val" id="ov-wdep" style="font-size:18px">—</div><div class="kpi-sub">coins</div></div>
+    <div class="kpi c2"><span class="kpi-ico">💰</span><div class="kpi-lbl">Weekly salary</div><div class="kpi-val" id="ov-wsal" style="font-size:18px">—</div><div class="kpi-sub">coins</div></div>
+  </div>
+
+  <!-- NEEDS ATTENTION -->
+  <div class="slbl" style="margin-top:16px">// Needs your attention</div>
+  <div class="attn-wrap" id="attnWrap"></div>
+
+  <!-- PER-EMPLOYEE SALARY -->
+  <div class="slbl" style="margin-top:16px">// Salary by employee</div>
+  <div id="empSalaryWrap"></div>
+</div>
+
+<!-- A2. STOCK BY CATEGORY -->
+<div class="section" id="sec-catoverview">
+  <div class="slbl">// Stock by category</div>
+  <div class="cat-grid" id="catGrid">
+    <!-- filled by renderCategoryOverview() -->
+  </div>
+</div>
+
+<!-- B. EMPLOYEES -->
+<div class="section" id="sec-employees">
+  <div class="slbl">// Employees</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd" id="addEmpHead" onclick="toggleColl('addEmp')">
+      <div class="coll-title"><span>➕ Add employee</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="addEmpBody">
+      <div class="coll-inner">
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Employee code *</label><input class="form-input" id="ef-code" type="text" placeholder="EMP-001"></div>
+            <div class="form-group"><label class="form-label">Full name *</label><input class="form-input" id="ef-name" type="text" placeholder="Name"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Notes (optional)</label><textarea class="form-textarea" id="ef-notes" placeholder="Optional notes"></textarea></div>
+          <button class="btn-primary" onclick="addEmployee()">+ Add employee</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="empListContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
+</div>
+
+<!-- C. ADD STOCK (single + bulk) -->
+<div class="section" id="sec-addstock">
+  <div class="slbl">// Add stock</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd" id="addStockHead" onclick="toggleColl('addStock')">
+      <div class="coll-title"><span>📦 New stock unit</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="addStockBody">
+      <div class="coll-inner">
+        <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Order ID is assigned only when sold — do not enter it here.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Stock Type *</label>
+            <select class="form-select" id="sf-type" onchange="onSingleTypeChange()">
+              <option value="">Select type</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Stock ID *</label>
+              <input class="form-input" id="sf-stock" type="text" placeholder="C-0001" oninput="validateStockIdPrefix('sf-stock','sf-type','sf-stock-warn')">
+              <div class="form-warn" id="sf-stock-warn">Stock ID must start with the selected type prefix (e.g. C-, B-, M-)</div>
+            </div>
+            <div class="form-group"><label class="form-label">Assign to employee *</label><select class="form-select" id="sf-emp"><option value="">Select employee</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Uploaded at *</label><input class="form-input" id="sf-upload" type="datetime-local"></div>
+          <div class="form-group"><label class="form-label">Owner notes (optional)</label><textarea class="form-textarea" id="sf-notes" placeholder="Notes..."></textarea></div>
+          <button class="btn-primary" onclick="addStockUnit()">+ Add stock unit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')" style="margin-top:8px">
+    <div class="coll-title"><span>📦 Bulk replenish (create many)</span></div>
+    <span class="coll-arr">▼</span>
+  </div>
+  <div class="coll-body" id="bulkBody">
+      <div class="coll-inner">
+        <div class="info-box" style="margin-bottom:12px">
+          <strong>How bulk replenish works:</strong><br>
+          Select a stock type, starting number, and how many units to create.<br>
+          Example: Type <strong>B</strong>, start <strong>1</strong>, quantity <strong>4</strong> → creates B-0001, B-0002, B-0003, B-0004.<br>
+          Each B unit = <strong>10 physical items</strong> (1 sale event = 100 earnings).<br>
+          Each M unit = <strong>5 physical items</strong> (1 sale event = 100 earnings).<br>
+          Each C unit = <strong>1 physical item</strong> (1 sale event = 100 earnings).<br>
+          Existing stock IDs are skipped — no duplicates created.
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Assign to employee *</label><select class="form-select" id="bk-emp"><option value="">Select employee</option></select></div>
+            <div class="form-group"><label class="form-label">Stock Type *</label><select class="form-select" id="bk-type" onchange="onBulkTypeChange()"><option value="">Select type</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Starting number *</label><input class="form-input" id="bk-start" type="number" min="1" placeholder="1"></div>
+            <div class="form-group"><label class="form-label">Quantity to create *</label><input class="form-input" id="bk-qty" type="number" min="1" max="200" placeholder="10"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Uploaded at *</label><input class="form-input" id="bk-upload" type="datetime-local"></div>
+          <div class="form-group"><label class="form-label">Owner notes (optional)</label><textarea class="form-textarea" id="bk-notes" placeholder="Batch note..."></textarea></div>
+          <div class="info-box" id="bk-preview" style="display:none"></div>
+          <button class="btn-primary" id="bk-btn" onclick="bulkAddStock()">📦 Create stock units</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- E. LEDGER -->
+<div class="section" id="sec-ledger">
+  <div class="slbl">// Stock ledger</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd open" id="ledgerHead" onclick="toggleColl('ledger')">
+      <div class="coll-title"><span>📋 Records</span><span class="coll-badge" id="ledgerBadge">—</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body open" id="ledgerBody">
+      <div class="coll-inner">
+        <div class="search-wrap">
+          <span class="search-ico">🔍</span>
+          <input class="search-inp" id="searchInp" type="text" placeholder="Search Stock ID or Order ID..." oninput="renderLedger()">
+        </div>
+        <div class="emp-filter-row">
+          <select class="form-select" id="empFilterSel" onchange="renderLedger()" style="font-size:11px;padding:8px 12px">
+            <option value="">All employees</option>
+          </select>
+        </div>
+        <div class="filters">
+          <button class="fb fa"  onclick="setFilter('all',this)">All</button>
+          <button class="fb"     onclick="setFilter('type_c',this)">C units</button>
+          <button class="fb"     onclick="setFilter('type_b',this)">B bundles</button>
+          <button class="fb"     onclick="setFilter('type_m',this)">M bundles</button>
+          <button class="fb"     onclick="setFilter('waiting_to_be_sold',this)">🟡 Waiting</button>
+          <button class="fb"     onclick="setFilter('sold_approved',this)">✅ Approved sold</button>
+          <button class="fb"     onclick="setFilter('sold_notseen',this)">👁 Sold, not seen</button>
+          <button class="fb"     onclick="setFilter('issue',this)">🔴 Issue</button>
+          <button class="fb"     onclick="setFilter('cancelled',this)">⛔ Cancelled</button>
+          <button class="fb"     onclick="setFilter('wu',this)">📅 Uploaded this week</button>
+          <button class="fb"     onclick="setFilter('wa',this)">🗓 Approved this week</button>
+          <button class="fb"     onclick="setFilter('ou',this)">⚠ Old unsold 3d+</button>
+        </div>
+        <div class="ledger-count" id="ledgerCount">Loading...</div>
+        <div id="ledgerContainer"><div class="loading-wrap"><span class="spinner"></span>Loading records...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- F. SALARY PAYOUTS -->
+<div class="section" id="sec-payouts">
+  <div class="slbl">// Salary payouts</div>
+  <div style="margin-bottom:8px">
+    <div class="coll-hd" id="addPayoutHead" onclick="toggleColl('addPayout')">
+      <div class="coll-title"><span>💸 Record payout</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="addPayoutBody">
+      <div class="coll-inner">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Employee *</label>
+            <select class="form-select" id="po-emp" onchange="onPayoutEmpChange()"><option value="">Select employee</option></select>
+          </div>
+          <div id="po-summary" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div><div class="om-lbl">Salary earned</div><div class="om-val vg" id="po-earned">—</div></div>
+              <div><div class="om-lbl">Salary paid</div><div class="om-val" id="po-paid">—</div></div>
+              <div>
+                <div class="om-lbl">Available</div>
+                <div class="om-val vgold" id="po-avail">—</div>
+                <div id="po-avail-note" style="display:none;font-family:'DM Mono',monospace;font-size:9px;color:var(--red);margin-top:3px;line-height:1.4"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Amount * (coins)</label><input class="form-input" id="po-amount" type="number" min="1" placeholder="250"></div>
+            <div class="form-group"><label class="form-label">Method (optional)</label><input class="form-input" id="po-method" type="text" placeholder="Cash / Revolut / Crypto"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Paid at *</label><input class="form-input" id="po-paidat" type="datetime-local"></div>
+          <div class="form-group"><label class="form-label">Note (optional)</label><textarea class="form-textarea" id="po-note" placeholder="Optional note..."></textarea></div>
+          <button class="btn-primary" onclick="recordPayout()">💸 Record payout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slbl" style="margin-top:16px">// Payout history <span id="payout-count" style="color:var(--t2)"></span></div>
+  <div class="card">
+    <div id="payoutHistContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
+  </div>
+</div>
+
+<!-- G. WEEKLY STATS -->
+<div class="section" id="sec-stats">
+  <div class="slbl">// Weekly stats</div>
+  <div class="card">
+    <div class="week-hd">
+      <div class="wh-info"><div class="wh-lbl">Period</div><div class="wh-val" id="w-period">—</div></div>
+      <button class="rpt-btn" id="rptBtn" onclick="copyReport()">📋 Copy report</button>
+    </div>
+    <div class="week-grid">
+      <div class="wc"><div class="wc-lbl">Uploaded</div><div class="wc-val" id="w-up">—</div><div class="wc-sub">this week</div></div>
+      <div class="wc"><div class="wc-lbl">Approved sold</div><div class="wc-val wv-acc" id="w-sold">—</div><div class="wc-sub">sale events</div></div>
+      <div class="wc"><div class="wc-lbl">Earnings generated</div><div class="wc-val wv-gold" id="w-earn">—</div><div class="wc-sub">coins</div></div>
+      <div class="wc"><div class="wc-lbl">Deposit earned</div><div class="wc-val wv-acc" id="w-dep">—</div><div class="wc-sub">coins</div></div>
+      <div class="wc"><div class="wc-lbl">Salary earned</div><div class="wc-val wv-a2" id="w-sal">—</div><div class="wc-sub">coins</div></div>
+      <div class="wc"><div class="wc-lbl">Salary paid this week</div><div class="wc-val wv-red" id="w-paid">—</div><div class="wc-sub">coins</div></div>
+      <div class="wc"><div class="wc-lbl">Salary available (all)</div><div class="wc-val wv-purple" id="w-avail">—</div><div class="wc-sub">unpaid balance</div></div>
+      <div class="wc"><div class="wc-lbl">Sold not seen</div><div class="wc-val wv-purple" id="w-notseen">—</div><div class="wc-sub">pending confirm</div></div>
+      <div class="wc"><div class="wc-lbl">Sell-through</div><div class="wc-val" id="w-rate">—</div><div class="wc-bar"><div class="wc-bar-fill" id="w-rate-bar" style="width:0%"></div></div></div>
+      <div class="wc"><div class="wc-lbl">Avg time to sell</div><div class="wc-val wv-gold" id="w-tts">—</div><div class="wc-sub">approved only</div></div>
+    </div>
+  </div>
+
+  <div class="slbl" style="margin-top:16px">// Export data</div>
+  <div class="card" style="padding:16px">
+    <div class="export-row" style="margin-bottom:10px">
+      <button class="exp-btn ej" onclick="exportJSON()">📦 Export JSON</button>
+      <button class="exp-btn ec" onclick="exportCSV()">📊 Export CSV</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.55">Exports all stock units currently visible in the ledger.</p>
+  </div>
+</div>
+
+<div style="height:24px"></div>
+</div><!-- end .page -->
+
+<!-- MARK AS SOLD MODAL -->
+<div class="modal-ov" id="markSoldModal">
+  <div class="modal-box">
+    <div class="modal-ttl"><span>✅ Mark as sold</span><button class="modal-close" onclick="closeModal('markSoldModal')">✕</button></div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Enter the Order ID and sale date. Status becomes approved immediately.</p>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:14px">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">Stock unit</div>
+      <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--text)" id="ms-sid">—</div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Order ID * (required)</label><input class="form-input" id="ms-order" type="text" placeholder="ORD-001"></div>
+      <div class="form-group"><label class="form-label">Sold at *</label><input class="form-input" id="ms-soldAt" type="datetime-local"></div>
+      <div class="form-group"><label class="form-label">Owner note (optional)</label><textarea class="form-textarea" id="ms-note" placeholder="Internal note..."></textarea></div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-cancel" onclick="closeModal('markSoldModal')">Cancel</button>
+      <button class="modal-save" onclick="submitMarkSold()">✅ Confirm sold</button>
+    </div>
+  </div>
+</div>
+
+<!-- ISSUE MODAL -->
+<div class="modal-ov" id="issueModal">
+  <div class="modal-box">
+    <div class="modal-ttl"><span>🔴 Flag issue</span><button class="modal-close" onclick="closeModal('issueModal')">✕</button></div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Issue note *</label>
+      <textarea class="form-textarea" id="im-note" placeholder="Describe the issue..."></textarea>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-cancel" onclick="closeModal('issueModal')">Cancel</button>
+      <button class="modal-save red" onclick="submitIssue()">🔴 Set as issue</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-ov" id="editModal">
+  <div class="modal-box">
+    <div class="modal-ttl"><span>✏ Edit stock unit</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Stock ID *</label><input class="form-input" id="em-stock" type="text"></div>
+        <div class="form-group"><label class="form-label">Order ID (if known)</label><input class="form-input" id="em-order" type="text" placeholder="Leave blank if unknown"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="em-status">
+        <option value="waiting_to_be_sold">🟡 Waiting to be sold</option>
+        <option value="sold_approved">✅ Approved sold</option>
+        <option value="issue">🔴 Issue</option>
+        <option value="cancelled">⛔ Cancelled</option>
+      </select></div>
+      <div class="form-group"><label class="form-label">Sold at</label><input class="form-input" id="em-soldAt" type="datetime-local"></div>
+      <div class="form-group"><label class="form-label">Owner note</label><textarea class="form-textarea" id="em-note"></textarea></div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-cancel" onclick="closeModal('editModal')">Cancel</button>
+      <button class="modal-save" onclick="submitEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script>
+console.log('owner.html JS loaded');
+
+/* ─── NAVIGATION ────────────────────────────────────── */
+function goToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) { console.warn('goToSection: missing section', id); return; }
+  el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+window.goToSection = goToSection;
+document.querySelectorAll('[data-target]').forEach(btn => {
+  btn.addEventListener('click', () => goToSection(btn.dataset.target));
+});
+
+/* ─── SAFE CONFIG ───────────────────────────────────── */
+if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+  console.error('owner.html: Missing Supabase config. Check supabase-config.js');
+}
+const OWNER_PIN_SAFE = window.OWNER_PIN || '1234';
+
+/* ─── SUPABASE ──────────────────────────────────────── */
+const _sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+/* ─── STATE ─────────────────────────────────────────── */
+let allStock        = [];
+let allEmployees    = [];
+let allPayouts      = [];
+let stockTypes      = [];
+let ledgerFilter    = 'all';
+let actionId        = null;
+let realtimeChannel = null;
+let isAddingStock   = false;
+let isBulkAdding    = false;
+
+/* ─── SAFE TYPE HELPERS ─────────────────────────────── */
+const TYPE_FALLBACK = {
+  C: { prefix:'C', name:'Base stock unit', quantity_per_stock_sale:1, capital_per_stock_sale:300, earnings_per_approved_sale:100 },
+  B: { prefix:'B', name:'Bundle B',        quantity_per_stock_sale:10, capital_per_stock_sale:150, earnings_per_approved_sale:100 },
+  M: { prefix:'M', name:'Bundle M',        quantity_per_stock_sale:5,  capital_per_stock_sale:250, earnings_per_approved_sale:100 },
+};
+
+function getStockType(unit) {
+  if (!unit) return TYPE_FALLBACK['C'];
+  if (unit.stock_types) return unit.stock_types;
+  if (unit.stock_type_id && stockTypes.length) {
+    const t = stockTypes.find(t => t.id === unit.stock_type_id);
+    if (t) return t;
+  }
+  const p = getStockPrefix(unit);
+  return TYPE_FALLBACK[p] || TYPE_FALLBACK['C'];
+}
+// keep getType as alias for backward compat
+function getType(unit) { return getStockType(unit); }
+
+function getStockPrefix(unit) {
+  if (!unit) return 'C';
+  if (unit.stock_types && unit.stock_types.prefix) return unit.stock_types.prefix.toUpperCase();
+  if (unit.stock_type_id && stockTypes.length) {
+    const st = stockTypes.find(s => s.id === unit.stock_type_id);
+    if (st && st.prefix) return st.prefix.toUpperCase();
+  }
+  return ((unit.stock_id || '').split('-')[0] || 'C').toUpperCase();
+}
+
+function getQuantityPerSale(unit) { return getStockType(unit).quantity_per_stock_sale || 1; }
+function getCapitalPerSale(unit)  { return getStockType(unit).capital_per_stock_sale  || 300; }
+function getTypeDisplayName(unit) { return getStockType(unit).name || 'Base stock unit'; }
+
+function typePillCls(prefix) {
+  if (prefix === 'B') return 'tp-b';
+  if (prefix === 'M') return 'tp-m';
+  return 'tp-c';
+}
+
+/* ─── PIN ───────────────────────────────────────────── */
+function tryPin() {
+  const val = document.getElementById('pinInput').value;
+  if (val === OWNER_PIN_SAFE) {
+    document.getElementById('pinGate').style.display = 'none';
+    init();
+  } else {
+    document.getElementById('pinErr').textContent = 'Incorrect PIN. Try again.';
+    document.getElementById('pinInput').value = '';
+  }
+}
+document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key==='Enter') tryPin(); });
+
+/* ─── BOOT ──────────────────────────────────────────── */
+async function init() {
+  setNow('sf-upload'); setNow('bk-upload'); setNow('po-paidat');
+  await Promise.all([loadStockTypes(), loadEmployees()]);
+  await Promise.all([loadStock(), loadPayouts()]);
+  setupRealtime();
+}
+
+/* ─── STOCK TYPES ───────────────────────────────────── */
+async function loadStockTypes() {
+  const { data } = await _sb.from('stock_types').select('*').order('prefix');
+  stockTypes = data || [];
+  populateTypeSelects();
+}
+
+function populateTypeSelects() {
+  const types = stockTypes.length ? stockTypes : Object.values(TYPE_FALLBACK);
+  const opts = types.map(t =>
+    `<option value="${t.id||t.prefix}" data-prefix="${t.prefix}" data-qty="${t.quantity_per_stock_sale}" data-cap="${t.capital_per_stock_sale}">${t.prefix} — ${t.name} — ${t.capital_per_stock_sale}×${t.quantity_per_stock_sale}</option>`
+  ).join('');
+  ['sf-type','bk-type'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">Select type</option>' + opts;
+  });
+}
+
+function onSingleTypeChange() {
+  const sel = document.getElementById('sf-type');
+  const opt = sel.options[sel.selectedIndex];
+  const prefix = opt?.dataset?.prefix || '';
+  const stockInp = document.getElementById('sf-stock');
+  if (prefix && stockInp.value === '') stockInp.placeholder = prefix + '-0001';
+}
+
+function onBulkTypeChange() { updateBulkPreview(); }
+
+function updateBulkPreview() {
+  const sel = document.getElementById('bk-type');
+  const opt = sel.options[sel.selectedIndex];
+  const prefix = opt?.dataset?.prefix || '';
+  const qty  = parseInt(document.getElementById('bk-qty').value) || 0;
+  const start= parseInt(document.getElementById('bk-start').value) || 1;
+  const prev = document.getElementById('bk-preview');
+  if (!prefix || !qty) { prev.style.display='none'; return; }
+  const cap     = opt?.dataset?.cap || '?';
+  const qtyPhys = opt?.dataset?.qty || '?';
+  const end  = start + qty - 1;
+  const first= prefix + '-' + String(start).padStart(4,'0');
+  const last = prefix + '-' + String(end).padStart(4,'0');
+  prev.style.display = 'block';
+  prev.innerHTML = `<strong>Preview:</strong> ${first} → ${last} (${qty} stock unit${qty===1?'':'s'})<br>
+    Each unit: <strong>${qtyPhys} physical item${qtyPhys>1?'s':''}</strong>, capital <strong>${cap} coins</strong>, earnings <strong>100 coins</strong> per approved sale.<br>
+    Total capital: <strong>${qty * parseInt(cap)} coins</strong>`;
+}
+
+['bk-qty','bk-start'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateBulkPreview);
+});
+
+function validateStockIdPrefix(stockInputId, typeSelectId, warnId) {
+  const stockEl = document.getElementById(stockInputId);
+  const typeEl  = document.getElementById(typeSelectId);
+  const warnEl  = document.getElementById(warnId);
+  const opt = typeEl?.options[typeEl?.selectedIndex];
+  const prefix = opt?.dataset?.prefix || '';
+  if (!prefix || !stockEl.value) { warnEl.style.display='none'; return true; }
+  const ok = stockEl.value.toUpperCase().startsWith(prefix + '-');
+  warnEl.style.display = ok ? 'none' : 'block';
+  return ok;
+}
+
+/* ─── EMPLOYEES ─────────────────────────────────────── */
+async function loadEmployees() {
+  const { data, error } = await _sb.from('employees').select('*').order('name');
+  if (error) { showToast('Error loading employees: '+error.message,'err'); return; }
+  allEmployees = data || [];
+  renderEmployeeList();
+  populateEmpSelects();
+}
+
+function renderEmployeeList() {
+  const c = document.getElementById('empListContainer');
+  if (!allEmployees.length) { c.innerHTML='<div class="empty"><span class="empty-ico">👤</span>No employees yet.</div>'; return; }
+  c.innerHTML = allEmployees.map(e => {
+    const tgBadge = e.telegram_chat_id
+      ? `<span class="seen-badge seen-yes">📨 Connected</span>`
+      : `<span class="seen-badge seen-no">📨 Not connected</span>`;
+    return `
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500">${esc(e.name)}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span>${esc(e.employee_code)} · ${e.active?'Active':'Inactive'}</span>
+          ${tgBadge}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="oc-btn b-edit" onclick="setTelegramId('${e.id}', ${e.telegram_chat_id ? `'${e.telegram_chat_id}'` : 'null'})">📨 Set Telegram ID</button>
+        <button class="oc-btn b-edit" onclick="toggleEmpActive('${e.id}',${e.active})">${e.active?'Deactivate':'Activate'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function populateEmpSelects() {
+  const opts = allEmployees.filter(e=>e.active).map(e=>`<option value="${e.id}">${esc(e.name)} (${esc(e.employee_code)})</option>`).join('');
+  ['sf-emp','bk-emp','po-emp','empFilterSel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const prefix = id === 'empFilterSel' ? '<option value="">All employees</option>' : '<option value="">Select employee</option>';
+    el.innerHTML = prefix + opts;
+  });
+}
+
+async function addEmployee() {
+  const code = document.getElementById('ef-code').value.trim();
+  const name = document.getElementById('ef-name').value.trim();
+  const notes= document.getElementById('ef-notes').value.trim();
+  if (!code) { showToast('Employee code required','err'); return; }
+  if (!name) { showToast('Name required','err'); return; }
+  const { error } = await _sb.from('employees').insert({ employee_code:code, name, notes:notes||null });
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  ['ef-code','ef-name','ef-notes'].forEach(id=>document.getElementById(id).value='');
+  showToast('Employee added!','ok');
+  await loadEmployees();
+}
+
+async function toggleEmpActive(id, active) {
+  const { error } = await _sb.from('employees').update({ active:!active }).eq('id',id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await loadEmployees();
+}
+
+/* ─── TELEGRAM CHAT ID ───────────────────────────────── */
+async function setTelegramId(id, current) {
+  const val = prompt(
+    'Enter the Telegram chat ID for this employee.\n\n' +
+    'How to find it: have them message your bot once, then open\n' +
+    'https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates in a browser\n' +
+    'and copy the "chat":{"id": ...} number that matches their name.\n\n' +
+    'Leave blank to disconnect.',
+    current || ''
+  );
+  if (val === null) return; // cancelled
+  const trimmed = val.trim();
+  const { error } = await _sb.from('employees').update({ telegram_chat_id: trimmed || null }).eq('id', id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  showToast(trimmed ? 'Telegram ID saved' : 'Telegram ID cleared', 'ok');
+  await loadEmployees();
+}
+
+/* ─── STOCK DEDUPE ──────────────────────────────────── */
+function uniqueById(rows) {
+  const seen = new Set();
+  return (rows||[]).filter(row => {
+    if (!row?.id) return false;
+    if (seen.has(row.id)) return false;
+    seen.add(row.id); return true;
+  });
+}
+
+/* ─── LOAD STOCK ────────────────────────────────────── */
+async function loadStock() {
+  console.log('[loadStock] fetching…');
+  document.getElementById('ledgerContainer').innerHTML =
+    '<div class="loading-wrap"><span class="spinner"></span>Loading...</div>';
+  const { data, error } = await _sb
+    .from('stock_units')
+    .select('*, employees(name, employee_code), stock_types(prefix, name, quantity_per_stock_sale, capital_per_stock_sale, earnings_per_approved_sale)')
+    .order('uploaded_at', { ascending: false });
+  if (error) { showToast('Error loading stock: '+error.message,'err'); return; }
+  allStock = uniqueById(data);
+  console.log('[loadStock] rows:', allStock.length);
+  renderAll();
+}
+
+/* ─── ADD SINGLE STOCK ──────────────────────────────── */
+async function addStockUnit() {
+  if (isAddingStock) return;
+  if (!validateStockIdPrefix('sf-stock','sf-type','sf-stock-warn')) {
+    showToast('Stock ID prefix does not match selected type','err'); return;
+  }
+  const typeVal  = document.getElementById('sf-type').value;
+  const stockId  = document.getElementById('sf-stock').value.trim();
+  const empId    = document.getElementById('sf-emp').value;
+  const uploadAt = document.getElementById('sf-upload').value;
+  const notes    = document.getElementById('sf-notes').value.trim();
+  if (!typeVal)  { showToast('Select a stock type','err'); return; }
+  if (!stockId)  { showToast('Stock ID required','err'); return; }
+  if (!empId)    { showToast('Select an employee','err'); return; }
+  if (!uploadAt) { showToast('Uploaded at required','err'); return; }
+  const typeRow = stockTypes.find(t => t.id === typeVal || t.prefix === typeVal);
+  const typeId  = typeRow?.id || null;
+  isAddingStock = true;
+  const btn = document.querySelector('#addStockBody .btn-primary');
+  const orig = btn?.textContent;
+  if (btn) { btn.disabled=true; btn.textContent='Adding…'; }
+  try {
+    const { data, error } = await _sb.from('stock_units').insert({
+      stock_id: stockId, employee_id: empId,
+      uploaded_at: new Date(uploadAt).toISOString(),
+      owner_note: notes||null, status: 'waiting_to_be_sold',
+      stock_type_id: typeId
+    }).select().single();
+    if (error) { showToast('Error: '+error.message,'err'); return; }
+    _sb.from('stock_events').insert({ stock_unit_id:data.id, event_type:'created', actor:'owner' }).then(()=>{});
+    ['sf-stock','sf-notes'].forEach(id=>{ document.getElementById(id).value=''; });
+    setNow('sf-upload');
+    showToast('Stock unit added!','ok');
+    await loadStock();
+  } finally {
+    isAddingStock = false;
+    if (btn) { btn.disabled=false; btn.textContent=orig; }
+  }
+}
+
+/* ─── BULK ADD ──────────────────────────────────────── */
+async function bulkAddStock() {
+  if (isBulkAdding) return;
+  const typeVal  = document.getElementById('bk-type').value;
+  const empId    = document.getElementById('bk-emp').value;
+  const start    = parseInt(document.getElementById('bk-start').value);
+  const qty      = parseInt(document.getElementById('bk-qty').value);
+  const uploadAt = document.getElementById('bk-upload').value;
+  const notes    = document.getElementById('bk-notes').value.trim();
+  if (!typeVal)            { showToast('Select a stock type','err'); return; }
+  if (!empId)              { showToast('Select an employee','err'); return; }
+  if (!start || start < 1) { showToast('Starting number must be ≥ 1','err'); return; }
+  if (!qty || qty < 1)     { showToast('Quantity must be ≥ 1','err'); return; }
+  if (qty > 200)           { showToast('Max 200 units per batch','err'); return; }
+  if (!uploadAt)           { showToast('Uploaded at required','err'); return; }
+  const typeRow = stockTypes.find(t => t.id === typeVal || t.prefix === typeVal);
+  const typeId  = typeRow?.id || null;
+  const prefix  = typeRow?.prefix || typeVal.split('-')[0];
+  const candidates = [];
+  for (let i = 0; i < qty; i++) candidates.push(prefix + '-' + String(start + i).padStart(4,'0'));
+  const { data: existing } = await _sb.from('stock_units').select('stock_id').in('stock_id', candidates);
+  const existingSet = new Set((existing||[]).map(r=>r.stock_id));
+  const toCreate = candidates.filter(id => !existingSet.has(id));
+  if (!toCreate.length) { showToast('All stock IDs in this range already exist — none created.','err'); return; }
+  isBulkAdding = true;
+  const btn = document.getElementById('bk-btn');
+  const orig = btn?.textContent;
+  if (btn) { btn.disabled=true; btn.textContent=`Creating ${toCreate.length} units…`; }
+  try {
+    const rows = toCreate.map(sid => ({
+      stock_id: sid, employee_id: empId,
+      uploaded_at: new Date(uploadAt).toISOString(),
+      owner_note: notes||null, status: 'waiting_to_be_sold',
+      stock_type_id: typeId
+    }));
+    const { error } = await _sb.from('stock_units').insert(rows);
+    if (error) { showToast('Error: '+error.message,'err'); return; }
+    const skipped = candidates.length - toCreate.length;
+    showToast(`✅ Created ${toCreate.length} units${skipped?' ('+skipped+' skipped)':''}`, 'ok');
+    ['bk-notes'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('bk-preview').style.display='none';
+    setNow('bk-upload');
+    await loadStock();
+  } finally {
+    isBulkAdding = false;
+    if (btn) { btn.disabled=false; btn.textContent=orig; }
+  }
+}
+
+/* ─── REALTIME ──────────────────────────────────────── */
+function setupRealtime() {
+  if (realtimeChannel) return;
+  realtimeChannel = _sb
+    .channel('owner-stock-changes')
+    .on('postgres_changes', { event:'*', schema:'public', table:'stock_units' }, async () => { await loadStock(); })
+    .on('postgres_changes', { event:'*', schema:'public', table:'salary_payouts' }, async () => { await loadPayouts(); })
+    .subscribe(status => {
+      const dot = document.getElementById('connDot');
+      if (status==='SUBSCRIBED') { dot.classList.add('live'); dot.classList.remove('err'); }
+      else if (status==='CLOSED'||status==='CHANNEL_ERROR') { dot.classList.add('err'); dot.classList.remove('live'); }
+      else { dot.classList.remove('live','err'); }
+    });
+}
+
+/* ─── RENDER ALL ────────────────────────────────────── */
+function renderAll() { renderOverview(); renderCategoryOverview(); renderLedger(); renderWeekStats(); }
+
+function fmt(n) { return Number(n).toLocaleString(); }
+function txt(id,v) { const e=document.getElementById(id); if(e) e.textContent=v; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDT(s) { if(!s)return'—';try{return new Date(s).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});}catch(e){return s;} }
+function formatMs(ms) { const m=Math.floor(ms/60000);if(m<60)return m+'m';const h=Math.floor(m/60),rm=m%60;if(h<24)return h+'h'+(rm>0?' '+rm+'m':'');const d=Math.floor(h/24),rh=h%24;return d+'d'+(rh>0?' '+rh+'h':''); }
+function setNow(id) { const el=document.getElementById(id); if(el) el.value=new Date().toISOString().slice(0,16); }
+
+function renderOverview() {
+  const approved = allStock.filter(u=>u.status==='sold_approved').length;
+  const notseen  = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
+  const waiting  = allStock.filter(u=>u.status==='waiting_to_be_sold').length;
+  const issue    = allStock.filter(u=>u.status==='issue').length;
+  txt('ov-total',allStock.length); txt('ov-approved',approved);
+  txt('ov-notseen',notseen); txt('ov-waiting',waiting); txt('ov-issue',issue);
+  const s = computeWeek();
+  txt('ov-week',s.approvedWeek.length);
+  txt('ov-wdep',fmt(s.dep)); txt('ov-wsal',fmt(s.sal));
+  renderAttentionBlock();
+  renderEmpSalaryCards();
+}
+
+/* ─── NEEDS ATTENTION + EMP SALARY (Overview) ───────── */
+function jumpToFilter(filterKey) {
+  const btn = document.querySelector(`.fb[onclick*="setFilter('${filterKey}'"]`);
+  if (btn) setFilter(filterKey, btn);
+  goToSection('sec-ledger');
+}
+
+function renderAttentionBlock() {
+  const wrap = document.getElementById('attnWrap');
+  if (!wrap) return;
+  const notseen = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
+  const issues  = allStock.filter(u=>u.status==='issue').length;
+  let html = '';
+  if (notseen > 0) {
+    html += `<div class="attn-row ar-ns" onclick="jumpToFilter('sold_notseen')">
+      <span class="attn-ico">👁</span>
+      <div class="attn-body">
+        <div class="attn-title">${notseen} sold unit${notseen===1?'':'s'} not yet seen by employee</div>
+        <div class="attn-sub">Tap to view in ledger →</div>
+      </div>
+      <span class="attn-arr">›</span>
+    </div>`;
+  }
+  if (issues > 0) {
+    html += `<div class="attn-row ar-issue" onclick="jumpToFilter('issue')">
+      <span class="attn-ico">🔴</span>
+      <div class="attn-body">
+        <div class="attn-title">${issues} unit${issues===1?'':'s'} flagged as issue</div>
+        <div class="attn-sub">Tap to view in ledger →</div>
+      </div>
+      <span class="attn-arr">›</span>
+    </div>`;
+  }
+  if (!html) {
+    html = `<div class="attn-clear"><span>✅</span>All clear — nothing needs attention right now.</div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function renderEmpSalaryCards() {
+  const wrap = document.getElementById('empSalaryWrap');
+  if (!wrap) return;
+  const active = allEmployees.filter(e=>e.active);
+  if (!active.length) {
+    wrap.innerHTML = '<div class="empty"><span class="empty-ico">👤</span>No active employees.</div>';
+    return;
+  }
+  wrap.innerHTML = active.map(e => {
+    const s = calcSalaryForEmployee(e.id);
+    const soldCount = allStock.filter(u=>u.employee_id===e.id&&u.status==='sold_approved').length;
+    const availCls  = s.salaryAvail < 0 ? 'ev-neg' : 'ev-avail';
+    const availTxt  = fmt(s.salaryAvail) + (s.salaryAvail < 0 ? ' (advance)' : '');
+    return `
+    <div class="esal-card">
+      <div class="esal-top">
+        <span class="esal-name">${esc(e.name)} <span style="color:var(--muted);font-weight:400">(${esc(e.employee_code)})</span></span>
+        <span class="esal-units">${soldCount} sold</span>
+      </div>
+      <div class="esal-grid">
+        <div class="esal-cell"><div class="esal-lbl">Earned</div><div class="esal-val ev-earn">${fmt(s.salaryEarned)}</div></div>
+        <div class="esal-cell"><div class="esal-lbl">Paid</div><div class="esal-val">${fmt(s.salaryPaid)}</div></div>
+        <div class="esal-cell"><div class="esal-lbl">Available</div><div class="esal-val ${availCls}">${availTxt}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── CATEGORY OVERVIEW ─────────────────────────────── */
+function renderCategoryOverview() {
+  const grid = document.getElementById('catGrid');
+  if (!grid) return;
+  const prefixes = ['C','B','M'];
+  grid.innerHTML = prefixes.map(pfx => {
+    const t = TYPE_FALLBACK[pfx];
+    const units = allStock.filter(u => getStockPrefix(u) === pfx);
+    const total   = units.length;
+    const waiting = units.filter(u=>u.status==='waiting_to_be_sold').length;
+    const sold    = units.filter(u=>u.status==='sold_approved').length;
+    const notseen = units.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
+    const issues  = units.filter(u=>u.status==='issue'||u.status==='cancelled').length;
+    const physItems  = total * t.quantity_per_stock_sale;
+    const capitalVal = total * t.capital_per_stock_sale;
+    const unitLabel  = pfx==='C' ? 'C units' : pfx==='B' ? 'B bundles' : 'M bundles';
+    const physLabel  = pfx==='C' ? '1 item each' : pfx==='B' ? '10 items each' : '5 items each';
+    return `
+    <div class="cat-card cat-${pfx.toLowerCase()}">
+      <div class="cat-prefix">${pfx}</div>
+      <div class="cat-name">${t.name}</div>
+      <div class="cat-row"><span class="cat-lbl">total</span><span class="cat-val">${total}</span></div>
+      <div class="cat-row"><span class="cat-lbl">waiting</span><span class="cat-val cv-wait">${waiting}</span></div>
+      <div class="cat-row"><span class="cat-lbl">sold</span><span class="cat-val cv-sold">${sold}</span></div>
+      <div class="cat-row"><span class="cat-lbl">not seen</span><span class="cat-val cv-ns">${notseen}</span></div>
+      ${issues>0?`<div class="cat-row"><span class="cat-lbl">issue/cancel</span><span class="cat-val cv-issue">${issues}</span></div>`:''}
+      <div class="cat-divider"></div>
+      <div class="cat-phys"><strong>${fmt(physItems)}</strong> physical items<br><strong>${fmt(capitalVal)}</strong> coins capital<br><span style="color:var(--muted)">${physLabel}</span></div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── SALARY CALCULATIONS ───────────────────────────── */
+function calcSalaryForEmployee(empId) {
+  const sold = allStock
+    .filter(u => u.employee_id === empId && u.status === 'sold_approved')
+    .slice().sort((a,b) => new Date(a.approved_at)-new Date(b.approved_at));
+  let dep = 0, sal = 0;
+  sold.forEach((u, idx) => {
+    const pos = idx + 1;
+    const earnings = getStockType(u).earnings_per_approved_sale || 100;
+    const split = pos <= 20 ? {d:75,s:25} : pos <= 45 ? {d:60,s:40} : {d:50,s:50};
+    dep += Math.round(earnings * split.d / 100);
+    sal += Math.round(earnings * split.s / 100);
+  });
+  const totalPaid = allPayouts.filter(p => p.employee_id === empId).reduce((acc,p) => acc + (p.amount||0), 0);
+  return { salaryEarned: sal, salaryPaid: totalPaid, salaryAvail: sal - totalPaid, deposit: dep };
+}
+
+/* ─── FILTER ────────────────────────────────────────── */
+function setFilter(f, btn) {
+  ledgerFilter = f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fb-c','fb-b','fb-m','fp','fr','fw'));
+  const clsMap = {
+    all:'fa', type_c:'fb-c', type_b:'fb-b', type_m:'fb-m',
+    sold_approved:'fa', issue:'fr', waiting_to_be_sold:'fw',
+    cancelled:'fr', wu:'fw', wa:'fa', ou:'fr', sold_notseen:'fp'
+  };
+  btn.classList.add(clsMap[f]||'fa');
+  renderLedger();
+}
+
+function weekBounds() {
+  const now=new Date(),day=now.getDay(),diff=(day===0)?-6:1-day;
+  const mon=new Date(now); mon.setDate(now.getDate()+diff); mon.setHours(0,0,0,0);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+  return{start:mon,end:sun};
+}
+function inWeek(s,b){if(!s)return false;const d=new Date(s);return d>=b.start&&d<=b.end;}
+function isOldUnsold(u){return u.status==='waiting_to_be_sold'&&(Date.now()-new Date(u.uploaded_at).getTime())>3*864e5;}
+
+function getFilteredFrom(rows) {
+  const b   = weekBounds();
+  const q   = (document.getElementById('searchInp')||{value:''}).value.trim().toLowerCase();
+  const empF= (document.getElementById('empFilterSel')||{value:''}).value;
+  return rows.filter(u => {
+    if (q && u.stock_id?.toLowerCase().indexOf(q)===-1 && (u.order_id||'').toLowerCase().indexOf(q)===-1) return false;
+    if (empF && u.employee_id !== empF) return false;
+    if (ledgerFilter==='type_c')             return getStockPrefix(u)==='C';
+    if (ledgerFilter==='type_b')             return getStockPrefix(u)==='B';
+    if (ledgerFilter==='type_m')             return getStockPrefix(u)==='M';
+    if (ledgerFilter==='waiting_to_be_sold') return u.status==='waiting_to_be_sold';
+    if (ledgerFilter==='sold_approved')      return u.status==='sold_approved';
+    if (ledgerFilter==='sold_notseen')       return u.status==='sold_approved'&&!u.employee_seen_at;
+    if (ledgerFilter==='issue')              return u.status==='issue';
+    if (ledgerFilter==='cancelled')          return u.status==='cancelled';
+    if (ledgerFilter==='wu')                 return inWeek(u.uploaded_at,b);
+    if (ledgerFilter==='wa')                 return u.status==='sold_approved'&&inWeek(u.approved_at,b);
+    if (ledgerFilter==='ou')                 return isOldUnsold(u);
+    return true;
+  });
+}
+function getFiltered() { return getFilteredFrom(uniqueById(allStock)); }
+
+function statusMeta(status) {
+  const m = {
+    waiting_to_be_sold:{ cls:'cw',  badge:'s-waiting',  label:'🟡 Waiting' },
+    sold_approved:     { cls:'ca2', badge:'s-approved', label:'✅ Approved sold' },
+    issue:             { cls:'ci',  badge:'s-issue',    label:'🔴 Issue' },
+    cancelled:         { cls:'cc',  badge:'s-cancelled',label:'⛔ Cancelled' },
+  };
+  return m[status] || { cls:'', badge:'', label:status };
+}
+
+/* ─── RENDER LEDGER ─────────────────────────────────── */
+function renderLedger() {
+  const unique = uniqueById(allStock);
+  const fl = getFilteredFrom(unique);
+  txt('ledgerBadge', unique.length);
+  txt('ledgerCount', `Showing ${fl.length} of ${unique.length} record${unique.length===1?'':'s'}`);
+  const c = document.getElementById('ledgerContainer');
+  if (!fl.length) {
+    c.innerHTML = unique.length===0
+      ? '<div class="empty"><span class="empty-ico">📭</span>No stock units yet.</div>'
+      : '<div class="empty"><span class="empty-ico">🔎</span>No records match this filter.</div>';
+    return;
+  }
+  c.innerHTML = fl.map(u => stockCardHtml(u)).join('');
+}
+
+function tts(up, sold) { if(!up||!sold)return'—'; const ms=new Date(sold)-new Date(up); return ms<0?'—':formatMs(ms); }
+
+function stockCardHtml(u) {
+  const m   = statusMeta(u.status);
+  const t   = getStockType(u);
+  const prefix = getStockPrefix(u);
+  const empName = u.employees ? `${esc(u.employees.name)} (${esc(u.employees.employee_code)})` : '—';
+
+  const oidHtml = u.order_id
+    ? `<span class="oc-oid has">${esc(u.order_id)}</span>`
+    : `<span class="oc-oid no">No order ID yet</span>`;
+
+  const isSold    = u.status === 'sold_approved';
+  const isSeen    = isSold && !!u.employee_seen_at;
+  const isNotSeen = isSold && !u.employee_seen_at;
+
+  const seenBadge = isSold
+    ? (isSeen ? `<span class="seen-badge seen-yes">👁 Seen</span>` : `<span class="seen-badge seen-no">👁 Not seen</span>`)
+    : '';
+
+  const seenRow = isSeen
+    ? `<div class="seen-row"><span class="seen-row-txt">👁 Seen by employee</span><span class="seen-row-time">— ${formatDT(u.employee_seen_at)}</span></div>`
+    : (isNotSeen ? `<div class="notseen-row"><span class="notseen-txt">👁 Not yet seen by employee</span></div>` : '');
+
+  const ownerNote = u.owner_note ? `<div class="oc-note">🗒 ${esc(u.owner_note)}</div>` : '';
+
+  const canMarkSold = u.status==='waiting_to_be_sold'||u.status==='issue';
+  const canIssue    = u.status!=='sold_approved'&&u.status!=='cancelled';
+  const canReset    = u.status!=='waiting_to_be_sold'&&u.status!=='cancelled';
+  const canCancel   = u.status!=='cancelled';
+  const qty = t.quantity_per_stock_sale || 1;
+  const cap = t.capital_per_stock_sale  || 300;
+
+  return `
+  <div class="ord-card ${m.cls}">
+    <div class="oc-top">
+      <div class="oc-ids">
+        <span class="oc-sid">${esc(u.stock_id)}</span>
+        ${oidHtml}
+        <span class="oc-emp">${empName}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+        <span class="type-pill ${typePillCls(prefix)}">${prefix} · ${esc(t.name||'')} · ×${qty}</span>
+        ${seenBadge}
+        <span class="sbadge ${m.badge}">${m.label}</span>
+      </div>
+    </div>
+    <div class="oc-mid4">
+      <div><div class="om-lbl">Uploaded</div><div class="om-val">${formatDT(u.uploaded_at)}</div></div>
+      <div><div class="om-lbl">Sold at</div><div class="om-val ${isSold?'vg':''}">${isSold?formatDT(u.sold_at):'—'}</div></div>
+      <div><div class="om-lbl">Approved at</div><div class="om-val ${u.approved_at?'vg':''}">${formatDT(u.approved_at)}</div></div>
+      <div><div class="om-lbl">Time to sell</div><div class="om-val vgold">${tts(u.uploaded_at,u.approved_at)}</div></div>
+    </div>
+    <div class="oc-mid4" style="border-top:1px solid var(--bd)">
+      <div><div class="om-lbl">Type</div><div class="om-val">${prefix}</div></div>
+      <div><div class="om-lbl">Physical qty</div><div class="om-val">${qty} item${qty>1?'s':''}</div></div>
+      <div><div class="om-lbl">Capital</div><div class="om-val">${fmt(cap)} coins</div></div>
+      <div><div class="om-lbl">Earnings/sale</div><div class="om-val vg">${fmt(t.earnings_per_approved_sale||100)} coins</div></div>
+    </div>
+    ${ownerNote}
+    ${seenRow}
+    <div class="oc-actions">
+      ${canMarkSold?`<button class="oc-btn b-marksold" onclick="openMarkSold('${u.id}','${esc(u.stock_id)}')">✅ Mark as sold</button>`:''}
+      ${canIssue?`<button class="oc-btn b-issue" onclick="openIssue('${u.id}')">🔴 Flag issue</button>`:''}
+      ${canReset?`<button class="oc-btn b-wait" onclick="setStatus('${u.id}','waiting_to_be_sold','Reset to waiting')">🟡 Reset</button>`:''}
+      <button class="oc-btn b-edit" onclick="openEdit('${u.id}')">✏ Edit</button>
+      ${canCancel?`<button class="oc-btn b-cancel" onclick="setStatus('${u.id}','cancelled','Cancel stock unit')">⛔</button>`:''}
+      <button class="oc-btn b-del" onclick="deleteRecord('${u.id}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+/* ─── MARK AS SOLD ──────────────────────────────────── */
+function openMarkSold(id, stockId) {
+  actionId = id;
+  txt('ms-sid', stockId);
+  document.getElementById('ms-order').value  = '';
+  document.getElementById('ms-soldAt').value = new Date().toISOString().slice(0,16);
+  document.getElementById('ms-note').value   = '';
+  openModal('markSoldModal');
+}
+
+async function submitMarkSold() {
+  const orderId = document.getElementById('ms-order').value.trim();
+  const soldAt  = document.getElementById('ms-soldAt').value;
+  const note    = document.getElementById('ms-note').value.trim();
+  if (!orderId) { showToast('Order ID required','err'); return; }
+  if (!soldAt)  { showToast('Sold date/time required','err'); return; }
+  const now = new Date().toISOString();
+  const { error } = await _sb.from('stock_units').update({
+    status:'sold_approved', order_id:orderId,
+    sold_at:new Date(soldAt).toISOString(), approved_at:now,
+    owner_note:note||null, employee_seen_at:null, employee_seen_note:null, updated_at:now
+  }).eq('id',actionId);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await _sb.from('stock_events').insert({ stock_unit_id:actionId, event_type:'marked_sold', actor:'owner', note:note||null });
+  showToast('Marked as sold!','ok');
+  closeModal('markSoldModal');
+  await loadStock();
+}
+
+/* ─── ISSUE ─────────────────────────────────────────── */
+function openIssue(id) { actionId=id; document.getElementById('im-note').value=''; openModal('issueModal'); }
+async function submitIssue() {
+  const note = document.getElementById('im-note').value.trim();
+  if (!note) { showToast('Describe the issue','err'); return; }
+  const { error } = await _sb.from('stock_units').update({ status:'issue', owner_note:note, updated_at:new Date().toISOString() }).eq('id',actionId);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await _sb.from('stock_events').insert({ stock_unit_id:actionId, event_type:'issue', actor:'owner', note });
+  showToast('Issue flagged','ok');
+  closeModal('issueModal');
+  await loadStock();
+}
+
+/* ─── STATUS ────────────────────────────────────────── */
+async function setStatus(id, status, label) {
+  if (!confirm(`${label}?`)) return;
+  const updates = { status, updated_at:new Date().toISOString() };
+  if (status==='waiting_to_be_sold') {
+    updates.employee_seen_at=null; updates.employee_seen_note=null;
+    updates.sold_at=null; updates.approved_at=null; updates.order_id=null;
+  }
+  const { error } = await _sb.from('stock_units').update(updates).eq('id',id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await _sb.from('stock_events').insert({ stock_unit_id:id, event_type:status, actor:'owner' });
+  showToast('Status updated','ok');
+  await loadStock();
+}
+
+/* ─── EDIT ──────────────────────────────────────────── */
+function openEdit(id) {
+  const u = allStock.find(x=>x.id===id);
+  if (!u) return;
+  actionId = id;
+  document.getElementById('em-stock').value  = u.stock_id||'';
+  document.getElementById('em-order').value  = u.order_id||'';
+  document.getElementById('em-status').value = u.status||'waiting_to_be_sold';
+  document.getElementById('em-soldAt').value = u.sold_at?new Date(u.sold_at).toISOString().slice(0,16):'';
+  document.getElementById('em-note').value   = u.owner_note||'';
+  openModal('editModal');
+}
+
+async function submitEdit() {
+  const stockId = document.getElementById('em-stock').value.trim();
+  const orderId = document.getElementById('em-order').value.trim();
+  const status  = document.getElementById('em-status').value;
+  const soldAt  = document.getElementById('em-soldAt').value;
+  const note    = document.getElementById('em-note').value.trim();
+  if (!stockId) { showToast('Stock ID required','err'); return; }
+  const updates = { stock_id:stockId, status, owner_note:note||null, updated_at:new Date().toISOString() };
+  updates.order_id = orderId||null;
+  updates.sold_at  = soldAt?new Date(soldAt).toISOString():null;
+  const { error } = await _sb.from('stock_units').update(updates).eq('id',actionId);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await _sb.from('stock_events').insert({ stock_unit_id:actionId, event_type:'edited', actor:'owner' });
+  showToast('Record updated','ok');
+  closeModal('editModal');
+  await loadStock();
+}
+
+/* ─── DELETE ────────────────────────────────────────── */
+async function deleteRecord(id) {
+  if (!confirm('Permanently delete this stock unit? Cannot be undone.')) return;
+  const { error } = await _sb.from('stock_units').delete().eq('id',id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  showToast('Record deleted','ok');
+  await loadStock();
+}
+
+/* ─── SALARY PAYOUTS ────────────────────────────────── */
+async function loadPayouts() {
+  const { data, error } = await _sb
+    .from('salary_payouts')
+    .select('*, employees(name, employee_code)')
+    .order('paid_at', { ascending: false });
+  if (error) { console.error('loadPayouts error:', error.message); return; }
+  allPayouts = data || [];
+  renderPayoutHistory();
+  renderWeekStats();
+}
+
+function onPayoutEmpChange() {
+  const empId = document.getElementById('po-emp').value;
+  const summary = document.getElementById('po-summary');
+  if (!empId) { summary.style.display='none'; return; }
+  const s = calcSalaryForEmployee(empId);
+  summary.style.display = 'block';
+  txt('po-earned', fmt(s.salaryEarned)+' coins');
+  txt('po-paid',   fmt(s.salaryPaid)+' coins');
+  renderAvailDisplay('po-avail', 'po-avail-note', s.salaryAvail);
+}
+
+function renderAvailDisplay(valId, noteId, avail) {
+  const valEl  = document.getElementById(valId);
+  const noteEl = document.getElementById(noteId);
+  if (!valEl) return;
+  if (avail < 0) {
+    valEl.textContent = fmt(avail) + ' coins';
+    valEl.className = 'om-val';
+    valEl.style.color = 'var(--red)';
+    if (noteEl) { noteEl.textContent = '⚠ Advance — employee is ' + fmt(Math.abs(avail)) + ' coins ahead'; noteEl.style.display='block'; }
+  } else {
+    valEl.textContent = fmt(avail) + ' coins';
+    valEl.className = 'om-val vgold';
+    valEl.style.color = '';
+    if (noteEl) { noteEl.style.display='none'; }
+  }
+}
+
+async function recordPayout() {
+  const empId  = document.getElementById('po-emp').value;
+  const amount = parseFloat(document.getElementById('po-amount').value);
+  const method = document.getElementById('po-method').value.trim();
+  const paidAt = document.getElementById('po-paidat').value;
+  const note   = document.getElementById('po-note').value.trim();
+  if (!empId)               { showToast('Select an employee','err'); return; }
+  if (!amount || amount<=0) { showToast('Amount must be > 0','err'); return; }
+  if (!paidAt)              { showToast('Paid at date required','err'); return; }
+  const s = calcSalaryForEmployee(empId);
+  if (amount > s.salaryAvail) {
+    const newBalance = s.salaryAvail - amount;
+    const ok = confirm(
+      'This payout is higher than available salary.\n\n' +
+      'Available now : ' + fmt(s.salaryAvail) + ' coins\n' +
+      'Payout amount : ' + fmt(amount) + ' coins\n' +
+      'New balance   : ' + fmt(newBalance) + ' coins\n\n' +
+      'The employee balance will become negative. Future salary will cover the advance.\n\n' +
+      'Record this payout anyway?'
+    );
+    if (!ok) return;
+  }
+  const { error } = await _sb.from('salary_payouts').insert({
+    employee_id: empId, amount, method: method||null,
+    paid_at: new Date(paidAt).toISOString(), note: note||null
+  });
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  showToast('Payout recorded!','ok');
+  ['po-amount','po-method','po-note'].forEach(id=>{ document.getElementById(id).value=''; });
+  setNow('po-paidat');
+  document.getElementById('po-summary').style.display='none';
+  await loadPayouts();
+}
+
+function renderPayoutHistory() {
+  const c = document.getElementById('payoutHistContainer');
+  txt('payout-count', allPayouts.length ? `(${allPayouts.length})` : '');
+  if (!allPayouts.length) {
+    c.innerHTML = '<div class="empty"><span class="empty-ico">💸</span>No payouts recorded yet.</div>';
+    return;
+  }
+  c.innerHTML = allPayouts.map(p => {
+    const empName = p.employees ? `${esc(p.employees.name)} (${esc(p.employees.employee_code)})` : '—';
+    const meta = [formatDT(p.paid_at), p.method||'', p.note||''].filter(Boolean).join(' · ');
+    return `<div class="payout-row">
+      <div class="pr-left"><div class="pr-emp">${empName}</div><div class="pr-meta">${esc(meta)}</div></div>
+      <div class="pr-amount">${fmt(p.amount)} coins</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── WEEKLY STATS ──────────────────────────────────── */
+function splitForUnit(idx) {
+  const pos = idx + 1;
+  return pos<=20 ? {d:75,s:25} : pos<=45 ? {d:60,s:40} : {d:50,s:50};
+}
+
+let _wkCache = null;
+
+function computeWeek() {
+  const b = weekBounds();
+  const allApproved = allStock.filter(u=>u.status==='sold_approved')
+    .slice().sort((a,c)=>new Date(a.approved_at)-new Date(c.approved_at));
+  const appWeek  = allApproved.filter(u=>inWeek(u.approved_at,b));
+  const upWeek   = allStock.filter(u=>inWeek(u.uploaded_at,b));
+  const waiting  = allStock.filter(u=>u.status==='waiting_to_be_sold').length;
+  const notseen  = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
+  const soldFromUp = upWeek.filter(u=>u.status==='sold_approved'&&inWeek(u.approved_at,b)).length;
+  const rate = upWeek.length>0 ? Math.round(soldFromUp/upWeek.length*100) : 0;
+  let wEarn=0, wDep=0, wSal=0;
+  appWeek.forEach(u => {
+    const globalIdx = allApproved.indexOf(u);
+    const sp = splitForUnit(globalIdx);
+    const earn = getStockType(u).earnings_per_approved_sale || 100;
+    wEarn += earn;
+    wDep  += Math.round(earn * sp.d / 100);
+    wSal  += Math.round(earn * sp.s / 100);
+  });
+  const allEmpIds = [...new Set(allStock.map(u=>u.employee_id))];
+  let totalSalAvail = 0;
+  allEmpIds.forEach(eid => { totalSalAvail += calcSalaryForEmployee(eid).salaryAvail; });
+  const salPaidWeek = allPayouts.filter(p=>inWeek(p.paid_at,b)).reduce((acc,p)=>acc+(p.amount||0),0);
+  const ttsList = appWeek.filter(u=>u.uploaded_at&&u.approved_at)
+    .map(u=>new Date(u.approved_at)-new Date(u.uploaded_at)).filter(ms=>ms>=0);
+  const avgTts = ttsList.length>0 ? formatMs(ttsList.reduce((a,c)=>a+c,0)/ttsList.length) : '—';
+  const opts = {day:'2-digit',month:'short'};
+  const period = b.start.toLocaleDateString('en-GB',opts)+' – '+b.end.toLocaleDateString('en-GB',opts);
+  return { uploaded:upWeek.length, approvedWeek:appWeek, waiting, notseen, rate, wEarn, wDep, wSal, salPaidWeek, totalSalAvail, avgTts, period };
+}
+
+function renderWeekStats() {
+  const s = computeWeek(); _wkCache = s;
+  txt('w-period',s.period); txt('w-up',s.uploaded); txt('w-sold',s.approvedWeek.length);
+  txt('w-earn',fmt(s.wEarn)); txt('w-dep',fmt(s.wDep)); txt('w-sal',fmt(s.wSal));
+  txt('w-paid',fmt(s.salPaidWeek)); txt('w-notseen',s.notseen); txt('w-rate',s.rate+'%'); txt('w-tts',s.avgTts);
+  const availEl = document.getElementById('w-avail');
+  if (availEl) { availEl.textContent = fmt(s.totalSalAvail); availEl.style.color = s.totalSalAvail < 0 ? 'var(--red)' : ''; }
+  const bar=document.getElementById('w-rate-bar'); if(bar) bar.style.width=s.rate+'%';
+}
+
+/* ─── COPY REPORT ───────────────────────────────────── */
+function copyReport() {
+  const s = _wkCache || computeWeek();
+  const notSeenList = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at);
+  const L = [
+    '═══════════════════════════════',
+    '  WEEKLY REPORT — '+s.period,
+    '═══════════════════════════════',
+    'Uploaded this week    : '+s.uploaded,
+    'Approved sold         : '+s.approvedWeek.length+' sale events',
+    'Sold, not seen by emp : '+s.notseen,
+    'Waiting to sell       : '+s.waiting,
+    'Sell-through rate     : '+s.rate+'%',
+    '',
+    'Earnings generated    : '+s.wEarn+' coins',
+    'Deposit earned        : '+s.wDep+' coins',
+    'Salary earned         : '+s.wSal+' coins',
+    'Salary paid this week : '+s.salPaidWeek+' coins',
+    'Salary available total: '+s.totalSalAvail+' coins'+(s.totalSalAvail<0?' (advance balance)':''),
+    'Avg time to sell      : '+s.avgTts,
+  ];
+  if (s.approvedWeek.length) {
+    L.push('','─────────────────────────────','APPROVED SALES THIS WEEK:','─────────────────────────────');
+    s.approvedWeek.forEach((u,i) => {
+      const t = getStockType(u);
+      L.push(`${i+1}. ${u.stock_id} | Order: ${u.order_id||'—'} | Type: ${getStockPrefix(u)} ×${t.quantity_per_stock_sale||1}`);
+      L.push(`   Employee : ${u.employees?.name||'—'}`);
+      L.push(`   Sold     : ${formatDT(u.sold_at)}`);
+      L.push(`   Approved : ${formatDT(u.approved_at)}`);
+      L.push(`   Seen     : ${u.employee_seen_at?formatDT(u.employee_seen_at):'NOT YET SEEN'}`);
+    });
+  }
+  if (notSeenList.length) {
+    L.push('','─────────────────────────────','SOLD — NOT YET SEEN:','─────────────────────────────');
+    notSeenList.forEach((u,i) => {
+      L.push(`${i+1}. ${u.stock_id} | Order: ${u.order_id||'—'} | ${u.employees?.name||'—'}`);
+    });
+  }
+  L.push('═══════════════════════════════');
+  clipboard(L.join('\n'), document.getElementById('rptBtn'), '📋 Copy report');
+}
+
+/* ─── EXPORT ────────────────────────────────────────── */
+function exportJSON() {
+  dl(JSON.stringify({ version:'3.0', exported_at:new Date().toISOString(), records:getFiltered() },null,2),
+    'stock_export_'+new Date().toISOString().slice(0,10)+'.json');
+}
+function exportCSV() {
+  const fl = getFiltered();
+  const headers = ['stock_id','order_id','type','physical_qty','capital','employee','status','uploaded_at','sold_at','approved_at','employee_seen_at','owner_note'];
+  const rows = fl.map(u => {
+    const t = getStockType(u);
+    return [
+      u.stock_id||'', u.order_id||'', getStockPrefix(u)+'×'+(t.quantity_per_stock_sale||1),
+      t.quantity_per_stock_sale||1, t.capital_per_stock_sale||300,
+      u.employees?`${u.employees.name} (${u.employees.employee_code})`:'',
+      u.status||'', u.uploaded_at||'', u.sold_at||'', u.approved_at||'',
+      u.employee_seen_at||'', u.owner_note||''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  });
+  dl([headers.join(','),...rows].join('\n'), 'stock_export_'+new Date().toISOString().slice(0,10)+'.csv');
+}
+
+/* ─── HELPERS ───────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; actionId=null; }
+document.querySelectorAll('.modal-ov').forEach(m => m.addEventListener('click', e=>{ if(e.target===m) closeModal(m.id); }));
+
+let toastTimer;
+function showToast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+function clipboard(text,btn,orig) {
+  function done() { if(!btn||!orig)return; btn.textContent='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent=orig; btn.classList.remove('copied'); },2200); }
+  if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(done).catch(()=>fb(text,done)); } else fb(text,done);
+}
+function fb(text,done){ const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0;top:0;left:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta); }
+function dl(content,name){ const b=new Blob([content],{type:'application/octet-stream'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u); }
+
+function toggleColl(n) {
+  const h=document.getElementById(n+'Head'),b=document.getElementById(n+'Body');
+  if(!h||!b)return;
+  const o=b.classList.contains('open');
+  if(o){b.classList.remove('open');h.classList.remove('open');}else{b.classList.add('open');h.classList.add('open');}
+}
+
+/* ─── WINDOW EXPORTS ────────────────────────────────── */
+window.tryPin             = tryPin;
+window.toggleColl         = toggleColl;
+window.addEmployee        = addEmployee;
+window.toggleEmpActive    = toggleEmpActive;
+window.setTelegramId      = setTelegramId;
+window.addStockUnit       = addStockUnit;
+window.bulkAddStock       = bulkAddStock;
+window.onSingleTypeChange = onSingleTypeChange;
+window.onBulkTypeChange   = onBulkTypeChange;
+window.validateStockIdPrefix = validateStockIdPrefix;
+window.setFilter          = setFilter;
+window.openMarkSold       = openMarkSold;
+window.submitMarkSold     = submitMarkSold;
+window.openIssue          = openIssue;
+window.submitIssue        = submitIssue;
+window.setStatus          = setStatus;
+window.openEdit           = openEdit;
+window.submitEdit         = submitEdit;
+window.deleteRecord       = deleteRecord;
+window.recordPayout       = recordPayout;
+window.onPayoutEmpChange  = onPayoutEmpChange;
+window.copyReport         = copyReport;
+window.exportJSON         = exportJSON;
+window.exportCSV          = exportCSV;
+window.closeModal         = closeModal;
+window.renderLedger       = renderLedger;
+window.jumpToFilter       = jumpToFilter;
+</script>
+</body>
+</html>
