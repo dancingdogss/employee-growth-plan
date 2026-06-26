@@ -942,8 +942,14 @@ function renderEmployeeList() {
       : null;
     const linkSection = token
       ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px;word-break:break-all;">${privLink}</div>
-         <button class="oc-btn b-edit" style="margin-top:6px;" id="cpyBtn-${e.id}" data-link="${privLink}" onclick="copyEmpLink(this)">🔗 Copy private link</button>`
-      : `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red);margin-top:3px;">No access token yet — run migration</div>`;
+         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+           <button class="oc-btn b-edit" id="cpyBtn-${e.id}" data-link="${privLink}" onclick="copyEmpLink(this)">🔗 Copy private link</button>
+           <button class="oc-btn b-marksold" data-link="${privLink}" onclick="openEmpDashboard(this)">👁 Open as employee</button>
+         </div>`
+      : `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red);margin-top:3px;">No access token yet — run migration</div>
+         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+           <button class="oc-btn" disabled title="Run token migration first" style="opacity:.45;cursor:not-allowed;">👁 Open as employee</button>
+         </div>`;
     return `
     <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
@@ -970,6 +976,11 @@ function renderEmployeeList() {
 function copyEmpLink(btn) {
   const link = btn.dataset.link;
   clipboard(link, btn, '🔗 Copy private link');
+}
+
+function openEmpDashboard(btn) {
+  const link = btn.dataset.link;
+  if (link) window.open(link, '_blank', 'noopener,noreferrer');
 }
 
 function populateEmpSelects() {
@@ -1915,6 +1926,8 @@ window.jumpToFilter       = jumpToFilter;
 window.hideOwnerMessage   = hideOwnerMessage;
 window.deleteOwnerMessage = deleteOwnerMessage;
 window.toggleShowHidden   = toggleShowHidden;
+window.copyEmpLink        = copyEmpLink;
+window.openEmpDashboard   = openEmpDashboard;
 </script>
 </body>
 </html>
