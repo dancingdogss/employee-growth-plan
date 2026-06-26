@@ -38,13 +38,32 @@ Deno.serve(async (req) => {
 
     const { data: employee, error: empError } = await supabase
       .from("employees")
-      .select("name, telegram_chat_id")
+      .select("name, telegram_chat_id, employee_access_token")
       .eq("id", newRow.employee_id)
       .single();
 
     if (empError || !employee?.telegram_chat_id) {
       console.log("No Telegram chat id for employee_id:", newRow.employee_id);
       return new Response("ignored: employee has no telegram_chat_id", { status: 200 });
+    }
+
+    const DASHBOARD_BASE_URL = "https://dancingdogss.github.io/wow-character/";
+    let dashboardUrl: string;
+    if (employee.employee_access_token) {
+      dashboardUrl =
+        `${DASHBOARD_BASE_URL}` +
+        `?token=${encodeURIComponent(employee.employee_access_token)}` +
+        `&source=telegram_sold` +
+        `&t=${Date.now()}` +
+        `#sec-stock`;
+    } else {
+      console.warn(`Employee ${newRow.employee_id} has no employee_access_token — falling back to ?emp=`);
+      dashboardUrl =
+        `${DASHBOARD_BASE_URL}` +
+        `?emp=${encodeURIComponent(newRow.employee_id)}` +
+        `&source=telegram_sold` +
+        `&t=${Date.now()}` +
+        `#sec-stock`;
     }
 
     const lines = [
@@ -63,6 +82,11 @@ Deno.serve(async (req) => {
           chat_id: employee.telegram_chat_id,
           text,
           parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "Open Dashboard", url: dashboardUrl }],
+            ],
+          },
         }),
       }
     );

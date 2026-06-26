@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
 
     const { data: employee, error: empErr } = await supabase
       .from("employees")
-      .select("id, name, employee_code, telegram_chat_id")
+      .select("id, name, employee_code, telegram_chat_id, employee_access_token")
       .eq("id", cleanEmployeeId)
       .single();
 
@@ -112,13 +112,25 @@ Deno.serve(async (req) => {
 
     const messageId = msgRow.id;
 
-    const dashboardUrl =
-      `${DASHBOARD_BASE_URL}` +
-      `?emp=${encodeURIComponent(cleanEmployeeId)}` +
-      `&msg=${encodeURIComponent(messageId)}` +
-      `&source=telegram_message` +
-      `&t=${Date.now()}` +
-      `#sec-messages`;
+    let dashboardUrl: string;
+    if (employee.employee_access_token) {
+      dashboardUrl =
+        `${DASHBOARD_BASE_URL}` +
+        `?token=${encodeURIComponent(employee.employee_access_token)}` +
+        `&msg=${encodeURIComponent(messageId)}` +
+        `&source=telegram_message` +
+        `&t=${Date.now()}` +
+        `#sec-messages`;
+    } else {
+      console.warn(`Employee ${cleanEmployeeId} has no employee_access_token — falling back to ?emp=`);
+      dashboardUrl =
+        `${DASHBOARD_BASE_URL}` +
+        `?emp=${encodeURIComponent(cleanEmployeeId)}` +
+        `&msg=${encodeURIComponent(messageId)}` +
+        `&source=telegram_message` +
+        `&t=${Date.now()}` +
+        `#sec-messages`;
+    }
 
     const lines: string[] = [];
 

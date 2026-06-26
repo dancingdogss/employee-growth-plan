@@ -936,21 +936,40 @@ function renderEmployeeList() {
     const tgBadge = e.telegram_chat_id
       ? `<span class="seen-badge seen-yes">📨 Connected</span>`
       : `<span class="seen-badge seen-no">📨 Not connected</span>`;
+    const token = e.employee_access_token;
+    const privLink = token
+      ? `https://dancingdogss.github.io/wow-character/?token=${encodeURIComponent(token)}`
+      : null;
+    const linkSection = token
+      ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px;word-break:break-all;">${privLink}</div>
+         <button class="oc-btn b-edit" style="margin-top:6px;" id="cpyBtn-${e.id}" data-link="${privLink}" onclick="copyEmpLink(this)">🔗 Copy private link</button>`
+      : `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--red);margin-top:3px;">No access token yet — run migration</div>`;
     return `
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500">${esc(e.name)}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span>${esc(e.employee_code)} · ${e.active?'Active':'Inactive'}</span>
-          ${tgBadge}
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500">${esc(e.name)}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span>${esc(e.employee_code)} · ${e.active?'Active':'Inactive'}</span>
+            ${tgBadge}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="oc-btn b-edit" onclick="setTelegramId('${e.id}', ${e.telegram_chat_id ? `'${e.telegram_chat_id}'` : 'null'})">📨 Set Telegram ID</button>
+          <button class="oc-btn b-edit" onclick="toggleEmpActive('${e.id}',${e.active})">${e.active?'Deactivate':'Activate'}</button>
         </div>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="oc-btn b-edit" onclick="setTelegramId('${e.id}', ${e.telegram_chat_id ? `'${e.telegram_chat_id}'` : 'null'})">📨 Set Telegram ID</button>
-        <button class="oc-btn b-edit" onclick="toggleEmpActive('${e.id}',${e.active})">${e.active?'Deactivate':'Activate'}</button>
+      <div style="border-top:1px solid var(--bd);padding-top:8px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Private dashboard link</div>
+        ${linkSection}
       </div>
     </div>`;
   }).join('');
+}
+
+function copyEmpLink(btn) {
+  const link = btn.dataset.link;
+  clipboard(link, btn, '🔗 Copy private link');
 }
 
 function populateEmpSelects() {
