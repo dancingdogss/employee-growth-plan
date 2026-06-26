@@ -469,11 +469,33 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
             <select class="form-select" id="msg-emp"><option value="">Select employee</option></select>
           </div>
           <div class="form-group">
+            <label class="form-label">Title (optional)</label>
+            <input class="form-input" id="msg-title" type="text" placeholder="e.g. Important notice">
+          </div>
+          <div class="form-group">
             <label class="form-label">Message *</label>
             <textarea class="form-textarea" id="msg-text" placeholder="e.g. Please confirm you've seen this message"></textarea>
           </div>
           <button class="btn-primary" onclick="sendOwnerMessage()">📨 Send via Telegram</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- MESSAGE HISTORY (owner view) -->
+  <div style="margin-top:8px">
+    <div class="coll-hd" id="msgHistHead" onclick="toggleColl('msgHist')">
+      <div class="coll-title"><span>📋 Message history</span><span class="coll-badge" id="msgHistBadge">—</span></div>
+      <span class="coll-arr">▼</span>
+    </div>
+    <div class="coll-body" id="msgHistBody">
+      <div class="coll-inner">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <p style="font-size:11px;color:var(--muted);line-height:1.5;margin:0">Messages sent to employees. Hide removes from employee view (soft). Delete is permanent to dashboard only — employee cannot unsee.</p>
+          <button class="btn-secondary" id="showHiddenBtn" onclick="toggleShowHidden()" style="width:auto;padding:7px 13px;font-size:10px;flex-shrink:0">👁 Show hidden</button>
+        </div>
+        <div id="msgHistContainer"><div class="loading-wrap"><span class="spinner"></span>Loading...</div></div>
       </div>
     </div>
   </div>
@@ -760,8 +782,10 @@ let stockTypes      = [];
 let ledgerFilter    = 'all';
 let actionId        = null;
 let realtimeChannel = null;
-let isAddingStock   = false;
-let isBulkAdding    = false;
+let isAddingStock      = false;
+let isBulkAdding       = false;
+let allOwnerMessages   = [];
+let ownerMsgShowHidden = false;
 
 /* ─── SAFE TYPE HELPERS ─────────────────────────────── */
 const TYPE_FALLBACK = {
@@ -820,7 +844,7 @@ document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key
 async function init() {
   setNow('sf-upload'); setNow('bk-upload'); setNow('po-paidat');
   await Promise.all([loadStockTypes(), loadEmployees()]);
-  await Promise.all([loadStock(), loadPayouts()]);
+  await Promise.all([loadStock(), loadPayouts(), loadOwnerMessages()]);
   setupRealtime();
 }
 
@@ -979,6 +1003,7 @@ async function setTelegramId(id, current) {
 /* ─── SEND MESSAGE TO EMPLOYEE(S) ─────────────────────── */
 async function sendOwnerMessage() {
   const empVal = document.getElementById('msg-emp').value;
+  const title  = (document.getElementById('msg-title')?.value || '').trim();
   const text   = document.getElementById('msg-text').value.trim();
   if (!empVal) { showToast('Select who to message','err'); return; }
   if (!text)   { showToast('Message text required','err'); return; }
@@ -995,18 +1020,14 @@ async function sendOwnerMessage() {
   let okCount = 0, failCount = 0;
   let lastError = '';
   for (const employee_id of targets) {
-    const { error: insertError } = await _sb.from('owner_messages').insert({ employee_id, message: text });
-    if (insertError) {
-      failCount++; lastError = insertError.message;
-      console.error('owner_messages insert failed:', insertError);
-      continue;
-    }
-    const { data: fnData, error: fnError } = await _sb.functions.invoke('notify-message', { body: { employee_id, text } });
+    const body = { employee_id, message: text };
+    if (title) body.title = title;
+    const { data: fnData, error: fnError } = await _sb.functions.invoke('notify-message', { body });
     if (fnError) {
       failCount++; lastError = fnError.message || String(fnError);
       console.error('notify-message invoke failed:', fnError);
     } else if (fnData && fnData.ok === false) {
-      failCount++; lastError = fnData.reason || 'Telegram delivery failed';
+      failCount++; lastError = fnData.error || 'Telegram delivery failed';
       console.error('notify-message reported failure:', fnData);
     } else {
       okCount++;
@@ -1015,8 +1036,93 @@ async function sendOwnerMessage() {
 
   if (btn) { btn.disabled = false; btn.textContent = orig; }
   document.getElementById('msg-text').value = '';
+  const titleEl = document.getElementById('msg-title');
+  if (titleEl) titleEl.value = '';
   const summary = `Sent to ${okCount} employee${okCount===1?'':'s'}${failCount?', '+failCount+' failed':''}`;
   showToast(failCount && !okCount ? summary+': '+lastError : summary, failCount && !okCount ? 'err' : 'ok');
+  await loadOwnerMessages();
+}
+
+/* ─── OWNER MESSAGE HISTORY ─────────────────────────────── */
+async function loadOwnerMessages() {
+  let q = _sb
+    .from('owner_messages')
+    .select('*, employees(name, employee_code)')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (!ownerMsgShowHidden) q = q.is('owner_hidden_at', null);
+  const { data, error } = await q;
+  if (error) { console.error('loadOwnerMessages error:', error.message); return; }
+  allOwnerMessages = data || [];
+  renderOwnerMessageHistory();
+}
+
+function renderOwnerMessageHistory() {
+  const c = document.getElementById('msgHistContainer');
+  if (!c) return;
+  const badge = document.getElementById('msgHistBadge');
+  if (badge) badge.textContent = allOwnerMessages.length || 0;
+  if (!allOwnerMessages.length) {
+    c.innerHTML = '<div class="empty"><span class="empty-ico">📨</span>No messages sent yet.</div>';
+    return;
+  }
+  c.innerHTML = allOwnerMessages.map(m => {
+    const empName  = m.employees ? `${esc(m.employees.name)} (${esc(m.employees.employee_code)})` : '—';
+    const bodyText = m.body || m.message || '';
+    const isHidden = !!m.owner_hidden_at;
+    const tgStatus = m.telegram_sent_at ? `<span style="color:var(--accent)">✅ Sent ${formatDT(m.telegram_sent_at)}</span>`
+                   : m.telegram_error   ? `<span style="color:var(--red)">❌ Failed</span>`
+                   : '—';
+    return `
+    <div class="ord-card" style="${isHidden ? 'opacity:.55' : ''}">
+      <div class="oc-top">
+        <div class="oc-ids">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text)">${empName}</span>
+          ${m.title ? `<span class="oc-oid has">${esc(m.title)}</span>` : ''}
+          ${isHidden ? `<span class="seen-badge seen-no">Owner-hidden</span>` : ''}
+        </div>
+      </div>
+      <div style="padding:9px 13px;font-size:12px;color:var(--t2);line-height:1.5;border-bottom:1px solid var(--bd)">${esc(bodyText)}</div>
+      <div class="oc-mid4">
+        <div><div class="om-lbl">Sent</div><div class="om-val" style="font-size:10px">${formatDT(m.created_at || m.sent_at)}</div></div>
+        <div><div class="om-lbl">Telegram</div><div class="om-val" style="font-size:10px">${tgStatus}</div></div>
+        <div><div class="om-lbl">Dashboard opened</div><div class="om-val ${m.dashboard_opened_at ? 'vg' : ''}" style="font-size:10px">${formatDT(m.dashboard_opened_at)}</div></div>
+        <div><div class="om-lbl">Seen by employee</div><div class="om-val ${m.seen_at ? 'vg' : ''}" style="font-size:10px">${formatDT(m.seen_at)}</div></div>
+      </div>
+      <div class="oc-actions">
+        <button class="oc-btn b-edit" onclick="hideOwnerMessage('${m.id}',${!isHidden})">${isHidden ? '👁 Unhide' : '🙈 Hide'}</button>
+        <button class="oc-btn b-del" onclick="deleteOwnerMessage('${m.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function hideOwnerMessage(id, hide) {
+  const now = new Date().toISOString();
+  const { error } = await _sb.from('owner_messages')
+    .update({ owner_hidden_at: hide ? now : null, updated_at: now })
+    .eq('id', id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  await loadOwnerMessages();
+}
+
+async function deleteOwnerMessage(id) {
+  if (!confirm('Soft-delete this message? The employee will no longer see it. (Not permanent in DB.)')) return;
+  const now = new Date().toISOString();
+  const { error } = await _sb.from('owner_messages')
+    .update({ deleted_at: now, updated_at: now })
+    .eq('id', id);
+  if (error) { showToast('Error: '+error.message,'err'); return; }
+  showToast('Message removed from employee view','ok');
+  await loadOwnerMessages();
+}
+
+function toggleShowHidden() {
+  ownerMsgShowHidden = !ownerMsgShowHidden;
+  const btn = document.getElementById('showHiddenBtn');
+  if (btn) btn.textContent = ownerMsgShowHidden ? '🙈 Hide hidden' : '👁 Show hidden';
+  loadOwnerMessages();
 }
 
 /* ─── STOCK DEDUPE ──────────────────────────────────── */
@@ -1787,6 +1893,9 @@ window.exportCSV          = exportCSV;
 window.closeModal         = closeModal;
 window.renderLedger       = renderLedger;
 window.jumpToFilter       = jumpToFilter;
+window.hideOwnerMessage   = hideOwnerMessage;
+window.deleteOwnerMessage = deleteOwnerMessage;
+window.toggleShowHidden   = toggleShowHidden;
 </script>
 </body>
 </html>
