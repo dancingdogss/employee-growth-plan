@@ -105,16 +105,19 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .tp-c{color:var(--accent);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.08);}
 .tp-b{color:var(--a2);border-color:rgba(91,106,240,.3);background:rgba(91,106,240,.08);}
 .tp-m{color:var(--gold);border-color:rgba(240,192,91,.3);background:rgba(240,192,91,.08);}
+.tp-cp{color:var(--purple);border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.08);}
 /* CATEGORY CARDS */
-.cat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:0;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:0;}
 .cat-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 11px;position:relative;overflow:hidden;}
 .cat-card.cat-c{border-color:rgba(0,212,170,.2);}
 .cat-card.cat-b{border-color:rgba(91,106,240,.2);}
 .cat-card.cat-m{border-color:rgba(240,192,91,.2);}
+.cat-card.cat-cpremium{border-color:rgba(139,92,246,.2);}
 .cat-prefix{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;line-height:1;margin-bottom:3px;}
 .cat-c .cat-prefix{color:var(--accent);}
 .cat-b .cat-prefix{color:var(--a2);}
 .cat-m .cat-prefix{color:var(--gold);}
+.cat-cpremium .cat-prefix{color:var(--purple);}
 .cat-name{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
 .cat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
 .cat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);}
@@ -184,6 +187,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .fb{font-family:'DM Mono',monospace;font-size:10px;padding:5px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .14s;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
 .fb.fa{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
 .fb.fb-c{border-color:rgba(0,212,170,.4);color:var(--accent);background:rgba(0,212,170,.07);}
+.fb.fb-cp{border-color:rgba(139,92,246,.4);color:var(--purple);background:rgba(139,92,246,.07);}
 .fb.fb-b{border-color:rgba(91,106,240,.4);color:var(--a2);background:rgba(91,106,240,.07);}
 .fb.fb-m{border-color:rgba(240,192,91,.4);color:var(--gold);background:rgba(240,192,91,.07);}
 .fb.fp{border-color:rgba(139,92,246,.4);color:var(--purple);background:rgba(139,92,246,.07);}
@@ -590,6 +594,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
         <div class="filters">
           <button class="fb fa"  onclick="setFilter('all',this)">All</button>
           <button class="fb"     onclick="setFilter('type_c',this)">C units</button>
+          <button class="fb"     onclick="setFilter('type_cp',this)">CPREMIUM units</button>
           <button class="fb"     onclick="setFilter('type_b',this)">B bundles</button>
           <button class="fb"     onclick="setFilter('type_m',this)">M bundles</button>
           <button class="fb"     onclick="setFilter('waiting_to_be_sold',this)">🟡 Waiting</button>
@@ -790,6 +795,7 @@ let ownerMsgShowHidden = false;
 /* ─── SAFE TYPE HELPERS ─────────────────────────────── */
 const TYPE_FALLBACK = {
   C: { prefix:'C', name:'Base stock unit', quantity_per_stock_sale:1, capital_per_stock_sale:300, earnings_per_approved_sale:100 },
+  CPREMIUM: { prefix:'CPREMIUM', name:'Premium stock unit', quantity_per_stock_sale:1, capital_per_stock_sale:350, earnings_per_approved_sale:100 },
   B: { prefix:'B', name:'Bundle B',        quantity_per_stock_sale:10, capital_per_stock_sale:150, earnings_per_approved_sale:100 },
   M: { prefix:'M', name:'Bundle M',        quantity_per_stock_sale:5,  capital_per_stock_sale:250, earnings_per_approved_sale:100 },
 };
@@ -824,6 +830,7 @@ function getTypeDisplayName(unit) { return getStockType(unit).name || 'Base stoc
 function typePillCls(prefix) {
   if (prefix === 'B') return 'tp-b';
   if (prefix === 'M') return 'tp-m';
+  if (prefix === 'CPREMIUM') return 'tp-cp';
   return 'tp-c';
 }
 
@@ -1379,7 +1386,7 @@ function renderEmpSalaryCards() {
 function renderCategoryOverview() {
   const grid = document.getElementById('catGrid');
   if (!grid) return;
-  const prefixes = ['C','B','M'];
+  const prefixes = ['C','CPREMIUM','B','M'];
   grid.innerHTML = prefixes.map(pfx => {
     const t = TYPE_FALLBACK[pfx];
     const units = allStock.filter(u => getStockPrefix(u) === pfx);
@@ -1390,8 +1397,8 @@ function renderCategoryOverview() {
     const issues  = units.filter(u=>u.status==='issue'||u.status==='cancelled').length;
     const physItems  = total * t.quantity_per_stock_sale;
     const capitalVal = total * t.capital_per_stock_sale;
-    const unitLabel  = pfx==='C' ? 'C units' : pfx==='B' ? 'B bundles' : 'M bundles';
-    const physLabel  = pfx==='C' ? '1 item each' : pfx==='B' ? '10 items each' : '5 items each';
+    const unitLabel  = pfx + (t.quantity_per_stock_sale > 1 ? ' bundles' : ' units');
+    const physLabel  = t.quantity_per_stock_sale + ' item' + (t.quantity_per_stock_sale===1?'':'s') + ' each';
     return `
     <div class="cat-card cat-${pfx.toLowerCase()}">
       <div class="cat-prefix">${pfx}</div>
@@ -1427,9 +1434,9 @@ function calcSalaryForEmployee(empId) {
 /* ─── FILTER ────────────────────────────────────────── */
 function setFilter(f, btn) {
   ledgerFilter = f;
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fb-c','fb-b','fb-m','fp','fr','fw'));
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fb-c','fb-cp','fb-b','fb-m','fp','fr','fw'));
   const clsMap = {
-    all:'fa', type_c:'fb-c', type_b:'fb-b', type_m:'fb-m',
+    all:'fa', type_c:'fb-c', type_cp:'fb-cp', type_b:'fb-b', type_m:'fb-m',
     sold_approved:'fa', issue:'fr', waiting_to_be_sold:'fw',
     cancelled:'fr', wu:'fw', wa:'fa', ou:'fr', sold_notseen:'fp'
   };
@@ -1454,6 +1461,7 @@ function getFilteredFrom(rows) {
     if (q && u.stock_id?.toLowerCase().indexOf(q)===-1 && (u.order_id||'').toLowerCase().indexOf(q)===-1) return false;
     if (empF && u.employee_id !== empF) return false;
     if (ledgerFilter==='type_c')             return getStockPrefix(u)==='C';
+    if (ledgerFilter==='type_cp')            return getStockPrefix(u)==='CPREMIUM';
     if (ledgerFilter==='type_b')             return getStockPrefix(u)==='B';
     if (ledgerFilter==='type_m')             return getStockPrefix(u)==='M';
     if (ledgerFilter==='waiting_to_be_sold') return u.status==='waiting_to_be_sold';
