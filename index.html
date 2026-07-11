@@ -971,9 +971,20 @@ body.locked .dock{display:none;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
-<script src="calc-shared.js"></script>
+<script src="js/calculations.js"></script>
 <script>
 console.log('index.html JS loaded');
+
+// Fail loud, not silent: if the shared calculation module did not load
+// (wrong path, blocked file, bad deploy) we must NOT fall through and render
+// zeroed or wrong deposit/salary totals.
+if (typeof window.GrowthCalculations === 'undefined') {
+  console.error(
+    '[growth-plan] js/calculations.js failed to load — deposit/salary totals ' +
+    'cannot be computed. Check the <script src="js/calculations.js"> path ' +
+    '(it must resolve relative to this page for Live Server, token links, and static hosting).'
+  );
+}
 
 /* ─── NAVIGATION ──────────────────────────────────── */
 function goToSection(id) {
@@ -1419,45 +1430,28 @@ function applyStockFilter(units) {
 
 /* ─── SALARY CALCS ────────────────────────────────── */
 function calcMyStats() {
-  // Canonical calculation lives in calc-shared.js: 1-20 => 75/25, 21-45 =>
-  // 60/40, deposit capped at GrowthCalc.DEPOSIT_CAP, then flat
-  // GrowthCalc.POST_CAP_SALARY_PER_APPROVED_SALE salary per sale.
-  const breakdown = GrowthCalc.calcApprovedBreakdown(
-    allStockUnits,
-    unit => getStockType(unit).earnings_per_approved_sale || 100
-  );
-  const u = breakdown.count;
-  const dep = breakdown.dep, sal = breakdown.sal;
+  // Canonical calculation lives in js/calculations.js: 1-20 => 75/25, 21-45 =>
+  // 60/40, deposit capped at GrowthCalculations.DEPOSIT_CAP, then flat
+  // GrowthCalculations.POST_CAP_SALARY_PER_SALE salary per sale. Both the
+  // financial totals and the level/progression come from the shared module so
+  // this page can never drift from owner.html.
+  const earningsFn = unit => getStockType(unit).earnings_per_approved_sale || 100;
+  const totals = GrowthCalculations.calcFinancialTotals(allStockUnits, {
+    earningsFn,
+    payouts: allPayouts
+  });
+  const u = totals.approvedSaleCount;
+  const dep = totals.deposit, sal = totals.salaryEarned;
+  const totalPaid = totals.salaryPaid, avail = totals.salaryAvailable;
 
-  const totalPaid = allPayouts.reduce((acc,p) => acc+(p.amount||0), 0);
-  const avail = GrowthCalc.calcAvailableSalary(sal, totalPaid);
+  const lvl = GrowthCalculations.calcLevel(u);
 
-  // Level ladder: Lv2 at 20 units, Lv3 at 45, then +25 units per level up to MAX_LEVEL.
-  // Splits stay position-based (above) — levels 3+ display 50/50.
-  const MAX_LEVEL = 60;
-  const levelStart = n => n <= 1 ? 0 : n === 2 ? 20 : 45 + (n - 3) * 25;
-  let lvlNum;
-  if (u < 20)      lvlNum = 1;
-  else if (u < 45) lvlNum = 2;
-  else             lvlNum = Math.min(3 + Math.floor((u - 45) / 25), MAX_LEVEL);
-
-  let level, dPct, sPct, pbLbl, pbPct, pbW, pbFull, pbSub, nextLbl;
-  level = 'Level ' + lvlNum;
-  if (lvlNum === 1)      { dPct = 75; sPct = 25; }
-  else if (lvlNum === 2) { dPct = 60; sPct = 40; }
-  else                   { dPct = 50; sPct = 50; }
-
-  if (lvlNum < MAX_LEVEL) {
-    const cur = levelStart(lvlNum), next = levelStart(lvlNum + 1);
-    const pct = Math.round((u - cur) / (next - cur) * 100), r = next - u;
-    pbLbl='Progress to Level '+(lvlNum+1); pbPct=pct+'%'; pbW=pct; pbFull=false;
-    pbSub=r+' approved event'+(r===1?'':'s')+' remaining'; nextLbl=r+' → Lv '+(lvlNum+1);
-  } else {
-    pbLbl='Level '+MAX_LEVEL+' — Stable'; pbPct='100%'; pbW=100; pbFull=true;
-    pbSub='Maximum level reached.'; nextLbl='Max level';
-  }
-
-  return { u, dep, sal, avail, totalPaid, earn:u*100, level, dPct, sPct, pbLbl, pbPct, pbW, pbFull, pbSub, nextLbl };
+  return {
+    u, dep, sal, avail, totalPaid, earn: totals.totalEarnings,
+    level: lvl.level, dPct: lvl.dPct, sPct: lvl.sPct,
+    pbLbl: lvl.pbLbl, pbPct: lvl.pbPct, pbW: lvl.pbW, pbFull: lvl.pbFull,
+    pbSub: lvl.pbSub, nextLbl: lvl.nextLbl
+  };
 }
 
 /* ─── RENDER ALL ──────────────────────────────────── */
@@ -1566,10 +1560,10 @@ function renderTracker(s) {
   txt('bp-cp', Math.floor(s.dep/350));
   txt('bp-b', Math.floor(s.dep/150));
   txt('bp-m', Math.floor(s.dep/250));
-  // Deposit is provably clamped to GrowthCalc.DEPOSIT_CAP, so >= and === are
-  // equivalent here — >= is just the defensive form.
+  // Deposit is provably clamped to GrowthCalculations.DEPOSIT_CAP, so >= and
+  // === are equivalent here — >= is just the defensive form.
   const capStatus = document.getElementById('depositCapStatus');
-  if (capStatus) capStatus.classList.toggle('show', s.dep >= GrowthCalc.DEPOSIT_CAP);
+  if (capStatus) capStatus.classList.toggle('show', s.dep >= GrowthCalculations.DEPOSIT_CAP);
 }
 
 function renderSalarySection(s) {

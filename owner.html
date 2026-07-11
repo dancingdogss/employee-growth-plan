@@ -756,9 +756,20 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
-<script src="calc-shared.js"></script>
+<script src="js/calculations.js"></script>
 <script>
 console.log('owner.html JS loaded');
+
+// Fail loud, not silent: if the shared calculation module did not load
+// (wrong path, blocked file, bad deploy) we must NOT fall through and render
+// zeroed or wrong deposit/salary totals.
+if (typeof window.GrowthCalculations === 'undefined') {
+  console.error(
+    '[growth-plan] js/calculations.js failed to load — deposit/salary totals ' +
+    'cannot be computed. Check the <script src="js/calculations.js"> path ' +
+    '(it must resolve relative to this page for Live Server and static hosting).'
+  );
+}
 
 /* ─── NAVIGATION ────────────────────────────────────── */
 function goToSection(id) {
@@ -1427,19 +1438,19 @@ function renderCategoryOverview() {
 
 /* ─── SALARY CALCULATIONS ───────────────────────────── */
 function calcSalaryForEmployee(empId) {
-  // Canonical calculation lives in calc-shared.js — same helper index.html
-  // uses, so employee and owner totals can never drift apart.
+  // Canonical calculation lives in js/calculations.js — the SAME
+  // calcFinancialTotals() helper index.html uses, so employee and owner
+  // totals can never drift apart.
   const mine = allStock.filter(u => u.employee_id === empId);
-  const breakdown = GrowthCalc.calcApprovedBreakdown(
-    mine,
-    u => getStockType(u).earnings_per_approved_sale || 100
-  );
-  const totalPaid = allPayouts.filter(p => p.employee_id === empId).reduce((acc,p) => acc + (p.amount||0), 0);
+  const totals = GrowthCalculations.calcFinancialTotals(mine, {
+    earningsFn: u => getStockType(u).earnings_per_approved_sale || 100,
+    payouts: allPayouts.filter(p => p.employee_id === empId)
+  });
   return {
-    salaryEarned: breakdown.sal,
-    salaryPaid: totalPaid,
-    salaryAvail: GrowthCalc.calcAvailableSalary(breakdown.sal, totalPaid),
-    deposit: breakdown.dep
+    salaryEarned: totals.salaryEarned,
+    salaryPaid: totals.salaryPaid,
+    salaryAvail: totals.salaryAvailable,
+    deposit: totals.deposit
   };
 }
 
@@ -1790,12 +1801,12 @@ function computeWeek() {
   const soldFromUp = upWeek.filter(u=>u.status==='sold_approved'&&inWeek(u.approved_at,b)).length;
   const rate = upWeek.length>0 ? Math.round(soldFromUp/upWeek.length*100) : 0;
   // Each unit's deposit/salary contribution comes from ITS OWN employee's
-  // full chronological approved-sale history (calc-shared.js), never a
+  // full chronological approved-sale history (js/calculations.js), never a
   // cross-employee global index — so a unit approved this week for an
   // employee who already reached the deposit cap correctly contributes 0
   // deposit / flat salary.
   const earningsFn = u => getStockType(u).earnings_per_approved_sale || 100;
-  const allBreakdown = GrowthCalc.calcAllEmployeesBreakdown(approvedAll, earningsFn);
+  const allBreakdown = GrowthCalculations.calcAllEmployeesBreakdown(approvedAll, earningsFn);
   let wEarn=0, wDep=0, wSal=0;
   appWeek.forEach(u => {
     const contrib = allBreakdown.perUnit.get(u.id) || {d:0,s:0};
