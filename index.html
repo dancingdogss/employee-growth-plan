@@ -216,6 +216,13 @@ body::before{
 .v-s{font-size:9.5px;color:var(--muted);margin-top:4px;}
 .vv-gold{color:var(--gold);} .vv-green{color:var(--accent);} .vv-vio{color:#aa9bff;}
 
+/* Deposit-cap status (shown only once deposit == DEPOSIT_CAP) */
+.cap-status{display:none;padding:13px 15px;gap:5px;flex-direction:column;border-top:1px solid var(--bd);background:linear-gradient(90deg,rgba(255,200,77,.09),transparent);}
+.cap-status.show{display:flex;}
+.cap-status-title{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--gold);}
+.cap-status-body{font-size:11px;line-height:1.55;color:var(--t2);}
+.cap-status-future{display:inline-flex;align-items:center;gap:5px;margin-top:2px;width:fit-content;font-family:var(--f-m);font-size:9px;letter-spacing:.4px;color:var(--muted);background:var(--s2);border:1px solid var(--bd2);border-radius:99px;padding:4px 10px;opacity:.8;cursor:default;}
+
 /* ── DEPOSIT POWER SHOP ── */
 .shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
 .shop-tile{position:relative;border-radius:16px;padding:15px 10px 12px;text-align:center;background:var(--s2);border:1px solid var(--bd2);overflow:hidden;}
@@ -633,6 +640,14 @@ body.locked .dock{display:none;}
         <div class="v-v vv-vio" id="stEarn">—</div>
         <div class="v-s">events × 100</div>
       </div>
+    </div>
+    <div class="cap-status" id="depositCapStatus">
+      <div class="cap-status-title">🔒 Deposit cap reached</div>
+      <div class="cap-status-body">
+        Your deposit is secured at 3,000 coins.<br>
+        New approved sales now add 50 salary coins and no additional deposit.
+      </div>
+      <span class="cap-status-future">🔮 Higher deposit capacity — coming later</span>
     </div>
   </div>
 
@@ -1383,6 +1398,10 @@ function renderTracker(s) {
   txt('bp-cp', Math.floor(s.dep/350));
   txt('bp-b', Math.floor(s.dep/150));
   txt('bp-m', Math.floor(s.dep/250));
+  // Deposit is provably clamped to GrowthCalc.DEPOSIT_CAP, so >= and === are
+  // equivalent here — >= is just the defensive form.
+  const capStatus = document.getElementById('depositCapStatus');
+  if (capStatus) capStatus.classList.toggle('show', s.dep >= GrowthCalc.DEPOSIT_CAP);
 }
 
 function renderSalarySection(s) {
