@@ -856,6 +856,7 @@ body.locked .dock{display:none;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
+<script src="calc-shared.js"></script>
 <script>
 console.log('index.html JS loaded');
 
@@ -1276,22 +1277,18 @@ function applyStockFilter(units) {
 
 /* ─── SALARY CALCS ────────────────────────────────── */
 function calcMyStats() {
-  const sold = allStockUnits
-    .filter(u => u.status === 'sold_approved')
-    .slice().sort((a,b) => new Date(a.approved_at)-new Date(b.approved_at));
-
-  const u = sold.length;
-  let dep = 0, sal = 0;
-  sold.forEach((unit, idx) => {
-    const pos = idx + 1;
-    const earn = getStockType(unit).earnings_per_approved_sale || 100;
-    const sp = pos <= 20 ? {d:75,s:25} : pos <= 45 ? {d:60,s:40} : {d:50,s:50};
-    dep += Math.round(earn * sp.d / 100);
-    sal += Math.round(earn * sp.s / 100);
-  });
+  // Canonical calculation lives in calc-shared.js: 1-20 => 75/25, 21-45 =>
+  // 60/40, deposit capped at GrowthCalc.DEPOSIT_CAP, then flat
+  // GrowthCalc.POST_CAP_SALARY_PER_APPROVED_SALE salary per sale.
+  const breakdown = GrowthCalc.calcApprovedBreakdown(
+    allStockUnits,
+    unit => getStockType(unit).earnings_per_approved_sale || 100
+  );
+  const u = breakdown.count;
+  const dep = breakdown.dep, sal = breakdown.sal;
 
   const totalPaid = allPayouts.reduce((acc,p) => acc+(p.amount||0), 0);
-  const avail = sal - totalPaid;
+  const avail = GrowthCalc.calcAvailableSalary(sal, totalPaid);
 
   // Level ladder: Lv2 at 20 units, Lv3 at 45, then +25 units per level up to MAX_LEVEL.
   // Splits stay position-based (above) — levels 3+ display 50/50.

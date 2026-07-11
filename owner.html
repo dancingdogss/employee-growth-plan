@@ -756,6 +756,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
+<script src="calc-shared.js"></script>
 <script>
 console.log('owner.html JS loaded');
 
@@ -936,6 +937,18 @@ function populateMsgEmpSelect() {
   el.innerHTML = '<option value="">Select employee</option><option value="__all__">📢 All active employees</option>' + opts;
 }
 
+// Builds the employee dashboard link relative to wherever owner.html is
+// currently being served from (local Live Server, production host, etc.)
+// instead of a hardcoded domain, so "Open as employee" always opens the
+// SAME index.html copy — same origin, same directory — as the owner page
+// that generated the link. Param name ('token') must match what
+// index.html's init() reads via params.get('token').
+function buildEmployeeLink(token) {
+  const url = new URL('index.html', window.location.href);
+  url.searchParams.set('token', token);
+  return url.toString();
+}
+
 function renderEmployeeList() {
   const c = document.getElementById('empListContainer');
   if (!allEmployees.length) { c.innerHTML='<div class="empty"><span class="empty-ico">👤</span>No employees yet.</div>'; return; }
@@ -944,9 +957,7 @@ function renderEmployeeList() {
       ? `<span class="seen-badge seen-yes">📨 Connected</span>`
       : `<span class="seen-badge seen-no">📨 Not connected</span>`;
     const token = e.employee_access_token;
-    const privLink = token
-      ? `https://dancingdogss.github.io/wow-character/?token=${encodeURIComponent(token)}`
-      : null;
+    const privLink = token ? buildEmployeeLink(token) : null;
     const linkSection = token
       ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px;word-break:break-all;">${privLink}</div>
          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
@@ -1310,7 +1321,7 @@ function renderOverview() {
   txt('ov-notseen',notseen); txt('ov-waiting',waiting); txt('ov-issue',issue);
   const s = computeWeek();
   txt('ov-week',s.approvedWeek.length);
-  txt('ov-wdep',fmt(s.dep)); txt('ov-wsal',fmt(s.sal));
+  txt('ov-wdep',fmt(s.wDep)); txt('ov-wsal',fmt(s.wSal));
   renderAttentionBlock();
   renderEmpSalaryCards();
 }
@@ -1416,19 +1427,20 @@ function renderCategoryOverview() {
 
 /* ─── SALARY CALCULATIONS ───────────────────────────── */
 function calcSalaryForEmployee(empId) {
-  const sold = allStock
-    .filter(u => u.employee_id === empId && u.status === 'sold_approved')
-    .slice().sort((a,b) => new Date(a.approved_at)-new Date(b.approved_at));
-  let dep = 0, sal = 0;
-  sold.forEach((u, idx) => {
-    const pos = idx + 1;
-    const earnings = getStockType(u).earnings_per_approved_sale || 100;
-    const split = pos <= 20 ? {d:75,s:25} : pos <= 45 ? {d:60,s:40} : {d:50,s:50};
-    dep += Math.round(earnings * split.d / 100);
-    sal += Math.round(earnings * split.s / 100);
-  });
+  // Canonical calculation lives in calc-shared.js — same helper index.html
+  // uses, so employee and owner totals can never drift apart.
+  const mine = allStock.filter(u => u.employee_id === empId);
+  const breakdown = GrowthCalc.calcApprovedBreakdown(
+    mine,
+    u => getStockType(u).earnings_per_approved_sale || 100
+  );
   const totalPaid = allPayouts.filter(p => p.employee_id === empId).reduce((acc,p) => acc + (p.amount||0), 0);
-  return { salaryEarned: sal, salaryPaid: totalPaid, salaryAvail: sal - totalPaid, deposit: dep };
+  return {
+    salaryEarned: breakdown.sal,
+    salaryPaid: totalPaid,
+    salaryAvail: GrowthCalc.calcAvailableSalary(breakdown.sal, totalPaid),
+    deposit: breakdown.dep
+  };
 }
 
 /* ─── FILTER ────────────────────────────────────────── */
@@ -1764,31 +1776,32 @@ function renderPayoutHistory() {
 }
 
 /* ─── WEEKLY STATS ──────────────────────────────────── */
-function splitForUnit(idx) {
-  const pos = idx + 1;
-  return pos<=20 ? {d:75,s:25} : pos<=45 ? {d:60,s:40} : {d:50,s:50};
-}
-
 let _wkCache = null;
 
 function computeWeek() {
   const b = weekBounds();
-  const allApproved = allStock.filter(u=>u.status==='sold_approved')
+  const approvedAll = allStock.filter(u=>u.status==='sold_approved');
+  const appWeek  = approvedAll
+    .filter(u=>inWeek(u.approved_at,b))
     .slice().sort((a,c)=>new Date(a.approved_at)-new Date(c.approved_at));
-  const appWeek  = allApproved.filter(u=>inWeek(u.approved_at,b));
   const upWeek   = allStock.filter(u=>inWeek(u.uploaded_at,b));
   const waiting  = allStock.filter(u=>u.status==='waiting_to_be_sold').length;
   const notseen  = allStock.filter(u=>u.status==='sold_approved'&&!u.employee_seen_at).length;
   const soldFromUp = upWeek.filter(u=>u.status==='sold_approved'&&inWeek(u.approved_at,b)).length;
   const rate = upWeek.length>0 ? Math.round(soldFromUp/upWeek.length*100) : 0;
+  // Each unit's deposit/salary contribution comes from ITS OWN employee's
+  // full chronological approved-sale history (calc-shared.js), never a
+  // cross-employee global index — so a unit approved this week for an
+  // employee who already reached the deposit cap correctly contributes 0
+  // deposit / flat salary.
+  const earningsFn = u => getStockType(u).earnings_per_approved_sale || 100;
+  const allBreakdown = GrowthCalc.calcAllEmployeesBreakdown(approvedAll, earningsFn);
   let wEarn=0, wDep=0, wSal=0;
   appWeek.forEach(u => {
-    const globalIdx = allApproved.indexOf(u);
-    const sp = splitForUnit(globalIdx);
-    const earn = getStockType(u).earnings_per_approved_sale || 100;
-    wEarn += earn;
-    wDep  += Math.round(earn * sp.d / 100);
-    wSal  += Math.round(earn * sp.s / 100);
+    const contrib = allBreakdown.perUnit.get(u.id) || {d:0,s:0};
+    wEarn += earningsFn(u);
+    wDep  += contrib.d;
+    wSal  += contrib.s;
   });
   const allEmpIds = [...new Set(allStock.map(u=>u.employee_id))];
   let totalSalAvail = 0;
