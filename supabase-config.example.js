@@ -10,10 +10,10 @@ const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // starts with eyJ...
 
 // UI config
 // ---
-// OWNER_PIN is a simple local UI gate. It is NOT real security.
-// Real security requires Supabase Auth + Row Level Security policies.
-// Anyone with DevTools can bypass this. Treat it as "accidental-click protection" only.
-const OWNER_PIN = "1234";
+// Owner access is gated by Supabase Auth (email/password) plus a
+// public.profiles row with role = 'owner' for the signed-in user — not by a
+// client-side secret. See docs/SECURITY_OWNER_AUTH_SETUP.md to provision an
+// owner account. There is no OWNER_PIN or client-side owner secret anymore.
 
 // Employee identifier used to filter stock units for the employee view.
 // In a real auth setup this would come from the authenticated session.

@@ -66,8 +66,13 @@ Deno.serve(async (req) => {
         `#sec-stock`;
     }
 
+    // Prefer the user-facing stock_name; fall back to the internal stock_id for
+    // legacy rows created before stock_name existed. Escape Telegram Markdown
+    // metacharacters so an owner-entered name (e.g. "A*B_C") can't break parsing.
+    const rawLabel = (newRow.stock_name ?? "").toString().trim() || newRow.stock_id;
+    const label = String(rawLabel).replace(/([*_`\[\]])/g, "\\$1");
     const lines = [
-      `✅ *${newRow.stock_id}* was just marked as sold`,
+      `✅ *${label}* was just marked as sold`,
     ];
     if (newRow.order_id) lines.push(`Order: ${newRow.order_id}`);
     lines.push("", "Open the app and tap \"Mark as seen\" to confirm.");
