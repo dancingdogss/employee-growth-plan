@@ -195,6 +195,34 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .fb.fw{border-color:rgba(240,163,91,.4);color:var(--a3);background:rgba(240,163,91,.07);}
 .ledger-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:10px;letter-spacing:1px;}
 .emp-filter-row{margin-bottom:10px;}
+
+/* Operational summary chips — complete counts, act as primary-view filters */
+.ledger-summary{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.lsum{flex:1 1 auto;min-width:78px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 11px;border-radius:11px;border:1px solid var(--bd);background:var(--s2);color:var(--muted);cursor:pointer;transition:border-color .14s,background .14s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.lsum:hover{transform:translateY(-1px);}
+.lsum-n{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;line-height:1;color:var(--text);}
+.lsum-l{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;}
+.lsum.active{border-color:rgba(0,212,170,.5);background:rgba(0,212,170,.08);}
+.lsum.ls-cur.active   {border-color:rgba(240,163,91,.5);background:rgba(240,163,91,.08);}
+.lsum.ls-sold.active  {border-color:rgba(0,212,170,.5);background:rgba(0,212,170,.08);}
+.lsum.ls-issue        {color:var(--red);}
+.lsum.ls-issue .lsum-n{color:var(--red);}
+.lsum.ls-issue.active {border-color:rgba(240,96,112,.6);background:rgba(240,96,112,.1);}
+.lsum.ls-issue.ls-alert{border-color:rgba(240,96,112,.55);background:rgba(240,96,112,.09);animation:lsPulse 2.2s ease-in-out infinite;}
+@keyframes lsPulse{0%,100%{box-shadow:0 0 0 0 rgba(240,96,112,0);}50%{box-shadow:0 0 0 3px rgba(240,96,112,.12);}}
+.lsum.ls-cancel       {opacity:.62;}
+.lsum.ls-cancel .lsum-n{color:var(--muted);}
+.lsum.ls-cancel.active{opacity:1;border-color:var(--bd2);background:var(--s2);}
+.lsum.ls-legacy       {border-style:dashed;border-color:rgba(240,192,91,.4);color:var(--gold);}
+.lsum.ls-legacy .lsum-n{color:var(--gold);}
+.lsum.ls-legacy.active{background:rgba(240,192,91,.08);}
+/* Search clear + pagination + inline clear link */
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:none;border-radius:6px;background:var(--bd);color:var(--muted);font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.search-clear:hover{color:var(--text);background:var(--bd2);}
+.show-more{width:100%;margin-top:6px;padding:11px;border-radius:11px;border:1px dashed var(--bd2);background:var(--s2);color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:background .14s;}
+.show-more:hover{background:rgba(0,212,170,.06);}
+.lnk-clear{margin-left:6px;background:none;border:none;color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;text-decoration:underline;}
+.modal-save:disabled{opacity:.55;cursor:not-allowed;}
 /* WEEKLY */
 .week-hd{background:var(--s2);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .wh-info{display:flex;flex-direction:column;gap:1px;}
@@ -582,9 +610,12 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     </div>
     <div class="coll-body open" id="ledgerBody">
       <div class="coll-inner">
+        <!-- Operational summary: complete counts (ignore search/pagination), click to switch primary view -->
+        <div class="ledger-summary" id="ledgerSummary"></div>
         <div class="search-wrap">
           <span class="search-ico">🔍</span>
-          <input class="search-inp" id="searchInp" type="text" placeholder="Search Stock ID or Order ID..." oninput="renderLedger()">
+          <input class="search-inp" id="searchInp" type="text" placeholder="Search stock ID, order ID, employee, code, type…" oninput="onLedgerSearch()">
+          <button class="search-clear" id="searchClear" onclick="clearLedgerSearch()" title="Clear search">✕</button>
         </div>
         <div class="emp-filter-row">
           <select class="form-select" id="empFilterSel" onchange="renderLedger()" style="font-size:11px;padding:8px 12px">
@@ -592,19 +623,15 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
           </select>
         </div>
         <div class="filters">
-          <button class="fb fa"  onclick="setFilter('all',this)">All</button>
-          <button class="fb"     onclick="setFilter('type_c',this)">C units</button>
-          <button class="fb"     onclick="setFilter('type_cp',this)">CPREMIUM units</button>
-          <button class="fb"     onclick="setFilter('type_b',this)">B bundles</button>
-          <button class="fb"     onclick="setFilter('type_m',this)">M bundles</button>
-          <button class="fb"     onclick="setFilter('waiting_to_be_sold',this)">🟡 Waiting</button>
-          <button class="fb"     onclick="setFilter('sold_approved',this)">✅ Approved sold</button>
-          <button class="fb"     onclick="setFilter('sold_notseen',this)">👁 Sold, not seen</button>
-          <button class="fb"     onclick="setFilter('issue',this)">🔴 Issue</button>
-          <button class="fb"     onclick="setFilter('cancelled',this)">⛔ Cancelled</button>
-          <button class="fb"     onclick="setFilter('wu',this)">📅 Uploaded this week</button>
-          <button class="fb"     onclick="setFilter('wa',this)">🗓 Approved this week</button>
-          <button class="fb"     onclick="setFilter('ou',this)">⚠ Old unsold 3d+</button>
+          <button class="fb"     onclick="setFilter('all')">All records</button>
+          <button class="fb"     onclick="setFilter('type_c')">C units</button>
+          <button class="fb"     onclick="setFilter('type_cp')">CPREMIUM units</button>
+          <button class="fb"     onclick="setFilter('type_b')">B bundles</button>
+          <button class="fb"     onclick="setFilter('type_m')">M bundles</button>
+          <button class="fb"     onclick="setFilter('sold_notseen')">👁 Sold, not seen</button>
+          <button class="fb"     onclick="setFilter('wu')">📅 Uploaded this week</button>
+          <button class="fb"     onclick="setFilter('wa')">🗓 Approved this week</button>
+          <button class="fb"     onclick="setFilter('ou')">⚠ Old unsold 3d+</button>
         </div>
         <div class="ledger-count" id="ledgerCount">Loading...</div>
         <div id="ledgerContainer"><div class="loading-wrap"><span class="spinner"></span>Loading records...</div></div>
@@ -706,8 +733,8 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <div class="form-group"><label class="form-label">Owner note (optional)</label><textarea class="form-textarea" id="ms-note" placeholder="Internal note..."></textarea></div>
     </div>
     <div class="modal-acts">
-      <button class="modal-cancel" onclick="closeModal('markSoldModal')">Cancel</button>
-      <button class="modal-save" onclick="submitMarkSold()">✅ Confirm sold</button>
+      <button class="modal-cancel" id="ms-cancel" onclick="closeModal('markSoldModal')">Cancel</button>
+      <button class="modal-save" id="ms-save" onclick="submitMarkSold()">✅ Confirm sold</button>
     </div>
   </div>
 </div>
@@ -796,13 +823,22 @@ let allStock        = [];
 let allEmployees    = [];
 let allPayouts      = [];
 let stockTypes      = [];
-let ledgerFilter    = 'all';
+let ledgerFilter    = 'waiting_to_be_sold';   // default primary view: Current stock
 let actionId        = null;
 let realtimeChannel = null;
 let isAddingStock      = false;
 let isBulkAdding       = false;
+let isMarkingSold      = false;                // guards against double-submit of Mark-as-sold
 let allOwnerMessages   = [];
 let ownerMsgShowHidden = false;
+
+/* ─── LEDGER VIEW CONFIG ────────────────────────────── */
+const LEDGER_PAGE_SIZE = 25;                   // Sold history renders in pages of 25
+let   ledgerShown      = LEDGER_PAGE_SIZE;      // how many rows of a paginated view are shown
+// Only large, history-style views paginate; Current/Issues/Cancelled render fully.
+const PAGINATED_VIEWS  = new Set(['sold_approved', 'all']);
+// Colour class applied to the matching refine chip for the active filter.
+const REFINE_CLS = { all:'fa', type_c:'fb-c', type_cp:'fb-cp', type_b:'fb-b', type_m:'fb-m', sold_notseen:'fp', wu:'fw', wa:'fa', ou:'fr' };
 
 /* ─── SAFE TYPE HELPERS ─────────────────────────────── */
 const TYPE_FALLBACK = {
@@ -1339,8 +1375,7 @@ function renderOverview() {
 
 /* ─── NEEDS ATTENTION + EMP SALARY (Overview) ───────── */
 function jumpToFilter(filterKey) {
-  const btn = document.querySelector(`.fb[onclick*="setFilter('${filterKey}'"]`);
-  if (btn) setFilter(filterKey, btn);
+  setFilter(filterKey);
   goToSection('sec-ledger');
 }
 
@@ -1455,15 +1490,13 @@ function calcSalaryForEmployee(empId) {
 }
 
 /* ─── FILTER ────────────────────────────────────────── */
-function setFilter(f, btn) {
+// Single source of truth for the active ledger filter. Both the summary /
+// primary-view chips and the secondary refine chips call this. Active-state
+// highlighting is derived in renderLedger(), so no button reference is needed.
+// Changing the view always resets pagination back to the first page.
+function setFilter(f) {
   ledgerFilter = f;
-  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fb-c','fb-cp','fb-b','fb-m','fp','fr','fw'));
-  const clsMap = {
-    all:'fa', type_c:'fb-c', type_cp:'fb-cp', type_b:'fb-b', type_m:'fb-m',
-    sold_approved:'fa', issue:'fr', waiting_to_be_sold:'fw',
-    cancelled:'fr', wu:'fw', wa:'fa', ou:'fr', sold_notseen:'fp'
-  };
-  btn.classList.add(clsMap[f]||'fa');
+  ledgerShown  = LEDGER_PAGE_SIZE;
   renderLedger();
 }
 
@@ -1481,7 +1514,17 @@ function getFilteredFrom(rows) {
   const q   = (document.getElementById('searchInp')||{value:''}).value.trim().toLowerCase();
   const empF= (document.getElementById('empFilterSel')||{value:''}).value;
   return rows.filter(u => {
-    if (q && u.stock_id?.toLowerCase().indexOf(q)===-1 && (u.order_id||'').toLowerCase().indexOf(q)===-1) return false;
+    // Case-insensitive search across stock ID, order ID, employee name,
+    // employee code and stock type/prefix. Runs on the COMPLETE dataset
+    // (before pagination) so matches outside the rendered page are found.
+    if (q) {
+      const hay = [
+        u.stock_id, u.order_id,
+        u.employees?.name, u.employees?.employee_code,
+        getStockPrefix(u), getStockType(u).name
+      ];
+      if (!hay.some(v => String(v||'').toLowerCase().indexOf(q) !== -1)) return false;
+    }
     if (empF && u.employee_id !== empF) return false;
     if (ledgerFilter==='type_c')             return getStockPrefix(u)==='C';
     if (ledgerFilter==='type_cp')            return getStockPrefix(u)==='CPREMIUM';
@@ -1492,11 +1535,26 @@ function getFilteredFrom(rows) {
     if (ledgerFilter==='sold_notseen')       return u.status==='sold_approved'&&!u.employee_seen_at;
     if (ledgerFilter==='issue')              return u.status==='issue';
     if (ledgerFilter==='cancelled')          return u.status==='cancelled';
+    if (ledgerFilter==='sale_reported')      return u.status==='sale_reported';
     if (ledgerFilter==='wu')                 return inWeek(u.uploaded_at,b);
     if (ledgerFilter==='wa')                 return u.status==='sold_approved'&&inWeek(u.approved_at,b);
     if (ledgerFilter==='ou')                 return isOldUnsold(u);
     return true;
   });
+}
+
+// Chronological ordering per view, on a COPY so allStock is never mutated:
+//   sold-style views  -> newest approved sale first
+//   cancelled         -> most recently updated first
+//   everything else   -> newest uploaded first (Current stock default)
+function sortForView(rows, view) {
+  const byApproved = (a,c)=> new Date(c.approved_at||0) - new Date(a.approved_at||0);
+  const byUploaded = (a,c)=> new Date(c.uploaded_at||0) - new Date(a.uploaded_at||0);
+  const byUpdated  = (a,c)=> new Date(c.updated_at||c.uploaded_at||0) - new Date(a.updated_at||a.uploaded_at||0);
+  const out = rows.slice();
+  if (view==='sold_approved' || view==='wa' || view==='sold_notseen') return out.sort(byApproved);
+  if (view==='cancelled') return out.sort(byUpdated);
+  return out.sort(byUploaded);
 }
 function getFiltered() { return getFilteredFrom(uniqueById(allStock)); }
 
@@ -1510,20 +1568,103 @@ function statusMeta(status) {
   return m[status] || { cls:'', badge:'', label:status };
 }
 
+/* ─── OPERATIONAL SUMMARY (Part A) ──────────────────── */
+// Counts come from the COMPLETE loaded dataset — independent of the search
+// box, the employee filter and pagination — and never change as those change.
+// Each chip is also the selector for its primary view.
+function renderLedgerSummary(unique) {
+  const rows = unique || uniqueById(allStock);
+  const c = {
+    waiting:   rows.filter(u=>u.status==='waiting_to_be_sold').length,
+    sold:      rows.filter(u=>u.status==='sold_approved').length,
+    issue:     rows.filter(u=>u.status==='issue').length,
+    cancelled: rows.filter(u=>u.status==='cancelled').length,
+    legacy:    rows.filter(u=>u.status==='sale_reported').length,
+    total:     rows.length,
+  };
+  const chip = (view,label,val,cls,extra='') =>
+    `<button class="lsum ${cls} ${ledgerFilter===view?'active':''} ${extra}" onclick="setFilter('${view}')">
+       <span class="lsum-n">${fmt(val)}</span><span class="lsum-l">${label}</span></button>`;
+  let html = '';
+  html += chip('waiting_to_be_sold','Current', c.waiting,   'ls-cur');
+  html += chip('sold_approved',     'Sold',    c.sold,      'ls-sold');
+  html += chip('issue',             'Issues',  c.issue,     'ls-issue', c.issue>0?'ls-alert':'');
+  html += chip('cancelled',         'Cancelled',c.cancelled,'ls-cancel');
+  html += chip('all',               'Total',   c.total,     'ls-total');
+  // Legacy sale_reported: compatibility only — shown solely when such records
+  // still exist. The owner interface is NOT built around an approval workflow.
+  if (c.legacy>0) html += chip('sale_reported','Legacy', c.legacy, 'ls-legacy');
+  const box = document.getElementById('ledgerSummary');
+  if (box) box.innerHTML = html;
+}
+
+// Derived highlight for the secondary refine chips (kept as plain .fb buttons).
+function syncRefineHighlight() {
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('fa','fb-c','fb-cp','fb-b','fb-m','fp','fr','fw'));
+  const btn = document.querySelector(`.fb[onclick*="setFilter('${ledgerFilter}'"]`);
+  if (btn) btn.classList.add(REFINE_CLS[ledgerFilter] || 'fa');
+}
+
 /* ─── RENDER LEDGER ─────────────────────────────────── */
 function renderLedger() {
   const unique = uniqueById(allStock);
-  const fl = getFilteredFrom(unique);
+  renderLedgerSummary(unique);
+  syncRefineHighlight();
+
+  const q  = (document.getElementById('searchInp')||{value:''}).value.trim();
+  const fl = sortForView(getFilteredFrom(unique), ledgerFilter);
+  const total = fl.length;
+  // Pagination applies to large history views only, and never while searching
+  // (so a match outside the first page is always surfaced).
+  const paginate = PAGINATED_VIEWS.has(ledgerFilter) && !q;
+  if (ledgerShown < LEDGER_PAGE_SIZE) ledgerShown = LEDGER_PAGE_SIZE;
+  const shown = paginate ? fl.slice(0, ledgerShown) : fl;
+
   txt('ledgerBadge', unique.length);
-  txt('ledgerCount', `Showing ${fl.length} of ${unique.length} record${unique.length===1?'':'s'}`);
+  const clr = document.getElementById('searchClear');
+  if (clr) clr.style.display = q ? 'flex' : 'none';
+
+  let countTxt = paginate
+    ? `Showing ${shown.length} of ${total}`
+    : `Showing ${total} of ${unique.length} record${unique.length===1?'':'s'}`;
+  if (q) countTxt += ` · ${total} match${total===1?'':'es'} for “${esc(q)}”`;
+  txt('ledgerCount', countTxt);
+
   const c = document.getElementById('ledgerContainer');
-  if (!fl.length) {
+  if (!total) {
     c.innerHTML = unique.length===0
       ? '<div class="empty"><span class="empty-ico">📭</span>No stock units yet.</div>'
-      : '<div class="empty"><span class="empty-ico">🔎</span>No records match this filter.</div>';
+      : (q
+          ? `<div class="empty"><span class="empty-ico">🔎</span>No records match “${esc(q)}” in this view.<button class="lnk-clear" onclick="clearLedgerSearch()">Clear search</button></div>`
+          : '<div class="empty"><span class="empty-ico">🔎</span>No records in this view.</div>');
     return;
   }
-  c.innerHTML = fl.map(u => stockCardHtml(u)).join('');
+
+  let html = shown.map(u => stockCardHtml(u)).join('');
+  if (paginate && shown.length < total) {
+    const next = Math.min(LEDGER_PAGE_SIZE, total - shown.length);
+    html += `<button class="show-more" onclick="showMoreLedger()">Show ${next} more · showing ${shown.length} of ${total}</button>`;
+  }
+  c.innerHTML = html;
+}
+
+function showMoreLedger() {
+  ledgerShown += LEDGER_PAGE_SIZE;
+  renderLedger();
+}
+
+// Search only re-renders the ledger (and its summary) — never the whole page —
+// and restarts pagination so results begin at the first page.
+function onLedgerSearch() {
+  ledgerShown = LEDGER_PAGE_SIZE;
+  renderLedger();
+}
+
+function clearLedgerSearch() {
+  const i = document.getElementById('searchInp');
+  if (i) i.value = '';
+  ledgerShown = LEDGER_PAGE_SIZE;
+  renderLedger();
 }
 
 function tts(up, sold) { if(!up||!sold)return'—'; const ms=new Date(sold)-new Date(up); return ms<0?'—':formatMs(ms); }
@@ -1609,22 +1750,70 @@ function openMarkSold(id, stockId) {
 }
 
 async function submitMarkSold() {
+  // Guard 1 (double-submit): synchronous flag check before any await. Because
+  // JS is single-threaded, a rapid second click re-enters here and returns
+  // immediately — so at most ONE Supabase update is ever issued.
+  if (isMarkingSold) return;
+
   const orderId = document.getElementById('ms-order').value.trim();
   const soldAt  = document.getElementById('ms-soldAt').value;
   const note    = document.getElementById('ms-note').value.trim();
-  if (!orderId) { showToast('Order ID required','err'); return; }
-  if (!soldAt)  { showToast('Sold date/time required','err'); return; }
-  const now = new Date().toISOString();
-  const { error } = await _sb.from('stock_units').update({
-    status:'sold_approved', order_id:orderId,
-    sold_at:new Date(soldAt).toISOString(), approved_at:now,
-    owner_note:note||null, employee_seen_at:null, employee_seen_note:null, updated_at:now
-  }).eq('id',actionId);
-  if (error) { showToast('Error: '+error.message,'err'); return; }
-  await _sb.from('stock_events').insert({ stock_unit_id:actionId, event_type:'marked_sold', actor:'owner', note:note||null });
-  showToast('Marked as sold!','ok');
-  closeModal('markSoldModal');
-  await loadStock();
+  if (!orderId)  { showToast('Order ID required','err'); return; }
+  if (!soldAt)   { showToast('Sold date/time required','err'); return; }
+  if (!actionId) { showToast('No stock unit selected','err'); return; }
+
+  const saveBtn = document.getElementById('ms-save');
+  const origTxt = saveBtn ? saveBtn.textContent : '';
+  isMarkingSold = true;
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Saving…'; }  // Guard 2: disabled + in-progress state
+
+  try {
+    const now = new Date().toISOString();
+    // Single status-transitioning UPDATE. This transition (→ sold_approved) is
+    // what the server-side Database Webhook (notify-sold) listens for, so the
+    // Telegram notification fires exactly once from the server — the client
+    // must NOT invoke it too, or the employee would get duplicate messages.
+    const { data, error } = await _sb.from('stock_units').update({
+      status:'sold_approved', order_id:orderId,
+      sold_at:new Date(soldAt).toISOString(), approved_at:now,
+      owner_note:note||null, employee_seen_at:null, employee_seen_note:null, updated_at:now
+    }).eq('id',actionId).select('id, employee_id, stock_id').single();
+
+    if (error) {
+      // DB failed: do NOT close the modal, do NOT touch the local record (it
+      // stays waiting), and show an honest error. No status transition means
+      // the webhook never runs, so no notification is sent.
+      showToast('Could not mark as sold: '+error.message,'err');
+      return;
+    }
+
+    // Best-effort audit log. If it fails we DO NOT roll back the sale — the
+    // sale already succeeded; the event log is secondary.
+    _sb.from('stock_events')
+      .insert({ stock_unit_id:actionId, event_type:'marked_sold', actor:'owner', note:note||null })
+      .then(({ error:evErr }) => { if (evErr) console.warn('stock_events log failed (non-critical):', evErr.message); });
+
+    // Close only AFTER the database confirms success.
+    closeModal('markSoldModal');
+
+    // Honest notification feedback. The Telegram send is a fire-and-forget
+    // server webhook we cannot observe from the browser; the one thing we can
+    // check is whether the employee even has a Telegram ID. If not, the sale
+    // still stands (never rolled back) but we warn that nobody was notified.
+    const emp = allEmployees.find(e => e.id === data.employee_id);
+    if (emp && emp.telegram_chat_id) {
+      showToast('✅ Marked as sold — employee notified via Telegram.','ok');
+    } else {
+      showToast('✅ Marked as sold. ⚠ Employee has no Telegram ID — no notification was sent.','ok');
+    }
+
+    await loadStock();
+  } catch (e) {
+    showToast('Could not mark as sold: '+(e?.message||e),'err');
+  } finally {
+    isMarkingSold = false;
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = origTxt || '✅ Confirm sold'; }
+  }
 }
 
 /* ─── ISSUE ─────────────────────────────────────────── */
@@ -1954,6 +2143,9 @@ window.exportJSON         = exportJSON;
 window.exportCSV          = exportCSV;
 window.closeModal         = closeModal;
 window.renderLedger       = renderLedger;
+window.showMoreLedger     = showMoreLedger;
+window.onLedgerSearch     = onLedgerSearch;
+window.clearLedgerSearch  = clearLedgerSearch;
 window.jumpToFilter       = jumpToFilter;
 window.hideOwnerMessage   = hideOwnerMessage;
 window.deleteOwnerMessage = deleteOwnerMessage;
