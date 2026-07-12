@@ -38,12 +38,14 @@ A real-time two-interface stock tracking system built with plain HTML, CSS, vani
 ```js
 const SUPABASE_URL      = "https://your-project.supabase.co";
 const SUPABASE_ANON_KEY = "eyJ...";  // your anon/public key
-const OWNER_PIN         = "1234";    // change this to your preferred PIN
 const DEFAULT_EMPLOYEE_CODE = "EMP-001";
 ```
 
 - Find your URL and anon key in **Project Settings → API** inside Supabase.
 - **Never put the `service_role` key in browser code.**
+- Owner access uses Supabase Auth (email/password), not a PIN. Follow
+  `docs/SECURITY_OWNER_AUTH_SETUP.md` to run the auth-foundation migration
+  and provision the owner account.
 
 ### 4. Enable Realtime
 
@@ -65,7 +67,7 @@ Both files load `supabase-config.js` from the same directory — keep all files 
 
 ## How the Owner uses it
 
-1. Open `owner.html` and enter the owner PIN.
+1. Open `owner.html` and sign in with the owner's Supabase Auth email/password.
 2. **Add an employee** under the Employees section.
 3. **Add stock units** — enter the Stock ID, assign to employee, set upload date.
    - Order ID is intentionally left blank at this stage. It is only assigned when a sale is approved.
@@ -138,14 +140,18 @@ This is not implemented yet. No photo upload buttons exist in the current UI.
 
 ## Security notes
 
-The current version is a **prototype**. The owner PIN is a local JavaScript variable — anyone with browser DevTools can bypass it.
+**Phase 1B (current):** `owner.html` requires Supabase Auth sign-in
+(email/password) plus a `public.profiles` row with `role = 'owner'` for the
+signed-in user — see `docs/SECURITY_OWNER_AUTH_SETUP.md`. There is no owner
+PIN or other client-side secret anymore; unauthorized accounts are signed out
+automatically and never see dashboard data.
 
-**Real security requires:**
-- Supabase Auth (email/password or OAuth login)
-- Row Level Security (RLS) policies on all tables
-- Employee accounts that can only see and update their own stock units
-- Owner accounts with full access
-
-The schema.sql includes commented-out RLS examples. Enable them once Supabase Auth is configured.
+**This is not yet complete backend security.** Owner login protects the
+`owner.html` *UI*, but Row Level Security is still **not enabled** on the
+business tables (`employees`, `stock_units`, `stock_events`, `stock_types`,
+`salary_payouts`, `owner_messages`). Direct REST/API access with the public
+anon key is not yet fully restricted at the database level — that is Phase 2
+(business-table RLS), which is still required before this can be called
+complete backend security.
 
 **Never put the `service_role` key in browser code.** Only the anon key belongs in client-side JavaScript.

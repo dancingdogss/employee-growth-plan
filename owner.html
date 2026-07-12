@@ -36,17 +36,16 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .hero-mark{width:38px;height:38px;flex-shrink:0;background:linear-gradient(135deg,var(--a2) 0%,var(--purple) 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
 .hero-txt h1{font-size:15px;font-weight:700;letter-spacing:-.2px;margin-bottom:2px;}
 .hero-txt p{color:var(--muted);font-size:11px;line-height:1.45;}
-/* PIN */
-.pin-gate{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
-.pin-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:28px 22px;width:100%;max-width:320px;text-align:center;}
-.pin-box h2{font-size:16px;font-weight:700;margin-bottom:6px;}
-.pin-box p{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:18px;}
-.pin-input{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:20px;padding:12px;outline:none;text-align:center;letter-spacing:6px;margin-bottom:10px;transition:border-color .2s;}
-.pin-input:focus{border-color:rgba(91,106,240,.5);}
-.pin-btn{width:100%;background:linear-gradient(135deg,rgba(91,106,240,.14),rgba(91,106,240,.07));border:1px solid rgba(91,106,240,.32);border-radius:10px;color:var(--a2);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;padding:12px;cursor:pointer;transition:all .14s;}
-.pin-btn:hover{background:linear-gradient(135deg,rgba(91,106,240,.22),rgba(91,106,240,.12));}
-.pin-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-top:8px;}
-.pin-note{font-size:10px;color:var(--muted);margin-top:12px;line-height:1.55;}
+/* AUTH */
+.auth-gate{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.auth-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:28px 22px;width:100%;max-width:340px;text-align:center;}
+.auth-box h2{font-size:16px;font-weight:700;margin-bottom:6px;}
+.auth-box p{font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:18px;}
+.auth-form{display:flex;flex-direction:column;gap:10px;text-align:left;}
+.auth-err{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);margin-top:10px;min-height:14px;line-height:1.5;}
+.auth-note{font-size:10px;color:var(--muted);margin-top:14px;line-height:1.55;}
+.auth-signout-btn{font-family:'DM Mono',monospace;font-size:10px;padding:6px 11px;border-radius:8px;border:1px solid var(--bd);background:var(--s1);color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .14s;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.auth-signout-btn:hover{color:var(--text);border-color:var(--bd2);}
 /* SECURITY */
 .sec-banner{background:rgba(240,96,112,.07);border:1px solid rgba(240,96,112,.22);border-radius:var(--r);padding:10px 13px;font-size:11px;color:var(--t2);line-height:1.55;margin-bottom:16px;}
 .sec-banner strong{color:var(--red);}
@@ -138,7 +137,8 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 .ord-card:last-child{margin-bottom:0;}
 .oc-top{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--bd);gap:8px;flex-wrap:wrap;}
 .oc-ids{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;}
-.oc-sid{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.oc-sid{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
+.oc-ref{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);opacity:.7;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .oc-oid{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:99px;background:var(--s1);border:1px solid var(--bd);}
 .oc-oid.has{color:var(--accent);}.oc-oid.no{color:var(--muted);}
 .oc-emp{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);padding:2px 7px;border-radius:99px;background:var(--s3);border:1px solid var(--bd2);}
@@ -386,19 +386,29 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 </head>
 <body>
 
-<!-- PIN GATE -->
-<div class="pin-gate" id="pinGate">
-  <div class="pin-box">
+<!-- AUTH GATE -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
     <div style="font-size:28px;margin-bottom:10px">🛡</div>
     <h2>Owner Dashboard</h2>
-    <p>Enter your owner PIN to access the dashboard.</p>
-    <input class="pin-input" type="password" id="pinInput" maxlength="12" placeholder="••••">
-    <button class="pin-btn" onclick="tryPin()">Unlock dashboard</button>
-    <div class="pin-err" id="pinErr"></div>
-    <div class="pin-note">⚠ Real security requires Supabase Auth + Row Level Security.</div>
+    <p>Owner access. Sign in with your authorized account.</p>
+    <form class="auth-form" id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" autocomplete="current-password" required>
+      </div>
+      <button class="btn-primary" type="submit" id="loginBtn">Sign in</button>
+    </form>
+    <div class="auth-err" id="authErr"></div>
+    <div class="auth-note">Owner accounts are provisioned manually. There is no self-service signup.</div>
   </div>
 </div>
 
+<div id="ownerApp" style="display:none">
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
@@ -423,12 +433,13 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
       <button class="npill" data-target="sec-stats">Stats</button>
     </div>
     <div class="conn-dot" id="connDot"></div>
+    <button class="auth-signout-btn" onclick="signOutOwner()">Sign out</button>
   </div>
 </div>
 
 <div class="page">
 <div class="section">
-  <div class="sec-banner"><strong>⚠ Security notice:</strong> This dashboard has no real server-side authentication. Real security requires Supabase Auth + Row Level Security.</div>
+  <div class="sec-banner"><strong>⚠ Security notice:</strong> Owner login now requires Supabase Auth plus a verified <code>profiles.role = 'owner'</code> row, which protects this dashboard UI. Business-table Row Level Security (employees, stock_units, stock_events, salary_payouts, owner_messages) is <strong>not yet enabled</strong> — direct anon-key API access is not fully secured until Phase 2 RLS ships. This phase is not complete backend security.</div>
 </div>
 
 <!-- A. OVERVIEW -->
@@ -537,67 +548,33 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 <div class="section" id="sec-addstock">
   <div class="slbl">// Add stock</div>
   <div style="margin-bottom:8px">
-    <div class="coll-hd" id="addStockHead" onclick="toggleColl('addStock')">
-      <div class="coll-title"><span>📦 New stock unit</span></div>
+    <div class="coll-hd open" id="addStockHead" onclick="toggleColl('addStock')">
+      <div class="coll-title"><span>📦 Add stock</span></div>
       <span class="coll-arr">▼</span>
     </div>
-    <div class="coll-body" id="addStockBody">
+    <div class="coll-body open" id="addStockBody">
       <div class="coll-inner">
-        <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Order ID is assigned only when sold — do not enter it here.</p>
+        <p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Enter a stock name and how many units to create. Each unit becomes a separate sellable record — you never enter a Stock ID or number range; internal references are generated automatically. Order ID is assigned only when sold.</p>
         <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Stock Type *</label>
-            <select class="form-select" id="sf-type" onchange="onSingleTypeChange()">
-              <option value="">Select type</option>
-            </select>
-          </div>
           <div class="form-row">
+            <div class="form-group"><label class="form-label">Assign to employee *</label><select class="form-select" id="sf-emp" onchange="updateAddPreview()"><option value="">Select employee</option></select></div>
             <div class="form-group">
-              <label class="form-label">Stock ID *</label>
-              <input class="form-input" id="sf-stock" type="text" placeholder="C-0001" oninput="validateStockIdPrefix('sf-stock','sf-type','sf-stock-warn')">
-              <div class="form-warn" id="sf-stock-warn">Stock ID must start with the selected type prefix (e.g. C-, B-, M-)</div>
+              <label class="form-label">Stock Type *</label>
+              <select class="form-select" id="sf-type" onchange="updateAddPreview()">
+                <option value="">Select type</option>
+              </select>
             </div>
-            <div class="form-group"><label class="form-label">Assign to employee *</label><select class="form-select" id="sf-emp"><option value="">Select employee</option></select></div>
           </div>
+          <div class="form-group"><label class="form-label">Stock name *</label><input class="form-input" id="sf-name" type="text" maxlength="120" placeholder="e.g. Blue Hoodie" oninput="updateAddPreview()"></div>
+          <div class="form-group"><label class="form-label">Number of stock units *</label><input class="form-input" id="sf-qty" type="number" min="1" max="500" step="1" value="1" oninput="updateAddPreview()"></div>
           <div class="form-group"><label class="form-label">Uploaded at *</label><input class="form-input" id="sf-upload" type="datetime-local"></div>
-          <div class="form-group"><label class="form-label">Owner notes (optional)</label><textarea class="form-textarea" id="sf-notes" placeholder="Notes..."></textarea></div>
-          <button class="btn-primary" onclick="addStockUnit()">+ Add stock unit</button>
+          <div class="form-group"><label class="form-label">Owner note (optional)</label><textarea class="form-textarea" id="sf-notes" placeholder="Notes..."></textarea></div>
+          <div class="info-box" id="sf-preview" style="display:none"></div>
+          <button class="btn-primary" id="sf-btn" onclick="createStockUnits()">+ Create stock units</button>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="coll-hd" id="bulkHead" onclick="toggleColl('bulk')" style="margin-top:8px">
-    <div class="coll-title"><span>📦 Bulk replenish (create many)</span></div>
-    <span class="coll-arr">▼</span>
-  </div>
-  <div class="coll-body" id="bulkBody">
-      <div class="coll-inner">
-        <div class="info-box" style="margin-bottom:12px">
-          <strong>How bulk replenish works:</strong><br>
-          Select a stock type, starting number, and how many units to create.<br>
-          Example: Type <strong>B</strong>, start <strong>1</strong>, quantity <strong>4</strong> → creates B-0001, B-0002, B-0003, B-0004.<br>
-          Each B unit = <strong>10 physical items</strong> (1 sale event = 100 earnings).<br>
-          Each M unit = <strong>5 physical items</strong> (1 sale event = 100 earnings).<br>
-          Each C unit = <strong>1 physical item</strong> (1 sale event = 100 earnings).<br>
-          Existing stock IDs are skipped — no duplicates created.
-        </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Assign to employee *</label><select class="form-select" id="bk-emp"><option value="">Select employee</option></select></div>
-            <div class="form-group"><label class="form-label">Stock Type *</label><select class="form-select" id="bk-type" onchange="onBulkTypeChange()"><option value="">Select type</option></select></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Starting number *</label><input class="form-input" id="bk-start" type="number" min="1" placeholder="1"></div>
-            <div class="form-group"><label class="form-label">Quantity to create *</label><input class="form-input" id="bk-qty" type="number" min="1" max="200" placeholder="10"></div>
-          </div>
-          <div class="form-group"><label class="form-label">Uploaded at *</label><input class="form-input" id="bk-upload" type="datetime-local"></div>
-          <div class="form-group"><label class="form-label">Owner notes (optional)</label><textarea class="form-textarea" id="bk-notes" placeholder="Batch note..."></textarea></div>
-          <div class="info-box" id="bk-preview" style="display:none"></div>
-          <button class="btn-primary" id="bk-btn" onclick="bulkAddStock()">📦 Create stock units</button>
-        </div>
-      </div>
-    </div>
 </div>
 
 <!-- E. LEDGER -->
@@ -760,9 +737,10 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
     <div class="modal-ttl"><span>✏ Edit stock unit</span><button class="modal-close" onclick="closeModal('editModal')">✕</button></div>
     <div class="form-grid">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Stock ID *</label><input class="form-input" id="em-stock" type="text"></div>
+        <div class="form-group"><label class="form-label">Stock name *</label><input class="form-input" id="em-name" type="text" maxlength="120" placeholder="e.g. Blue Hoodie"></div>
         <div class="form-group"><label class="form-label">Order ID (if known)</label><input class="form-input" id="em-order" type="text" placeholder="Leave blank if unknown"></div>
       </div>
+      <div class="form-group"><label class="form-label">Internal reference (read-only)</label><input class="form-input" id="em-stock" type="text" readonly style="opacity:.6;cursor:not-allowed"></div>
       <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="em-status">
         <option value="waiting_to_be_sold">🟡 Waiting to be sold</option>
         <option value="sold_approved">✅ Approved sold</option>
@@ -780,6 +758,7 @@ body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-he
 </div>
 
 <div class="toast" id="toast"></div>
+</div><!-- end #ownerApp -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
@@ -813,10 +792,11 @@ document.querySelectorAll('[data-target]').forEach(btn => {
 if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
   console.error('owner.html: Missing Supabase config. Check supabase-config.js');
 }
-const OWNER_PIN_SAFE = window.OWNER_PIN || '1234';
 
 /* ─── SUPABASE ──────────────────────────────────────── */
-const _sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+const _sb = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY)
+  ? supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
+  : null;
 
 /* ─── STATE ─────────────────────────────────────────── */
 let allStock        = [];
@@ -826,8 +806,7 @@ let stockTypes      = [];
 let ledgerFilter    = 'waiting_to_be_sold';   // default primary view: Current stock
 let actionId        = null;
 let realtimeChannel = null;
-let isAddingStock      = false;
-let isBulkAdding       = false;
+let isAddingStock      = false;                // guards against double-submit of Add stock
 let isMarkingSold      = false;                // guards against double-submit of Mark-as-sold
 let allOwnerMessages   = [];
 let ownerMsgShowHidden = false;
@@ -882,22 +861,161 @@ function typePillCls(prefix) {
   return 'tp-c';
 }
 
-/* ─── PIN ───────────────────────────────────────────── */
-function tryPin() {
-  const val = document.getElementById('pinInput').value;
-  if (val === OWNER_PIN_SAFE) {
-    document.getElementById('pinGate').style.display = 'none';
-    init();
-  } else {
-    document.getElementById('pinErr').textContent = 'Incorrect PIN. Try again.';
-    document.getElementById('pinInput').value = '';
+/* ─── STOCK LABELS ──────────────────────────────────── */
+// Primary, user-facing label for a stock unit. Prefers the owner-entered
+// stock_name; legacy rows created before Phase 1C have no stock_name, so we
+// fall back to the internal stock_id (stock_name || stock_id). Never blank.
+function stockLabel(u) {
+  const name = (u && u.stock_name != null) ? String(u.stock_name).trim() : '';
+  return name || (u && u.stock_id) || '—';
+}
+// Internal reference — shown only as small secondary/audit text, never as the
+// main label. Returns '' when it would just duplicate the visible name.
+function stockRef(u) {
+  const ref = (u && u.stock_id) ? String(u.stock_id) : '';
+  return ref && ref !== stockLabel(u) ? ref : '';
+}
+
+/* ─── AUTH ──────────────────────────────────────────── */
+let currentOwnerUser     = null;
+let dashboardInitialized = false;
+let authBusy             = false;
+let loginInFlight        = false;
+
+const authGateEl   = document.getElementById('authGate');
+const ownerAppEl   = document.getElementById('ownerApp');
+const loginFormEl  = document.getElementById('loginForm');
+const loginEmailEl = document.getElementById('loginEmail');
+const loginPassEl  = document.getElementById('loginPassword');
+const loginBtnEl   = document.getElementById('loginBtn');
+const authErrEl    = document.getElementById('authErr');
+
+function setAuthError(msg) { authErrEl.textContent = msg || ''; }
+function setFormBusy(busy) {
+  loginEmailEl.disabled  = busy;
+  loginPassEl.disabled   = busy;
+  loginBtnEl.disabled    = busy;
+  loginBtnEl.textContent = busy ? 'Signing in…' : 'Sign in';
+}
+function showAuthGate() { authGateEl.style.display = 'flex'; }
+function hideAuthGate() { authGateEl.style.display = 'none'; }
+function showOwnerApp() { ownerAppEl.style.display = ''; }
+function hideOwnerApp() { ownerAppEl.style.display = 'none'; }
+
+// Idempotent: safe to call repeatedly (e.g. redundant auth events) — only the
+// first call runs init(); later calls just ensure the UI reflects reality.
+async function initOwnerDashboardOnce() {
+  if (dashboardInitialized) { hideAuthGate(); showOwnerApp(); return; }
+  dashboardInitialized = true;
+  setAuthError('');
+  hideAuthGate();
+  showOwnerApp();
+  await init();
+}
+
+// Reverses initOwnerDashboardOnce(): drops realtime + in-memory state and
+// returns to the login screen. Triggered by sign-out or an unauthorized user.
+function teardownOwnerDashboard() {
+  if (realtimeChannel) { _sb.removeChannel(realtimeChannel); realtimeChannel = null; }
+  dashboardInitialized = false;
+  currentOwnerUser = null;
+  allStock = []; allEmployees = []; allPayouts = []; allOwnerMessages = [];
+  hideOwnerApp();
+  showAuthGate();
+}
+
+// Authorization is the profiles.role = 'owner' row, never the mere presence
+// of a session, and never user_metadata or email.
+async function handleAuthenticatedUser(user) {
+  if (authBusy) return;
+  authBusy = true;
+  try {
+    let isOwner = false;
+    try {
+      const { data, error } = await _sb
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+      isOwner = !error && !!data && data.role === 'owner';
+    } catch (e) {
+      isOwner = false;
+    }
+    if (!isOwner) {
+      await _sb.auth.signOut();
+      showAuthGate();
+      setAuthError('This account is not authorized for owner access.');
+      return;
+    }
+    currentOwnerUser = user;
+    await initOwnerDashboardOnce();
+  } finally {
+    authBusy = false;
   }
 }
-document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key==='Enter') tryPin(); });
+
+async function signOutOwner() {
+  if (!_sb) return;
+  await _sb.auth.signOut();
+}
+window.signOutOwner = signOutOwner;
+
+loginFormEl?.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (loginInFlight || !_sb) return;
+  loginInFlight = true;
+  setAuthError('');
+  setFormBusy(true);
+  const email    = loginEmailEl.value.trim();
+  const password = loginPassEl.value;
+  const { error } = await _sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    setAuthError('Invalid email or password.');
+    setFormBusy(false);
+    loginInFlight = false;
+    return;
+  }
+  loginPassEl.value = '';
+  loginInFlight = false;
+  // Success falls through to the onAuthStateChange('SIGNED_IN') listener,
+  // which is the single place that validates the owner role and initializes
+  // the dashboard — avoids duplicating that logic here.
+});
+
+if (_sb) {
+  _sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) {
+      handleAuthenticatedUser(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      teardownOwnerDashboard();
+      setFormBusy(false);
+    }
+  });
+} else {
+  setAuthError('Configuration error. Contact the administrator.');
+  setFormBusy(true);
+}
 
 /* ─── BOOT ──────────────────────────────────────────── */
+// Restores an existing session on page load. Ongoing changes (sign in from
+// the form, sign out) are handled by the onAuthStateChange listener above —
+// this runs once and only covers the initial page load.
+async function boot() {
+  if (!_sb) return;
+  setFormBusy(true);
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session?.user) {
+      await handleAuthenticatedUser(session.user);
+    }
+  } finally {
+    if (!dashboardInitialized) setFormBusy(false);
+  }
+}
+boot();
+
 async function init() {
-  setNow('sf-upload'); setNow('bk-upload'); setNow('po-paidat');
+  setNow('sf-upload'); setNow('po-paidat');
   await Promise.all([loadStockTypes(), loadEmployees()]);
   await Promise.all([loadStock(), loadPayouts(), loadOwnerMessages()]);
   setupRealtime();
@@ -913,58 +1031,39 @@ async function loadStockTypes() {
 function populateTypeSelects() {
   const types = stockTypes.length ? stockTypes : Object.values(TYPE_FALLBACK);
   const opts = types.map(t =>
-    `<option value="${t.id||t.prefix}" data-prefix="${t.prefix}" data-qty="${t.quantity_per_stock_sale}" data-cap="${t.capital_per_stock_sale}">${t.prefix} — ${t.name} — ${t.capital_per_stock_sale}×${t.quantity_per_stock_sale}</option>`
+    `<option value="${t.id||t.prefix}" data-prefix="${t.prefix}" data-qty="${t.quantity_per_stock_sale}" data-cap="${t.capital_per_stock_sale}" data-earn="${t.earnings_per_approved_sale||100}">${t.prefix} — ${t.name} — ${t.capital_per_stock_sale}×${t.quantity_per_stock_sale}</option>`
   ).join('');
-  ['sf-type','bk-type'].forEach(id => {
+  ['sf-type'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<option value="">Select type</option>' + opts;
   });
 }
 
-function onSingleTypeChange() {
-  const sel = document.getElementById('sf-type');
-  const opt = sel.options[sel.selectedIndex];
+// Live preview for the unified add-stock form. Pure display: shows how many
+// separate unit rows will be created, the physical-item total they represent,
+// and the potential total earnings. Never touches the database.
+function updateAddPreview() {
+  const sel  = document.getElementById('sf-type');
+  const opt  = sel.options[sel.selectedIndex];
   const prefix = opt?.dataset?.prefix || '';
-  const stockInp = document.getElementById('sf-stock');
-  if (prefix && stockInp.value === '') stockInp.placeholder = prefix + '-0001';
-}
-
-function onBulkTypeChange() { updateBulkPreview(); }
-
-function updateBulkPreview() {
-  const sel = document.getElementById('bk-type');
-  const opt = sel.options[sel.selectedIndex];
-  const prefix = opt?.dataset?.prefix || '';
-  const qty  = parseInt(document.getElementById('bk-qty').value) || 0;
-  const start= parseInt(document.getElementById('bk-start').value) || 1;
-  const prev = document.getElementById('bk-preview');
-  if (!prefix || !qty) { prev.style.display='none'; return; }
-  const cap     = opt?.dataset?.cap || '?';
-  const qtyPhys = opt?.dataset?.qty || '?';
-  const end  = start + qty - 1;
-  const first= prefix + '-' + String(start).padStart(4,'0');
-  const last = prefix + '-' + String(end).padStart(4,'0');
+  const name = document.getElementById('sf-name').value.trim();
+  const qty  = parseInt(document.getElementById('sf-qty').value, 10) || 0;
+  const empSel = document.getElementById('sf-emp');
+  const empName = empSel.options[empSel.selectedIndex]?.textContent?.trim() || '';
+  const prev = document.getElementById('sf-preview');
+  if (!prefix || !name || qty < 1) { prev.style.display = 'none'; return; }
+  const qtyPhys = parseInt(opt?.dataset?.qty, 10) || 1;
+  const earn    = parseInt(opt?.dataset?.earn, 10) || 100;
+  const physTotal = qty * qtyPhys;
+  const earnTotal = qty * earn;
   prev.style.display = 'block';
-  prev.innerHTML = `<strong>Preview:</strong> ${first} → ${last} (${qty} stock unit${qty===1?'':'s'})<br>
-    Each unit: <strong>${qtyPhys} physical item${qtyPhys>1?'s':''}</strong>, capital <strong>${cap} coins</strong>, earnings <strong>100 coins</strong> per approved sale.<br>
-    Total capital: <strong>${qty * parseInt(cap)} coins</strong>`;
-}
-
-['bk-qty','bk-start'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', updateBulkPreview);
-});
-
-function validateStockIdPrefix(stockInputId, typeSelectId, warnId) {
-  const stockEl = document.getElementById(stockInputId);
-  const typeEl  = document.getElementById(typeSelectId);
-  const warnEl  = document.getElementById(warnId);
-  const opt = typeEl?.options[typeEl?.selectedIndex];
-  const prefix = opt?.dataset?.prefix || '';
-  if (!prefix || !stockEl.value) { warnEl.style.display='none'; return true; }
-  const ok = stockEl.value.toUpperCase().startsWith(prefix + '-');
-  warnEl.style.display = ok ? 'none' : 'block';
-  return ok;
+  prev.innerHTML =
+    `<strong>${qty} stock unit${qty===1?'':'s'}</strong> will be created` +
+    ` · <strong>${esc(name)}</strong>` +
+    (empName ? ` · ${esc(empName)}` : '') +
+    ` · Type <strong>${esc(prefix)}</strong><br>` +
+    (qtyPhys > 1 ? `Physical items represented: <strong>${qty} × ${qtyPhys} = ${fmt(physTotal)}</strong><br>` : '') +
+    `Potential earnings: <strong>${qty} × ${earn} = ${fmt(earnTotal)} coins</strong>`;
 }
 
 /* ─── EMPLOYEES ─────────────────────────────────────── */
@@ -1050,7 +1149,7 @@ function openEmpDashboard(btn) {
 
 function populateEmpSelects() {
   const opts = allEmployees.filter(e=>e.active).map(e=>`<option value="${e.id}">${esc(e.name)} (${esc(e.employee_code)})</option>`).join('');
-  ['sf-emp','bk-emp','po-emp','empFilterSel'].forEach(id => {
+  ['sf-emp','po-emp','empFilterSel'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const prefix = id === 'empFilterSel' ? '<option value="">All employees</option>' : '<option value="">Select employee</option>';
@@ -1245,92 +1344,58 @@ async function loadStock() {
   renderAll();
 }
 
-/* ─── ADD SINGLE STOCK ──────────────────────────────── */
-async function addStockUnit() {
+/* ─── ADD STOCK (unified name + quantity) ───────────── */
+// One form, one server call. Quantity 1 creates one unit; quantity > 1 creates
+// that many separate sellable rows — each with the same user-facing stock_name
+// and its own auto-generated internal stock_id. All rows plus their 'created'
+// audit events are written atomically by the owner-only RPC create_stock_units;
+// the browser never loops inserts and never manages Stock IDs or number ranges.
+async function createStockUnits() {
   if (isAddingStock) return;
-  if (!validateStockIdPrefix('sf-stock','sf-type','sf-stock-warn')) {
-    showToast('Stock ID prefix does not match selected type','err'); return;
-  }
-  const typeVal  = document.getElementById('sf-type').value;
-  const stockId  = document.getElementById('sf-stock').value.trim();
-  const empId    = document.getElementById('sf-emp').value;
-  const uploadAt = document.getElementById('sf-upload').value;
-  const notes    = document.getElementById('sf-notes').value.trim();
-  if (!typeVal)  { showToast('Select a stock type','err'); return; }
-  if (!stockId)  { showToast('Stock ID required','err'); return; }
-  if (!empId)    { showToast('Select an employee','err'); return; }
-  if (!uploadAt) { showToast('Uploaded at required','err'); return; }
+  const typeVal   = document.getElementById('sf-type').value;
+  const stockName = document.getElementById('sf-name').value.trim();
+  const qty       = parseInt(document.getElementById('sf-qty').value, 10);
+  const empId     = document.getElementById('sf-emp').value;
+  const uploadAt  = document.getElementById('sf-upload').value;
+  const notes     = document.getElementById('sf-notes').value.trim();
+  if (!empId)                              { showToast('Select an employee','err'); return; }
+  if (!typeVal)                            { showToast('Select a stock type','err'); return; }
+  if (!stockName)                          { showToast('Stock name required','err'); return; }
+  if (stockName.length > 120)              { showToast('Stock name too long (max 120)','err'); return; }
+  if (!Number.isInteger(qty) || qty < 1)   { showToast('Quantity must be a whole number ≥ 1','err'); return; }
+  if (qty > 500)                           { showToast('Max 500 units per operation','err'); return; }
+  if (!uploadAt)                           { showToast('Uploaded at required','err'); return; }
   const typeRow = stockTypes.find(t => t.id === typeVal || t.prefix === typeVal);
   const typeId  = typeRow?.id || null;
+  if (!typeId) { showToast('Unknown stock type','err'); return; }
+
   isAddingStock = true;
-  const btn = document.querySelector('#addStockBody .btn-primary');
+  const btn = document.getElementById('sf-btn');
   const orig = btn?.textContent;
-  if (btn) { btn.disabled=true; btn.textContent='Adding…'; }
+  if (btn) { btn.disabled = true; btn.textContent = `Creating ${qty} unit${qty===1?'':'s'}…`; }
   try {
-    const { data, error } = await _sb.from('stock_units').insert({
-      stock_id: stockId, employee_id: empId,
-      uploaded_at: new Date(uploadAt).toISOString(),
-      owner_note: notes||null, status: 'waiting_to_be_sold',
-      stock_type_id: typeId
-    }).select().single();
-    if (error) { showToast('Error: '+error.message,'err'); return; }
-    _sb.from('stock_events').insert({ stock_unit_id:data.id, event_type:'created', actor:'owner' }).then(()=>{});
-    ['sf-stock','sf-notes'].forEach(id=>{ document.getElementById(id).value=''; });
+    const { data, error } = await _sb.rpc('create_stock_units', {
+      p_employee_id:   empId,
+      p_stock_type_id: typeId,
+      p_stock_name:    stockName,
+      p_quantity:      qty,
+      p_uploaded_at:   new Date(uploadAt).toISOString(),
+      p_owner_note:    notes || null
+    });
+    // On failure we create NO local records and surface a real error.
+    if (error) { showToast('Could not create stock: '+error.message,'err'); return; }
+    const created = (data && (data.created_count ?? data.count)) ?? qty;
+    const empName = allEmployees.find(e => e.id === empId)?.name || 'employee';
+    showToast(`Created ${created} × ${stockName} for ${empName}`, 'ok');
+    // Reset only after confirmed success.
+    ['sf-name','sf-notes'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('sf-qty').value = '1';
+    document.getElementById('sf-preview').style.display = 'none';
     setNow('sf-upload');
-    showToast('Stock unit added!','ok');
     await loadStock();
   } finally {
     isAddingStock = false;
-    if (btn) { btn.disabled=false; btn.textContent=orig; }
-  }
-}
-
-/* ─── BULK ADD ──────────────────────────────────────── */
-async function bulkAddStock() {
-  if (isBulkAdding) return;
-  const typeVal  = document.getElementById('bk-type').value;
-  const empId    = document.getElementById('bk-emp').value;
-  const start    = parseInt(document.getElementById('bk-start').value);
-  const qty      = parseInt(document.getElementById('bk-qty').value);
-  const uploadAt = document.getElementById('bk-upload').value;
-  const notes    = document.getElementById('bk-notes').value.trim();
-  if (!typeVal)            { showToast('Select a stock type','err'); return; }
-  if (!empId)              { showToast('Select an employee','err'); return; }
-  if (!start || start < 1) { showToast('Starting number must be ≥ 1','err'); return; }
-  if (!qty || qty < 1)     { showToast('Quantity must be ≥ 1','err'); return; }
-  if (qty > 200)           { showToast('Max 200 units per batch','err'); return; }
-  if (!uploadAt)           { showToast('Uploaded at required','err'); return; }
-  const typeRow = stockTypes.find(t => t.id === typeVal || t.prefix === typeVal);
-  const typeId  = typeRow?.id || null;
-  const prefix  = typeRow?.prefix || typeVal.split('-')[0];
-  const candidates = [];
-  for (let i = 0; i < qty; i++) candidates.push(prefix + '-' + String(start + i).padStart(4,'0'));
-  const { data: existing } = await _sb.from('stock_units').select('stock_id').in('stock_id', candidates);
-  const existingSet = new Set((existing||[]).map(r=>r.stock_id));
-  const toCreate = candidates.filter(id => !existingSet.has(id));
-  if (!toCreate.length) { showToast('All stock IDs in this range already exist — none created.','err'); return; }
-  isBulkAdding = true;
-  const btn = document.getElementById('bk-btn');
-  const orig = btn?.textContent;
-  if (btn) { btn.disabled=true; btn.textContent=`Creating ${toCreate.length} units…`; }
-  try {
-    const rows = toCreate.map(sid => ({
-      stock_id: sid, employee_id: empId,
-      uploaded_at: new Date(uploadAt).toISOString(),
-      owner_note: notes||null, status: 'waiting_to_be_sold',
-      stock_type_id: typeId
-    }));
-    const { error } = await _sb.from('stock_units').insert(rows);
-    if (error) { showToast('Error: '+error.message,'err'); return; }
-    const skipped = candidates.length - toCreate.length;
-    showToast(`✅ Created ${toCreate.length} units${skipped?' ('+skipped+' skipped)':''}`, 'ok');
-    ['bk-notes'].forEach(id=>{ document.getElementById(id).value=''; });
-    document.getElementById('bk-preview').style.display='none';
-    setNow('bk-upload');
-    await loadStock();
-  } finally {
-    isBulkAdding = false;
-    if (btn) { btn.disabled=false; btn.textContent=orig; }
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
   }
 }
 
@@ -1514,12 +1579,13 @@ function getFilteredFrom(rows) {
   const q   = (document.getElementById('searchInp')||{value:''}).value.trim().toLowerCase();
   const empF= (document.getElementById('empFilterSel')||{value:''}).value;
   return rows.filter(u => {
-    // Case-insensitive search across stock ID, order ID, employee name,
-    // employee code and stock type/prefix. Runs on the COMPLETE dataset
-    // (before pagination) so matches outside the rendered page are found.
+    // Case-insensitive search across stock name, internal stock reference,
+    // order ID, employee name, employee code and stock type/prefix. Runs on the
+    // COMPLETE dataset (before pagination) so matches outside the rendered page
+    // are found.
     if (q) {
       const hay = [
-        u.stock_id, u.order_id,
+        u.stock_name, u.stock_id, u.order_id,
         u.employees?.name, u.employees?.employee_code,
         getStockPrefix(u), getStockType(u).name
       ];
@@ -1704,7 +1770,8 @@ function stockCardHtml(u) {
   <div class="ord-card ${m.cls}">
     <div class="oc-top">
       <div class="oc-ids">
-        <span class="oc-sid">${esc(u.stock_id)}</span>
+        <span class="oc-sid">${esc(stockLabel(u))}</span>
+        ${stockRef(u) ? `<span class="oc-ref" title="Internal reference">${esc(stockRef(u))}</span>` : ''}
         ${oidHtml}
         <span class="oc-emp">${empName}</span>
       </div>
@@ -1729,7 +1796,7 @@ function stockCardHtml(u) {
     ${ownerNote}
     ${seenRow}
     <div class="oc-actions">
-      ${canMarkSold?`<button class="oc-btn b-marksold" onclick="openMarkSold('${u.id}','${esc(u.stock_id)}')">✅ Mark as sold</button>`:''}
+      ${canMarkSold?`<button class="oc-btn b-marksold" onclick="openMarkSold('${u.id}')">✅ Mark as sold</button>`:''}
       ${canIssue?`<button class="oc-btn b-issue" onclick="openIssue('${u.id}')">🔴 Flag issue</button>`:''}
       ${canReset?`<button class="oc-btn b-wait" onclick="setStatus('${u.id}','waiting_to_be_sold','Reset to waiting')">🟡 Reset</button>`:''}
       <button class="oc-btn b-edit" onclick="openEdit('${u.id}')">✏ Edit</button>
@@ -1740,9 +1807,10 @@ function stockCardHtml(u) {
 }
 
 /* ─── MARK AS SOLD ──────────────────────────────────── */
-function openMarkSold(id, stockId) {
+function openMarkSold(id) {
   actionId = id;
-  txt('ms-sid', stockId);
+  const u = allStock.find(x => x.id === id);
+  txt('ms-sid', u ? stockLabel(u) : id);
   document.getElementById('ms-order').value  = '';
   document.getElementById('ms-soldAt').value = new Date().toISOString().slice(0,16);
   document.getElementById('ms-note').value   = '';
@@ -1849,6 +1917,7 @@ function openEdit(id) {
   const u = allStock.find(x=>x.id===id);
   if (!u) return;
   actionId = id;
+  document.getElementById('em-name').value   = (u.stock_name!=null?u.stock_name:'') || u.stock_id || '';
   document.getElementById('em-stock').value  = u.stock_id||'';
   document.getElementById('em-order').value  = u.order_id||'';
   document.getElementById('em-status').value = u.status||'waiting_to_be_sold';
@@ -1858,13 +1927,16 @@ function openEdit(id) {
 }
 
 async function submitEdit() {
-  const stockId = document.getElementById('em-stock').value.trim();
+  const stockName = document.getElementById('em-name').value.trim();
   const orderId = document.getElementById('em-order').value.trim();
   const status  = document.getElementById('em-status').value;
   const soldAt  = document.getElementById('em-soldAt').value;
   const note    = document.getElementById('em-note').value.trim();
-  if (!stockId) { showToast('Stock ID required','err'); return; }
-  const updates = { stock_id:stockId, status, owner_note:note||null, updated_at:new Date().toISOString() };
+  if (!stockName) { showToast('Stock name required','err'); return; }
+  if (stockName.length > 120) { showToast('Stock name too long (max 120)','err'); return; }
+  // stock_id (internal reference) is never edited from the UI — it is generated
+  // once at creation and preserved for compatibility/audit.
+  const updates = { stock_name:stockName, status, owner_note:note||null, updated_at:new Date().toISOString() };
   updates.order_id = orderId||null;
   updates.sold_at  = soldAt?new Date(soldAt).toISOString():null;
   const { error } = await _sb.from('stock_units').update(updates).eq('id',actionId);
@@ -2050,7 +2122,7 @@ function copyReport() {
     L.push('','─────────────────────────────','APPROVED SALES THIS WEEK:','─────────────────────────────');
     s.approvedWeek.forEach((u,i) => {
       const t = getStockType(u);
-      L.push(`${i+1}. ${u.stock_id} | Order: ${u.order_id||'—'} | Type: ${getStockPrefix(u)} ×${t.quantity_per_stock_sale||1}`);
+      L.push(`${i+1}. ${stockLabel(u)} | Order: ${u.order_id||'—'} | Type: ${getStockPrefix(u)} ×${t.quantity_per_stock_sale||1}`);
       L.push(`   Employee : ${u.employees?.name||'—'}`);
       L.push(`   Sold     : ${formatDT(u.sold_at)}`);
       L.push(`   Approved : ${formatDT(u.approved_at)}`);
@@ -2060,7 +2132,7 @@ function copyReport() {
   if (notSeenList.length) {
     L.push('','─────────────────────────────','SOLD — NOT YET SEEN:','─────────────────────────────');
     notSeenList.forEach((u,i) => {
-      L.push(`${i+1}. ${u.stock_id} | Order: ${u.order_id||'—'} | ${u.employees?.name||'—'}`);
+      L.push(`${i+1}. ${stockLabel(u)} | Order: ${u.order_id||'—'} | ${u.employees?.name||'—'}`);
     });
   }
   L.push('═══════════════════════════════');
@@ -2074,11 +2146,11 @@ function exportJSON() {
 }
 function exportCSV() {
   const fl = getFiltered();
-  const headers = ['stock_id','order_id','type','physical_qty','capital','employee','status','uploaded_at','sold_at','approved_at','employee_seen_at','owner_note'];
+  const headers = ['stock_name','stock_id','order_id','type','physical_qty','capital','employee','status','uploaded_at','sold_at','approved_at','employee_seen_at','owner_note'];
   const rows = fl.map(u => {
     const t = getStockType(u);
     return [
-      u.stock_id||'', u.order_id||'', getStockPrefix(u)+'×'+(t.quantity_per_stock_sale||1),
+      stockLabel(u), u.stock_id||'', u.order_id||'', getStockPrefix(u)+'×'+(t.quantity_per_stock_sale||1),
       t.quantity_per_stock_sale||1, t.capital_per_stock_sale||300,
       u.employees?`${u.employees.name} (${u.employees.employee_code})`:'',
       u.status||'', u.uploaded_at||'', u.sold_at||'', u.approved_at||'',
@@ -2116,17 +2188,13 @@ function toggleColl(n) {
 }
 
 /* ─── WINDOW EXPORTS ────────────────────────────────── */
-window.tryPin             = tryPin;
 window.toggleColl         = toggleColl;
 window.addEmployee        = addEmployee;
 window.toggleEmpActive    = toggleEmpActive;
 window.setTelegramId      = setTelegramId;
 window.sendOwnerMessage   = sendOwnerMessage;
-window.addStockUnit       = addStockUnit;
-window.bulkAddStock       = bulkAddStock;
-window.onSingleTypeChange = onSingleTypeChange;
-window.onBulkTypeChange   = onBulkTypeChange;
-window.validateStockIdPrefix = validateStockIdPrefix;
+window.createStockUnits   = createStockUnits;
+window.updateAddPreview   = updateAddPreview;
 window.setFilter          = setFilter;
 window.openMarkSold       = openMarkSold;
 window.submitMarkSold     = submitMarkSold;
